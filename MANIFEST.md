@@ -81,6 +81,7 @@ All annotations are COCO format, 17 keypoints.
 | `slurm/train.sh [overrides]` | `train_adaptive_model_hrnet.py`, init DarkPose W48 | courses-gpu / v100-sxm2 / 8:00 | AUTO_RESUME on; resubmit to continue; sources `.env` for W&B |
 | `slurm/install_pkgs.sh <pkgs>` | pip install into env + import smoke test | short / CPU / 0:30 | login node kills pip |
 | `slurm/submit_run.sh <NAME> <TIME> [overrides]` | train + chained Test500f evals (best/final) | cluster | default root `data/syrip_fixed/` |
+| `slurm/make_real_only_data.sh` | build `data/syrip_fixed_200R/` (real-only train set) | either machine | G2 ablation |
 | `slurm/make_clean_data.sh` | build `data/syrip_clean/` symlink root | either machine | no copying |
 | `slurm/sync.sh push\|pull\|env` | rsync code -> cluster, results -> server, WANDB key -> cluster | server | no `--delete` |
 
@@ -103,6 +104,8 @@ All annotations are COCO format, 17 keypoints.
 | `tools/plot_curves.py` | Part 4.5 curves from TB logs | `figures/<run>_curves.png` |
 | `tools/visualize_preds.py` | Part 4 GT-vs-pred grids, per-keypoint similarity, pycocotools AP | `figures/viz/` |
 | `tools/wandb_smoke.py` | offline check of the W&B code path | — |
+| `tools/video_infer.py` | 7.3 video file / folder batch / webcam inference with tracking | `<out>/<name>_pose.mp4`, `_keypoints.jsonl/.csv` |
+| `docs/part3_model_notes.md`, `docs/part7_synthetic_and_apps.md` | Part 3 notes; 7.1 status + 7.3 results | — |
 
 Server copies of weights (git-ignored): `models/hrnet_fidip.pth`, `models/E1b/model_best.pth`. Figures are git-ignored (`figures/`).
 

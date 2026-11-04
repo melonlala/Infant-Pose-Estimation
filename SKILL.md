@@ -89,6 +89,7 @@ Keep this table and the `AGENT.md` summary table in sync whenever you submit, fi
 - Weights: `rsync explorer:/home/hou.yuchen/courses/eece7373/<ckpt> models/...` (git-ignored).
 - `tools/demo.py --image <img> --model models/hrnet_fidip.pth --output figures/demo/x.jpg`
 - `.venv-demo/bin/streamlit run tools/streamlit_demo.py` -> http://localhost:8501
+- `.venv-demo/bin/python tools/video_infer.py --source <video|folder|0> --out figures/video/ [--no-flip] [--show]` (7.3; no webcam on the server)
 - `python3 tools/plot_curves.py log/<RUN>/syrip/adaptive_pose_hrnet/<dir> --name <RUN>` after `sync.sh pull`
 - `.venv-demo/bin/python tools/visualize_preds.py --models E0=models/hrnet_fidip.pth ...` (add `--ann`/`--images` for `data/syrip_clean`)
 
