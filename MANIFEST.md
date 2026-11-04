@@ -70,6 +70,7 @@ All annotations are COCO format, 17 keypoints.
 | `slurm/unpack_data.sh` | unzip `syrip_for_train.zip`, assert image counts | short / CPU / 0:30 | |
 | `slurm/eval.sh <model> [overrides]` | `test_adaptive_model.py`, GT bbox | courses-gpu / 1 GPU / 0:45 | |
 | `slurm/train.sh [overrides]` | `train_adaptive_model_hrnet.py`, init DarkPose W48 | courses-gpu / v100-sxm2 / 8:00 | AUTO_RESUME on; resubmit to continue; sources `.env` for W&B |
+| `slurm/install_pkgs.sh <pkgs>` | pip install into env + import smoke test | short / CPU / 0:30 | login node kills pip |
 | `slurm/push_results.sh "<msg>"` | commit + push `logs/` from the cluster | login node | results sync to server |
 
 ## 7. Runs & checkpoints
@@ -78,7 +79,7 @@ All annotations are COCO format, 17 keypoints.
 |--------|-------------|--------------------|--------------|-----------------|----------|----|
 | E0 | Pretrained FiDIP eval | baseline, `TEST.USE_GT_BBOX True` | 11509270 | `models/hrnet_fidip.pth` | `logs/fidip-eval-11509270.out` | 92.1 |
 | E1 | Reproduce FiDIP training | baseline + `TRAIN.CHECKPOINT models/coco/w48_384x288.pth WORKERS 8` | 11509271 (**failed**: no tensorboard) | — | `logs/fidip-train-11509271.out` | — |
-| E1b | E1 resubmitted after env fix | same as E1 | _pending_ | `output/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/model_best.pth` | `logs/fidip-train-<id>.out`, `log/syrip/adaptive_pose_hrnet/`, W&B `fidip` | — |
+| E1b | E1 resubmitted after env fix | same as E1, `WANDB_NAME=E1b-reproduce` | 11601446 → 11601467 | `output/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/model_best.pth` | `logs/fidip-train-<id>.out`, `log/syrip/adaptive_pose_hrnet/`, W&B `fidip` | — |
 
 ## 8. Final reported result
 

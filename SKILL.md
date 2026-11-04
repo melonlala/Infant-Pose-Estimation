@@ -52,6 +52,7 @@ One repo, `origin` = `git@github.com:melonlala/Infant-Pose-Estimation.git` (priv
 | `setup_env.sh` | (re)build `envs/fidip`, `make` nms, gdown models, GPU check | courses-gpu, 1 GPU, 1:30 | `sbatch slurm/setup_env.sh` |
 | `unpack_data.sh` | unzip `syrip_for_train.zip`, assert image counts | short, CPU, 0:30 | `sbatch slurm/unpack_data.sh` |
 | `eval.sh <model> [cfg overrides]` | `test_adaptive_model.py` on Test100, GT bbox | courses-gpu, 1 GPU, 0:45 | `sbatch slurm/eval.sh models/hrnet_fidip.pth` |
+| `install_pkgs.sh <pkg...>` | pip-install into `envs/fidip` + import smoke test (login node kills pip) | short, CPU, 0:30 | `sbatch slurm/install_pkgs.sh wandb` |
 | `train.sh [cfg overrides]` | `train_adaptive_model_hrnet.py`, init DarkPose W48, W&B if key present | courses-gpu, V100-SXM2, 8:00 | `sbatch slurm/train.sh` |
 | `push_results.sh "<msg>"` | commit + push `logs/` (login node, **not** sbatch) | - | `bash slurm/push_results.sh "E1 done"` |
 
@@ -76,7 +77,7 @@ Poll at most every 30 s. A training epoch prints an AP table; `model_best.pth` t
 
 | ID | Slurm job | Status | Notes |
 |--|--|--|--|
-| E1 | see `AGENT.md` summary table | - | reproduce FiDIP training |
+| E1b | 11601446 (pip, short) → 11601467 (train, afterok) | queued 2026-11-03 | reproduce FiDIP training; E1 = 11509271 failed |
 
 Keep this table and the `AGENT.md` summary table in sync whenever you submit, finish, or cancel a job.
 

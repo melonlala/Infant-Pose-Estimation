@@ -33,7 +33,7 @@ accuracy than the paper's numbers (see `STUDENT_GUIDE.md`, Part 7).
 |----|------|-------------|--------|--------------|----|------|------|----|--------|
 | E0 | 2026-10-30 | Pretrained FiDIP eval (`hrnet_fidip.pth`, GT bbox) | `w48_384x288_adam_lr1e-3_infant.yaml` | 11509270 | 92.1 | 97.1 | 97.1 | 93.6 | done |
 | E1 | 2026-10-30 | Reproduce FiDIP training (init: DarkPose `coco/w48_384x288.pth`) | `w48_384x288_adam_lr1e-3_infant.yaml` + `TRAIN.CHECKPOINT` | 11509271 | — | — | — | — | **failed** (no `tensorboard`, 9 s) |
-| E1b | 2026-11-03 | E1 resubmitted after env fix, W&B logging | same as E1 | _pending_ | — | — | — | — | pending |
+| E1b | 2026-11-03 | E1 resubmitted after env fix, W&B logging | same as E1 | 11601446 (pip) → 11601467 (train, afterok) | — | — | — | — | queued |
 
 ---
 
@@ -108,7 +108,11 @@ accuracy than the paper's numbers (see `STUDENT_GUIDE.md`, Part 7).
   - `train_adaptive_model_hrnet.py`: optional W&B (`sync_tensorboard=True`, per-epoch `val/AP`, `best_AP` summary). It is enabled only
     when `WANDB_API_KEY` is set. The run id is stored in the output dir so AUTO_RESUME continues the same W&B run.
     `train.sh`/`eval.sh` source `.env`.
-- **Decision / next:** see E1b row in the summary table.
+  - The first `pip install` ran on the login node and was killed (SIGTERM, exit 143). Added `slurm/install_pkgs.sh` (short partition)
+    and installed through job 11601446, which also smoke-tests the training script's imports.
+  - Submitted E1b: `sbatch --dependency=afterok:11601446 --export=ALL,WANDB_NAME=E1b-reproduce slurm/train.sh` -> **11601467**.
+- **Decision / next:** once E1b trains, compare its best Test100 AP to E0 (92.1) and the paper (93.6). W&B is active only if
+  `.env` with `WANDB_API_KEY` is on the cluster before the job starts. Otherwise sync later with `wandb sync --sync-tensorboard log/...`.
 
 ---
 
@@ -120,5 +124,6 @@ _(Record approaches that didn't work and why, so they aren't repeated.)_
   the first time. Fix: `wget` the public zip on the cluster, check sha256, then unzip in a Slurm job,
   because the login node kills `unzip` for exceeding resource limits.
 - `gdown` has no `--remaining-ok` flag (folder download failed in job 11509124).
+- **`pip install` on the login node gets killed** (exit 143). Run installs with `sbatch slurm/install_pkgs.sh <pkgs>`.
 - **E1 (11509271) died at import**: the env had `tensorboardx`, but the script imports `torch.utils.tensorboard`. Lesson: smoke-test the
   *training* script's imports in `setup_env.sh`, not just the eval path. Also poll `sacct` after `afterok` chains, and don't log a job as running unchecked.
