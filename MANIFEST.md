@@ -44,6 +44,7 @@ Local copy under `data/` (git-ignored); cluster copy: `data/SyRIP` via rsync (15
 | `data/syrip/annotations/person_keypoints_validate_infant.json` | 100 (`images/validate_infant/`) | 100 | present | = Test100 in paper; default val set |
 | `data/SyRIP/annotations/{200R,1000S,200R_1000S}/` | — | 200 / 1000 / 1200 | present | original SyRIP train subsets |
 | `data/SyRIP/annotations/validate500/` | 500 (`data/SyRIP/images/validate_infant/`) | 500 | present | = Test500 in paper; ⊃ Test100; saturated (~98.4 AP), see AGENT.md |
+| `data/syrip_fixed/` (server + cluster) | symlinks | 1200 / 100 | present | **use for training/eval from track D on.** `data/syrip` layout with train json = `SyRIP/200R_1000S` (the `syrip_for_train` json has wrong labels on all 1000 synthetic images) and the correct `test11.jpg`. Built by `tools/make_syrip_fixed.sh` |
 | `data/syrip500/` (cluster only) | symlinks | — | present | eval root for Test500: `DATASET.ROOT data/syrip500/` |
 | `data/SyRIP/annotations/validate100/` | — | 100 | present | = Test100 |
 | Expanded SyRIP (optional) | https://coe.northeastern.edu/Research/AClab/Expanded_SyRIP/ | — | — | for extensions |

@@ -37,6 +37,12 @@ accuracy than the paper's numbers (see `STUDENT_GUIDE.md`, Part 7).
 | E1b-500 | 2026-11-03 | E1b `model_best` on **Test500** | same | 11602005 | 98.5 | 98.9 | 98.8 | 99.3 | done |
 | E1b-F-500 | 2026-11-03 | E1b `final_state` (ep 20) on **Test500** | same | 11602006 | 98.3 | 98.9 | 98.8 | 99.1 | done |
 | E1b | 2026-11-03 | E1 resubmitted after env fix, W&B logging | same as E1 | 11601446 (pip) → 11601467 (train, afterok) | 91.1 | 97.0 | 97.0 | 92.7 | done (best @ epoch 6 of 20; final 90.3) |
+| D0 | 2026-11-03 | Released `hrnet_fidip.pth` on **fixed** Test100 (correct test11) | baseline + `DATASET.ROOT data/syrip_fixed/` | 11602447 | — | — | — | — | queued (offline estimate 92.7) |
+| D0b | 2026-11-03 | E1b `model_best` on **fixed** Test100 | same | 11602449 | — | — | — | — | queued (offline estimate 92.7) |
+| D1 | 2026-11-03 | E1b config, **fixed train labels** (only data changed) | baseline + `DATASET.ROOT data/syrip_fixed/`, `OUTPUT_DIR output/D1` | 11602450 | — | — | — | — | queued |
+| T5f-E0 | 2026-11-03 | Released `hrnet_fidip.pth` on **Test500, area fixed** | baseline + `DATASET.ROOT data/syrip500_fixed/`, `OUTPUT_DIR output_test500f/E0` | 11602599 | — | — | — | — | queued (offline estimate 90.9) |
+| T5f-E1b | 2026-11-03 | E1b `model_best` on Test500, area fixed | same, `output_test500f/E1b` | 11602600 | — | — | — | — | queued (offline estimate 89.7) |
+| T5f-D1 | 2026-11-03 | D1 `model_best` on Test500, area fixed | same, `output_test500f/D1` | 11602601 (afterok 11602450) | — | — | — | — | waiting on D1 |
 
 ---
 
@@ -158,6 +164,62 @@ accuracy than the paper's numbers (see `STUDENT_GUIDE.md`, Part 7).
   duplicates (e.g. test345 = test349). Near-duplicate video frames between Test500 and the real training images are possible but unchecked.
 - **Decision:** use **Test100** as the primary metric (hard and discriminative). Report Test500 only as a secondary sanity number.
   The 1-AP gap of E1b vs E0 on Test100 does not show up on Test500, so the gap is in the hard images.
+
+### 2026-11-03 — Raw-data annotation audit (`tools/check_annotations.py`)
+- **Asked:** check the raw data for wrong or duplicate annotations.
+- **Did:** wrote `tools/check_annotations.py` (structure, keypoints, bbox/area, is_synthetic, identical labels, md5 + dHash
+  duplicates, and label agreement between copies), ran it on all 8 JSONs in `data/`, drew overlays of the flagged cases, and
+  re-scored the saved Test500 predictions with pycocotools.
+- **Result (confirmed by overlays):**
+  1. **Training labels for all 1000 synthetic images are wrong** in `data/syrip/annotations/person_keypoints_train_infant.json`
+     (the file FiDIP trains on). Its synthetic entries carry MINI-RGBD source poses (`image_source: MINI_dataset`,
+     `original_file_name: 01/syn_00000.png`, 13 kps, always 640x480), not labels for the SyRIP renders in `images/train_infant/`.
+     bbox IoU against `SyRIP/annotations/200R_1000S` is a median of 0.31, and 0% of images agree within 5% of bbox size. 46 entries also have the wrong size
+     (json 640x480, file 1920x1080). The images are byte-identical in both copies. `SyRIP/annotations/200R_1000S` matches them, and its 200 real labels are identical.
+  2. **Test500 `area` is the constant 2443298** for all 500 anns (`validate500` json). COCOeval uses gt area as the OKS scale, so
+     Test500 AP is inflated. With area = bbox w*h: E0 98.4 → **90.9**, E1b 98.5 → **89.7**, E1b final 98.3 → **90.0**. This explains
+     the "saturation" logged earlier. The train JSONs also use a constant area of 14233, which is harmless because the loader only checks `area > 0`.
+  3. **Test100 `test11.jpg` is the wrong image** in `data/syrip/images/validate_infant/`: it is byte-identical to `test24.jpg`. The labels
+     and the `SyRIP/` copy are correct. Scoring Test100 GT with predictions made on the correct images gives E0 92.1 → **92.7** and E1b 91.1 → **92.7**.
+     So E1b's "−1 AP vs E0" was an artifact, and the gap to the paper (93.6) is 0.9.
+  4. **Duplicates / leakage:** 4 images are in both train and Test100 (train00073=test20, train00272=test46, train00315=test42,
+     train00340=test50), each labelled twice with disagreements of 32–87 px. Three Test500 images appear twice (test56=test217, test7=test222,
+     test345=test349), also labelled inconsistently. Near-duplicates (dHash≤12), real images only: test162~test435, test328~test365,
+     test207~test47, test139~test166, train00044~train00464. There are no near-duplicates between train and test beyond the 4 exact ones.
+  5. **Copy-pasted label:** test149 has exactly test118's keypoints, on a different baby (Test500 only).
+  6. Test100 and Test500 disagree on test83 and test84 (two annotation passes; both look plausible).
+  7. Weak heuristic flags only. These need manual review and are mostly real twisted or side-view poses: 17 L/R shoulder–hip disagreements in Test500,
+     7 in 200R, and coincident joints such as train00133 with l_hip = r_hip.
+  8. `train_pre_infant`: keypoints are in original COCO coordinates on resized images, and the 2000+ SURREAL entries share one dummy pose.
+     This is **harmless**: that loader feeds only the domain classifier (`meta['synthetic']`).
+- **Decision / next:** train with `SyRIP/annotations/200R_1000S` labels, restore the correct `test11.jpg`, and evaluate Test500 with area = bbox area.
+  Then rerun E0 and E1. Report Test100 numbers from both before and after the fix.
+
+### 2026-11-03 — Part 7 track D: retrain on fixed labels
+- **Asked:** to beat the paper (Part 7), retrain with the corrected annotations.
+- **Did:** `tools/make_syrip_fixed.sh` builds `data/syrip_fixed/` on the server and the cluster. All files are symlinks, so `data/syrip` and `data/SyRIP` stay untouched:
+  - train json → `SyRIP/annotations/200R_1000S`
+  - `test11.jpg` → `SyRIP` copy
+  - everything else → `data/syrip`
+  Checks: ids ↔ file names match, json sizes match the files, and `is_synthetic` counts are 1000 synthetic / 200 real.
+  Submitted (cluster code as already pushed, no code change):
+  - D0 11602447 (released ckpt, fixed Test100)
+  - D0b 11602449 (E1b `model_best`, fixed Test100)
+  - D1 11602450 (E1b config + `DATASET.ROOT data/syrip_fixed/ OUTPUT_DIR output/D1 LOG_DIR log/D1`, W&B `D1-fixed-labels`, `--time 1:00`)
+- **Note:** a parallel sweep (E1c/E2/E3/E4/p100probe, submitted 20:12 from another session) still trains on `data/syrip/`,
+  i.e. with the broken synthetic labels. Its results are not comparable with track D. The QOS allows 2 running jobs per user, so D jobs queue behind it.
+- **Hypothesis:** about half of every batch had wrong pose targets. With correct targets, the synthetic half should help instead of hurting,
+  so D1 should beat E1b (92.7 on fixed Test100) and may reach or exceed the paper's 93.6.
+- **Compare against:** D0 / D0b (same fixed Test100), not the old 92.1 / 91.1.
+
+### 2026-11-03 — Test500 with a valid `area` (third data fix)
+- **Did:** `tools/make_syrip500_fixed.py` builds `data/syrip500_fixed/` on the server and the cluster. It is the validate500 json with `area` = bbox w*h
+  (the original uses a constant 2443298). Images symlink to `SyRIP/images/validate_infant`. Copied the script and `tools/check_annotations.py` to the cluster
+  with a one-off rsync (not via `sync.sh`, which pushes from the main checkout). Submitted T5f-E0 11602599, T5f-E1b 11602600, and T5f-D1 11602601
+  (afterok on D1).
+- **Note:** the offline Test100 estimate (92.7) was too low. The real D0 eval on `data/syrip_fixed` gave **93.6 / 98.5 / 98.5 / AR 94.6**, which matches the paper.
+  The whole E0 gap (92.1 vs 93.6) was the wrong `test11.jpg`.
+- **Next:** Test500 (area fixed) is now usable as a second metric. It is not used for model selection, so it avoids the Test100 `model_best` bias.
 
 ---
 
