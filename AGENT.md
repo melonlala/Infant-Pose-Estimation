@@ -43,6 +43,9 @@ accuracy than the paper's numbers (see `STUDENT_GUIDE.md`, Part 7).
 | E4 | 2026-11-03 | E1b + 100 ep | `output/E4` | 11602175 | — | — | — | — | **failed** (same W&B bug), superseded |
 | E5–E8 | 2026-11-03 | clean-data runs (`data/syrip_clean`): E5 plain, E6 +DA, E7 paper-like, E8 100 ep | `output/E5..E8` | 11602485, 11602498/11602574 (dup), 11602575, 11602580 | — | — | — | — | **cancelled** by request: the user is retraining on their own fix (D-track, `data/syrip_fixed`) |
 | P100 probe | 2026-11-03 | 1 epoch on P100-16GB, E2 settings | `output/probe_p100` | 11602176 | — | — | — | — | **CUDA OOM** → P100 not usable at batch 20 (V100 peak 12.6 GiB plain / 17.2 GiB with DA) |
+| D0 | 2026-11-03 | *(user)* E0 `hrnet_fidip.pth` on **fixed Test100** (`data/syrip_fixed`, correct test11) | `DATASET.ROOT data/syrip_fixed/` | 11602447 | **93.6** | 98.5 | 98.5 | 94.6 | done; = paper's 93.6 |
+| D0b | 2026-11-03 | *(user)* E1b `model_best` on fixed Test100 | same | 11602449 | 92.6 | 98.5 | 98.5 | 93.7 | done |
+| D1 | 2026-11-03 | *(user)* retrain E1b config on **fixed labels** (`200R_1000S`), DA off, 20 ep | `train.sh DATASET.ROOT data/syrip_fixed/ OUTPUT_DIR output/D1` | 11602450 | **93.8** | 98.5 | 98.5 | 94.9 | done (best @ epoch 16, 0-idx; final 93.6); W&B run 0997f45c |
 
 ---
 
@@ -222,6 +225,24 @@ accuracy than the paper's numbers (see `STUDENT_GUIDE.md`, Part 7).
   confidence table; download button. Uploads are saved to `temp_uploads/` (6.3). Headless-tested with `streamlit.testing` (no exceptions, 17-row table).
 - Run on the server: `.venv-demo/bin/streamlit run tools/streamlit_demo.py` (venv = base python + yacs, streamlit, dsntnn, pycocotools).
 - 6.3 still needs the user's own infant images in `temp_uploads/`.
+
+### 2026-11-03 — Check of the user's data fix (`data/syrip_fixed`) and D-track results
+- **Asked:** check the updated fixed data and the model trained on it.
+- **Audit of `data/syrip_fixed` (server and cluster):** train ann -> `SyRIP/annotations/200R_1000S` (the correct synthetic labels). `train_pre`
+  and val ann are unchanged. `validate_infant/test11.jpg` -> SyRIP's 1536×2048 file (md5 0161fbed on both machines). 0 size mismatches in train/val.
+  It is functionally identical to `data/syrip_clean`. Still present: the 4 Test100 <-> annotated-train duplicates (test20/42/46/50).
+- **Results (Test100 fixed):** released E0 **93.6** (exactly the paper's DarkPose+FiDIP number; the earlier 92.1 came entirely from the swapped
+  test11, not the environment). E1b 92.6. **D1 93.8** best / 93.6 final. Fixing the labels is worth **+1.2 AP** over E1b, and D1 matches or slightly beats
+  the released checkpoint (+0.2, within the ±0.3 run noise from E1b vs E1c).
+- **Results (Test500 with fixed area, T5f jobs of the 原始数据标注检查 session, not used for model selection):** E0 90.9, E1b 89.7, **D1 91.4**
+  (AP50 98.8, AP75 96.7, AR 92.6). D1 beats the released checkpoint by **+0.5** on the larger set.
+- **Curves (`figures/D1_curves.png` vs `figures/E1b_curves.png`):** with correct targets the train MSE ends at 2.7e-4 (E1b 6.7e-4) and train PCK at
+  0.92 (E1b 0.65). Val AP keeps rising to epoch ~16 instead of plateauing at ~5, so the E1b "plateau" was mostly label noise. Now val loss > train loss
+  (ratio 1.16), a normal small generalisation gap with no sign of over/underfitting in 20 epochs. The domain classifier only reaches 0.6–0.83
+  accuracy (E1b 1.0) even with DA off; with correct synthetic poses, real and synthetic features are less separable.
+- **Decision / next:** D1 is the new reproduction baseline (93.8 Test100 / 91.4 Test500f). Part 7 ablations should restart from D1 on
+  `data/syrip_fixed`: replicate D1 (noise), +DA (λ 0.0005, PRE_EPOCH 1), LR 1e-3, 100 epochs. Report Test500f alongside Test100, and consider
+  removing the 4 leaked Test100 images (or reporting Test96) for the final numbers.
 
 ---
 

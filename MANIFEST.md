@@ -110,7 +110,8 @@ Server copies of weights (git-ignored): `models/hrnet_fidip.pth`, `models/E1b/mo
 | | Value |
 |--|-------|
 | Published FiDIP baseline (paper) | DarkPose+FiDIP, Test100: AP 93.6 / AP50 98.5 / AP75 98.5 / AR 94.6 |
-| Reproduced baseline run | E1b (11601467): Test100 AP 91.1 / 97.0 / 97.0 / AR 92.7 (best epoch 6; selected on Test100) |
+| Reproduced baseline run | **D1** (11602450, user, `data/syrip_fixed`): fixed Test100 AP 93.8 / 98.5 / 98.5 / AR 94.9 (best epoch 16); Test500 (fixed area) AP 91.4. Ckpt `output/D1/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/model_best.pth`. Superseded: E1b 91.1 (broken labels, swapped test11) |
+| Released checkpoint, same eval | E0 on fixed Test100: 93.6 (= paper); Test500 fixed area: 90.9 |
 | Best improved run | _TBD_ |
 | Checkpoint | _TBD_ |
 | Exact reproduce command | _TBD_ |

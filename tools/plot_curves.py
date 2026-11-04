@@ -84,10 +84,21 @@ def main():
 
     # 3. val COCO metrics
     ax = axs[1, 0]; style(ax, 'Validation keypoint AP / AR (Test100)', 'score')
+    ends = []
     for i, (tag, lab) in enumerate([('valid_AP', 'AP'), ('valid_Ap .5', 'AP50'), ('valid_AP .75', 'AP75'), ('valid_AR', 'AR')]):
         if tag in d:
             y = d[tag][1]; ax.plot(ep + 1, y, color=C[i], lw=2, label=lab, marker='o', ms=3.5, mec=SURF, mew=1)
-            label_end(ax, ep + 1, y, f'{lab} {y[-1]:.3f}', C[i])
+            ends.append([y[-1], lab, C[i], y])
+    # merge end labels that would collide (e.g. AP50 == AP75) into one "AP50 = AP75 0.985" label
+    span = max(e[0] for e in ends) - min(e[0] for e in ends) or 1.0
+    ends.sort(key=lambda e: -e[0]); groups = []
+    for e in ends:
+        if groups and abs(groups[-1][-1][0] - e[0]) < 0.04 * span + 1e-3:
+            groups[-1].append(e)
+        else:
+            groups.append([e])
+    for g in groups:
+        label_end(ax, ep + 1, g[0][3], ' = '.join(e[1] for e in g) + f' {g[0][0]:.3f}', g[0][2])
     b = int(np.argmax(d['valid_AP'][1]))
     ax.annotate(f'best AP {d["valid_AP"][1][b]:.3f} @ epoch {b + 1}', (b + 1, d['valid_AP'][1][b]),
                 xytext=(28, -24), textcoords='offset points', ha='left', fontsize=8, color=INK2,
