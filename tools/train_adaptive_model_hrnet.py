@@ -113,12 +113,13 @@ def main():
     # The run id is stored in final_output_dir so AUTO_RESUME jobs continue the same run.
     wandb_run = None
     if os.environ.get('WANDB_API_KEY') and os.environ.get('WANDB_MODE') != 'disabled':
+        import uuid
         import wandb
         id_file = os.path.join(final_output_dir, 'wandb_run_id.txt')
         if os.path.exists(id_file):
             run_id = open(id_file).read().strip()
         else:
-            run_id = wandb.util.generate_id()
+            run_id = uuid.uuid4().hex[:8]   # wandb>=0.2x has no wandb.util.generate_id
             with open(id_file, 'w') as f:
                 f.write(run_id)
         wandb_run = wandb.init(
@@ -338,9 +339,12 @@ def main():
         else:
             best_model = False
 
+        max_mem_gb = torch.cuda.max_memory_allocated() / 1024 ** 3
+        logger.info('=> epoch {} val AP {:.4f} (best {:.4f}), peak GPU mem {:.2f} GiB'.format(
+            epoch, perf_indicator, best_perf, max_mem_gb))
         if wandb_run is not None:
             wandb_run.log({'val/AP': perf_indicator, 'val/best_AP': best_perf,
-                           'epoch': epoch + 1})
+                           'gpu/peak_mem_gib': max_mem_gb, 'epoch': epoch + 1})
 
         logger.info('=> saving checkpoint to {}'.format(final_output_dir))
         save_checkpoint({

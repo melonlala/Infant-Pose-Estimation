@@ -72,3 +72,7 @@ lib/nms/gpu_nms.cpp
 # results pulled from the cluster by `slurm/sync.sh pull` (GitHub holds code only)
 logs/
 output_*/
+# report figures / demo outputs (generated, not code)
+figures/
+temp_uploads/
+.venv*/
