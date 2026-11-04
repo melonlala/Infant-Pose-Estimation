@@ -46,6 +46,10 @@ accuracy than the paper's numbers (see `STUDENT_GUIDE.md`, Part 7).
 | D0 | 2026-11-03 | *(user)* E0 `hrnet_fidip.pth` on **fixed Test100** (`data/syrip_fixed`, correct test11) | `DATASET.ROOT data/syrip_fixed/` | 11602447 | **93.6** | 98.5 | 98.5 | 94.6 | done; = paper's 93.6 |
 | D0b | 2026-11-03 | *(user)* E1b `model_best` on fixed Test100 | same | 11602449 | 92.6 | 98.5 | 98.5 | 93.7 | done |
 | D1 | 2026-11-03 | *(user)* retrain E1b config on **fixed labels** (`200R_1000S`), DA off, 20 ep | `train.sh DATASET.ROOT data/syrip_fixed/ OUTPUT_DIR output/D1` | 11602450 | **93.8** | 98.5 | 98.5 | 94.9 | done (best @ epoch 16, 0-idx; final 93.6); W&B run 0997f45c |
+| F1 | 2026-11-03 | D1 replicate (run-to-run noise on fixed data) | `submit_run.sh F1` (D1 config, `data/syrip_fixed`) | 11603301 → t5b 11603312, t5f 11603317 | — | — | — | — | running |
+| F2 | 2026-11-03 | D1 + DA (`LAMBDA 0.0005`, `PRE_EPOCH 1`) | `submit_run.sh F2 ...` | 11603328 → 11603329, 11603330 | — | — | — | — | queued |
+| F3 | 2026-11-03 | D1 + LR 1e-3 (paper LR) | `submit_run.sh F3 ... TRAIN.LR 0.001` | 11603335 → 11603336, 11603337 | — | — | — | — | queued |
+| F4 | 2026-11-03 | D1 + 100 epochs (LR drop ×0.1 at ep 40) | `submit_run.sh F4 ... TRAIN.END_EPOCH 100` | 11603343 → 11603344, 11603345 | — | — | — | — | queued |
 
 ---
 
@@ -244,6 +248,17 @@ accuracy than the paper's numbers (see `STUDENT_GUIDE.md`, Part 7).
   `data/syrip_fixed`: replicate D1 (noise), +DA (λ 0.0005, PRE_EPOCH 1), LR 1e-3, 100 epochs. Report Test500f alongside Test100, and consider
   removing the 4 leaked Test100 images (or reporting Test96) for the final numbers.
 
+### 2026-11-03 — Part 7 restarted from D1 on fixed data (F-track)
+- **Asked:** restart the Part 7 experiments from D1 on `data/syrip_fixed`.
+- **Did:** `slurm/submit_run.sh <NAME> <TIME> [overrides]` (commit cfc5da2) submits the train job plus two `afterok` Test500-fixed-area evals
+  (`model_best` -> `output_test500f/<NAME>`, `final_state` -> `output_test500f/<NAME>_final`), and refuses a reused `output/<NAME>`.
+  Each run changes one factor vs D1: F1 replicate, F2 +DA, F3 LR 1e-3, F4 100 epochs. W&B is on (project `fidip`, run names = F1..F4).
+- **Hypotheses:** F1 measures noise on clean data (E1b vs E1c gave ±0.3 on broken data). F2: with correct labels the DC is no longer trivially
+  separating domains (D1 acc_D 0.6–0.83), so λ = 0.0005 should give a small gain, as in paper Table IV (+0.9 Finetune -> FiDIP). F3: the paper's 1e-3 may
+  destabilise fine-tuning from COCO weights. F4: D1 was still improving at epoch ~16, so longer training plus the LR drop at 40 should help.
+- **Note:** F1's first `submit_run.sh` call hit the local 100 s SSH timeout but kept running on the cluster and submitted its evals (11603312/17).
+  My manual re-submits (11603316/23) were duplicates and were cancelled.
+
 ---
 
 ## Dead ends & lessons learned
@@ -260,6 +275,8 @@ _(Record approaches that didn't work and why, so they aren't repeated.)_
 - **`wandb.util.generate_id` no longer exists** (wandb 0.31) → E3/E4 died at start. Run `tools/wandb_smoke.py` after any W&B code change.
 - **P100 (16 GB) OOMs** at batch 20 for W48 384×288 (V100 peak 12.6 GiB without DA, 17.2 GiB with DA pre-stage). Stay on V100/A100 or lower the batch.
 - **courses-gpu QoS: max 2 running jobs and 2 GPUs per user.** Submitting 4 jobs does not parallelise; plan chains accordingly.
+- **The login node is slow at `sbatch` (~30–60 s each)**: use `timeout 280` for `ssh explorer 'bash slurm/submit_run.sh ...'`. A local timeout
+  does not stop the remote script.
 - **An SSH timeout after `sbatch` does not mean the job was not submitted** (E6 got submitted twice). Check `sacct -S now-10minutes` before resubmitting.
 - `sync.sh push` once copied `.venv-demo/` to the cluster. It now applies `.gitignore` rules (`--filter=':- .gitignore'`).
 - **`pip install` on the login node gets killed** (exit 143). Run installs with `sbatch slurm/install_pkgs.sh <pkgs>`.

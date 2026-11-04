@@ -80,6 +80,7 @@ All annotations are COCO format, 17 keypoints.
 | `slurm/eval.sh <model> [overrides]` | `test_adaptive_model.py`, GT bbox | courses-gpu / 1 GPU / 0:45 | |
 | `slurm/train.sh [overrides]` | `train_adaptive_model_hrnet.py`, init DarkPose W48 | courses-gpu / v100-sxm2 / 8:00 | AUTO_RESUME on; resubmit to continue; sources `.env` for W&B |
 | `slurm/install_pkgs.sh <pkgs>` | pip install into env + import smoke test | short / CPU / 0:30 | login node kills pip |
+| `slurm/submit_run.sh <NAME> <TIME> [overrides]` | train + chained Test500f evals (best/final) | cluster | default root `data/syrip_fixed/` |
 | `slurm/make_clean_data.sh` | build `data/syrip_clean/` symlink root | either machine | no copying |
 | `slurm/sync.sh push\|pull\|env` | rsync code -> cluster, results -> server, WANDB key -> cluster | server | no `--delete` |
 

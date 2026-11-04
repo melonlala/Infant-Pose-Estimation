@@ -56,6 +56,8 @@ The experiment log is in `AGENT.md`, and the inventory of artifacts is in `MANIF
 | `train.sh [cfg overrides]` | `train_adaptive_model_hrnet.py`, init DarkPose W48, W&B if key present | courses-gpu, V100-SXM2, 8:00 | `sbatch slurm/train.sh` |
 | `sync.sh push\|pull\|env` | rsync code to / results from the cluster (run on the **server**) | - | `bash slurm/sync.sh push` |
 
+- **Preferred for new experiments:** `ssh explorer 'bash /home/hou.yuchen/courses/eece7373/slurm/submit_run.sh <NAME> <TIME> [cfg overrides]'`
+  (train on `data/syrip_fixed` + Test500f evals of best/final; refuses existing `output/<NAME>`). Use `timeout 280`.
 - Name the W&B run per experiment: `sbatch --export=ALL,WANDB_NAME=E2-lr5e-4 slurm/train.sh TRAIN.LR 0.0005`.
 - Different experiments must use different `OUTPUT_DIR`s (cfg override). Otherwise AUTO_RESUME picks up another run's `checkpoint.pth`.
 - `AUTO_RESUME` is on: resubmitting the same command continues from `output/.../checkpoint.pth`
@@ -77,7 +79,7 @@ Poll at most every 30 s. A training epoch prints an AP table; `model_best.pth` t
 
 | ID | Slurm job | Status | Notes |
 |--|--|--|--|
-| — | none from this session | | E5–E8 cancelled 2026-11-03 at the user's request. The user's D-track (D0/D0b/D1, `data/syrip_fixed`) and the T5f evals (原始数据标注检查 session) belong to others; don't touch them |
+| F1–F4 | F1 11603301, F2 11603328, F3 11603335, F4 11603343 (+ 2 chained Test500f evals each, see AGENT.md) | submitted 2026-11-03 | ablations from D1 on `data/syrip_fixed`. The user's D-track and the T5f evals belong to others |
 
 Keep this table and the `AGENT.md` summary table in sync whenever you submit, finish, or cancel a job.
 
