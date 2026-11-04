@@ -77,9 +77,23 @@ Poll at most every 30 s. A training epoch prints an AP table; `model_best.pth` t
 
 | ID | Slurm job | Status | Notes |
 |--|--|--|--|
-| — | none running | | E1b (11601467) done: AP 91.1. Its output dir holds `checkpoint.pth` at epoch 20, so new runs need a new `OUTPUT_DIR` |
+| — | none from this session | | E5–E8 cancelled 2026-11-03 at the user's request. The user's D-track (D0/D0b/D1, `data/syrip_fixed`) and the T5f evals (原始数据标注检查 session) belong to others; don't touch them |
 
 Keep this table and the `AGENT.md` summary table in sync whenever you submit, finish, or cancel a job.
+
+## Server-side demos and analysis (no cluster needed)
+
+- The server has 2× RTX 6000 Ada. Use `.venv-demo/bin/python` (base python 3.13 + torch, plus yacs/streamlit/dsntnn/pycocotools).
+- Weights: `rsync explorer:/home/hou.yuchen/courses/eece7373/<ckpt> models/...` (git-ignored).
+- `tools/demo.py --image <img> --model models/hrnet_fidip.pth --output figures/demo/x.jpg`
+- `.venv-demo/bin/streamlit run tools/streamlit_demo.py` -> http://localhost:8501
+- `python3 tools/plot_curves.py log/<RUN>/syrip/adaptive_pose_hrnet/<dir> --name <RUN>` after `sync.sh pull`
+- `.venv-demo/bin/python tools/visualize_preds.py --models E0=models/hrnet_fidip.pth ...` (add `--ann`/`--images` for `data/syrip_clean`)
+
+## Data
+
+- Train on **`DATASET.ROOT data/syrip_clean/`** (or the user's `data/syrip_fixed/`), never the raw `data/syrip/`: its synthetic labels are wrong.
+- GPU memory: V100 peak 12.6 GiB (no DA) / 17.2 GiB (DA). P100 16 GB OOMs. courses-gpu QoS allows 2 running jobs per user.
 
 ## Guardrails
 

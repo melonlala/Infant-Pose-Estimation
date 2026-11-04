@@ -48,7 +48,14 @@ Local copy under `data/` (git-ignored); cluster copy: `data/SyRIP` via rsync (15
 | `data/SyRIP/annotations/validate100/` | — | 100 | present | = Test100 |
 | Expanded SyRIP (optional) | https://coe.northeastern.edu/Research/AClab/Expanded_SyRIP/ | — | — | for extensions |
 
+| `data/syrip_clean/` (server + cluster) | symlinks | 1200 / 4057 / 100 | present | built by `slurm/make_clean_data.sh`: train ann = `SyRIP/annotations/200R_1000S` (correct synthetic labels), val images = SyRIP's (correct test11) |
+| `data/syrip_fixed/` (user's D-track) | — | — | present | the user's own fix; not inventoried by this session |
+
 All annotations are COCO format, 17 keypoints.
+
+**Known defects (2026-11-03 audit, see AGENT.md):** `syrip_for_train.zip` has (1) wrong keypoints for all 1000 synthetic training images and
+(2) a swapped `validate_infant/test11.jpg`. Test100 also contains 4 images identical to annotated training images (test20/42/46/50), and
+`validate500` has a constant `area` on every annotation (found by the 原始数据标注检查 session). The real 200R labels are fine.
 
 ## 4. Pretrained models
 
@@ -73,6 +80,7 @@ All annotations are COCO format, 17 keypoints.
 | `slurm/eval.sh <model> [overrides]` | `test_adaptive_model.py`, GT bbox | courses-gpu / 1 GPU / 0:45 | |
 | `slurm/train.sh [overrides]` | `train_adaptive_model_hrnet.py`, init DarkPose W48 | courses-gpu / v100-sxm2 / 8:00 | AUTO_RESUME on; resubmit to continue; sources `.env` for W&B |
 | `slurm/install_pkgs.sh <pkgs>` | pip install into env + import smoke test | short / CPU / 0:30 | login node kills pip |
+| `slurm/make_clean_data.sh` | build `data/syrip_clean/` symlink root | either machine | no copying |
 | `slurm/sync.sh push\|pull\|env` | rsync code -> cluster, results -> server, WANDB key -> cluster | server | no `--delete` |
 
 ## 7. Runs & checkpoints
@@ -83,6 +91,19 @@ All annotations are COCO format, 17 keypoints.
 | E1 | Reproduce FiDIP training | baseline + `TRAIN.CHECKPOINT models/coco/w48_384x288.pth WORKERS 8` | 11509271 (**failed**: no tensorboard) | — | `logs/fidip-train-11509271.out` | — |
 | E0/E1b on Test500 | evals with `DATASET.ROOT data/syrip500/` (symlink root -> `data/SyRIP/annotations/validate500`, `data/SyRIP/images/validate_infant`) | `OUTPUT_DIR output_test500/{E0,E1b,E1b_final}` | 11602004 / 11602005 / 11602006 | — | `logs/fidip-eval500-*-1160200[4-6].out` | 98.4 / 98.5 / 98.3 |
 | E1b | E1 resubmitted after env fix | same as E1, `WANDB_NAME=E1b-reproduce` | 11601446 → 11601467 | `output/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/model_best.pth` (ep 6; also `final_state.pth` ep 20, `checkpoint.pth`) | `logs/fidip-train-11601467.out`, `output/.../w48_384x288_adam_lr1e-3_infant_2026-11-03-19-28_train.log`, TB `log/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant_2026-11-03-19-28/` (no W&B) | 91.1 |
+
+## 7b. Tools (server-side, `.venv-demo` = base python + yacs/streamlit/dsntnn/pycocotools)
+
+| Tool | Purpose | Output |
+|------|---------|--------|
+| `tools/fidip_infer.py` | shared single-image inference (same path as eval) | — |
+| `tools/demo.py` | Part 6.1 CLI demo | annotated image + keypoint table |
+| `tools/streamlit_demo.py` | Part 6.2 web demo (`.venv-demo/bin/streamlit run tools/streamlit_demo.py`) | browser UI; uploads to `temp_uploads/` |
+| `tools/plot_curves.py` | Part 4.5 curves from TB logs | `figures/<run>_curves.png` |
+| `tools/visualize_preds.py` | Part 4 GT-vs-pred grids, per-keypoint similarity, pycocotools AP | `figures/viz/` |
+| `tools/wandb_smoke.py` | offline check of the W&B code path | — |
+
+Server copies of weights (git-ignored): `models/hrnet_fidip.pth`, `models/E1b/model_best.pth`. Figures are git-ignored (`figures/`).
 
 ## 8. Final reported result
 

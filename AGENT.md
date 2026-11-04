@@ -37,6 +37,12 @@ accuracy than the paper's numbers (see `STUDENT_GUIDE.md`, Part 7).
 | E1b-500 | 2026-11-03 | E1b `model_best` on **Test500** | same | 11602005 | 98.5 | 98.9 | 98.8 | 99.3 | done |
 | E1b-F-500 | 2026-11-03 | E1b `final_state` (ep 20) on **Test500** | same | 11602006 | 98.3 | 98.9 | 98.8 | 99.1 | done |
 | E1b | 2026-11-03 | E1 resubmitted after env fix, W&B logging | same as E1 | 11601446 (pip) → 11601467 (train, afterok) | 91.1 | 97.0 | 97.0 | 92.7 | done (best @ epoch 6 of 20; final 90.3) |
+| E1c | 2026-11-03 | E1b replicate (run-to-run noise) | same as E1b, `OUTPUT_DIR output/E1c` | 11602172 | 90.8 | — | — | — | done (best @ epoch 18, 0-indexed; final 89.6) |
+| E2 | 2026-11-03 | E1b + domain adaptation on (`LAMBDA 0.0005`, `PRE_EPOCH 1`) | `output/E2` | 11602173 | 91.1 | — | — | — | done (best @ epoch 9; final 90.1); **trained on broken synthetic labels** |
+| E3 | 2026-11-03 | E2 + LR 1e-3 + 100 ep | `output/E3` | 11602174 | — | — | — | — | **failed** at W&B init (`wandb.util.generate_id`), superseded |
+| E4 | 2026-11-03 | E1b + 100 ep | `output/E4` | 11602175 | — | — | — | — | **failed** (same W&B bug), superseded |
+| E5–E8 | 2026-11-03 | clean-data runs (`data/syrip_clean`): E5 plain, E6 +DA, E7 paper-like, E8 100 ep | `output/E5..E8` | 11602485, 11602498/11602574 (dup), 11602575, 11602580 | — | — | — | — | **cancelled** by request: the user is retraining on their own fix (D-track, `data/syrip_fixed`) |
+| P100 probe | 2026-11-03 | 1 epoch on P100-16GB, E2 settings | `output/probe_p100` | 11602176 | — | — | — | — | **CUDA OOM** → P100 not usable at batch 20 (V100 peak 12.6 GiB plain / 17.2 GiB with DA) |
 
 ---
 
@@ -159,6 +165,64 @@ accuracy than the paper's numbers (see `STUDENT_GUIDE.md`, Part 7).
 - **Decision:** use **Test100** as the primary metric (hard and discriminative). Report Test500 only as a secondary sanity number.
   The 1-AP gap of E1b vs E0 on Test100 does not show up on Test500, so the gap is in the hard images.
 
+  *(Update, from the "原始数据标注检查" session: the saturation is an annotation artifact. Every one of the 500 `validate500` anns
+  has the same `area` = 2443298, which inflates OKS. With area = bbox w·h, the old Test500 predictions rescore to E0 90.9 / E1b 89.7 / E1b-final 90.0.
+  See their T5f entries.)*
+
+### 2026-11-03 — Part 7 start: config vs paper; first ablations (E1c, E2; E3/E4 failed)
+- **Asked:** start Part 7 by comparing the training config with the paper.
+- **Paper (arXiv 2010.06100, HTML v5; some table values came from a summary, so verify against the PDF):** init session pre-trains the domain
+  classifier for 1 epoch (batch 128, feature extractor frozen). Then 100 epochs (batch 64) alternate Stage I (update the DC with the pose net locked) and
+  Stage II (update the pose net with the DC locked). Loss L = L_P − λ·L_D, λ = 0.0005. Adam, LR 1e-3, schedule not stated. First 3 ResNet stages frozen.
+  Table IV (Test100): DarkPose 88.5 → DarkPose+Finetune 92.7 → DarkPose+FiDIP 93.6 AP.
+- **Our yaml vs paper:** `LAMBDA 0.0` (DA **off**: `loss_p = MSE − LAMBDA·BCE`, `lib/core/function.py:140`), `PRE_EPOCH 0` (no DC init),
+  LR 1e-4, 20 epochs, batch 20 (16 for pre). `GAMMA1/2` are unused in code. Real data is up-weighted via `BalancedBatchSampler` (50/50 real/syn batches).
+  Code freezes the first 109 parameter tensors (`idx <= 108`). => **E1b is effectively "DarkPose + Finetune"**, not FiDIP.
+- **Did:** single-factor runs vs E1b (commit b3d0be0): E1c = replicate, E2 = DA on, E3 = DA + LR 1e-3 + 100 ep, E4 = 100 ep.
+  Added a per-epoch `val AP` / `peak GPU mem` log line + W&B fields.
+- **Result:** E1c best 90.8 (vs E1b 91.1) → **run-to-run noise ≈ ±0.3 AP on best-epoch Test100**; differences below ~0.5 AP are not meaningful from
+  one run. E2 best 91.1 (no gain), but its DC accuracy stays at 0.84–0.96 instead of 1.0, so the adversarial term does act on the features.
+  E3/E4 crashed at W&B init (`wandb.util.generate_id` is gone in wandb 0.31); fixed in 59e4756 (`uuid`) and checked with `tools/wandb_smoke.py`.
+  E1c/E2 ran before `.env` reached the cluster, so they have no W&B (TB only).
+
+### 2026-11-03 — Part 4.5: over/underfitting analysis (E1b; E1c/E2 look the same)
+- **Did:** `tools/plot_curves.py <tb_run_dir> --name <run>` → `figures/<run>_curves.png` (pose loss train vs val, PCK accuracy, val AP/AR, DC).
+- **Observations (E1b, 20 ep):** train MSE falls 34% (1.02e-3 → 0.67e-3) and train PCK rises 0.51 → 0.65. Val MSE drops only over epochs 1–4
+  (4.35e-4 → 3.9e-4) and then stays flat; val PCK stays flat at ~0.905 and val AP plateaus at 0.90–0.91 after epoch ~5. Val loss < train loss throughout,
+  because training uses heavy augmentation (rot ±45°, scale ±35%, half-body 0.3) and half of each batch is synthetic. The val/train loss ratio climbs from
+  0.43 to 0.59.
+- **Reading:** not underfitting (val AP 0.90+ from epoch 1, starting from a strong COCO init). There is **mild overfitting onset**: train keeps improving
+  and val does not, but val loss and AP do not degrade, so it is a plateau, not classic overfitting. Best-epoch selection on Test100 picks noise
+  (best epochs 6, 18, 9 across E1b/E1c/E2). Report best and final. The plateau is partly explained by the label defect below: half of every batch
+  carried wrong targets.
+
+### 2026-11-03 — Part 4 visualisation + data audit: synthetic training labels in syrip_for_train are wrong
+- **Did:** `tools/fidip_infer.py` (shared inference = eval path), `tools/visualize_preds.py` (GT vs pred grids for worst/best OKS, per-keypoint
+  similarity bars, COCO AP recomputed with pycocotools). Ran on the server GPU (RTX 6000 Ada) in `.venv-demo` with weights copied to `models/`.
+  The recomputed Test100 AP is E0 91.8 / E1b 91.0 (official 92.1 / 91.1), so the pipeline agrees within 0.3.
+- **Finding 1 (Test100):** `test11.jpg` in `syrip_for_train.zip` is a different 2048×2048 picture (baby lying sideways). Its GT (1536×2048, upright baby)
+  matches `SyRIP.zip`'s `test11.jpg`. Every model scores OKS ≈ 0.1 on it. All other 99 Test100 files are byte-identical to SyRIP's.
+- **Finding 2 (training labels, major):** for the **1000 synthetic** images in `syrip/annotations/person_keypoints_train_infant.json`, the keypoints do
+  not match the images. 46 have `width/height` 640×480 but the files are 1920×1080. The other 954 have consistent sizes but wrong poses
+  (figures/viz/synthetic_label_compare.jpg). `SyRIP.zip` `annotations/1000S` (= synthetic part of `200R_1000S`) has the right labels.
+  Independent check: E0 predictions (whole-image box) vs labels on all 1000 synthetic images give OKS mean **0.21** vs for_train labels and **0.62**
+  vs 1000S labels; 1000S is better on 955/1000. The 200 real labels are identical in both files. Every run so far (E1b, E1c, E2) trained with
+  wrong targets on half of each batch.
+- **Also:** 4 Test100 images are byte-identical to annotated real training images (test20=train00073, test42=train00315, test46=train00272,
+  test50=train00340). This leakage is not fixed by `syrip_clean`.
+- **Fix built:** `slurm/make_clean_data.sh` → `data/syrip_clean/` (symlinks): train ann = `SyRIP/annotations/200R_1000S`, val images = SyRIP's (fixes test11).
+  Built on both machines. The user independently built `data/syrip_fixed/` and is retraining (D-track: D0, D0b, D1), so the clean-data runs E5–E8 were cancelled.
+- **Per-keypoint (Test100, OKS-similarity):** ears are the weakest joints (left_ear 0.89 E0 / 0.91 E1b), then wrists and ankles; E1b is worse than E0
+  mainly on nose, elbows and right_knee/ankle. Worst images (both models): test11 (bad GT), test33, test41, test98 (small/occluded infants).
+
+### 2026-11-03 — Part 6 demos
+- `tools/demo.py` (6.1, guide's CLI: `--cfg --image --model --output --conf-threshold --output-size`, plus `--bbox`, `--no-flip`).
+  It prints a per-keypoint table and draws left = blue, right = orange.
+- `tools/streamlit_demo.py` (6.2): upload, `temp_uploads/`, or validation picker; model picker; threshold slider; flip toggle; optional box;
+  confidence table; download button. Uploads are saved to `temp_uploads/` (6.3). Headless-tested with `streamlit.testing` (no exceptions, 17-row table).
+- Run on the server: `.venv-demo/bin/streamlit run tools/streamlit_demo.py` (venv = base python + yacs, streamlit, dsntnn, pycocotools).
+- 6.3 still needs the user's own infant images in `temp_uploads/`.
+
 ---
 
 ## Dead ends & lessons learned
@@ -170,6 +234,13 @@ _(Record approaches that didn't work and why, so they aren't repeated.)_
   because the login node kills `unzip` for exceeding resource limits.
 - `gdown` has no `--remaining-ok` flag (folder download failed in job 11509124).
 - **A nested `OUTPUT_DIR` must already exist** (`lib/utils/utils.py:27` uses `mkdir()` without parents). `mkdir -p` the parent before `sbatch`.
+- **Don't trust `syrip_for_train.zip` labels blindly**: its synthetic keypoints are wrong and test11.jpg is swapped. Audit images vs annotations
+  (size check, overlay a few, score a trusted model against each label set) before training.
+- **`wandb.util.generate_id` no longer exists** (wandb 0.31) → E3/E4 died at start. Run `tools/wandb_smoke.py` after any W&B code change.
+- **P100 (16 GB) OOMs** at batch 20 for W48 384×288 (V100 peak 12.6 GiB without DA, 17.2 GiB with DA pre-stage). Stay on V100/A100 or lower the batch.
+- **courses-gpu QoS: max 2 running jobs and 2 GPUs per user.** Submitting 4 jobs does not parallelise; plan chains accordingly.
+- **An SSH timeout after `sbatch` does not mean the job was not submitted** (E6 got submitted twice). Check `sacct -S now-10minutes` before resubmitting.
+- `sync.sh push` once copied `.venv-demo/` to the cluster. It now applies `.gitignore` rules (`--filter=':- .gitignore'`).
 - **`pip install` on the login node gets killed** (exit 143). Run installs with `sbatch slurm/install_pkgs.sh <pkgs>`.
 - **E1 (11509271) died at import**: the env had `tensorboardx`, but the script imports `torch.utils.tensorboard`. Lesson: smoke-test the
   *training* script's imports in `setup_env.sh`, not just the eval path. Also poll `sacct` after `afterok` chains, and don't log a job as running unchecked.
