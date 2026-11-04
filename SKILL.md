@@ -79,7 +79,7 @@ Poll at most every 30 s. A training epoch prints an AP table; `model_best.pth` t
 
 | ID | Slurm job | Status | Notes |
 |--|--|--|--|
-| F1–F4 | F1 11603301, F2 11603328, F3 11603335, F4 11603343 (+ 2 chained Test500f evals each, see AGENT.md) | submitted 2026-11-03 | ablations from D1 on `data/syrip_fixed`. The user's D-track and the T5f evals belong to others |
+| G1–G3 | G1 11606776, G2 11606811, G3 11606822 (+2 chained Test500f evals each) | submitted 2026-11-03 | F1–F4 done. H-track rule in AGENT.md; others' D-track/T5f jobs are not ours |
 
 Keep this table and the `AGENT.md` summary table in sync whenever you submit, finish, or cancel a job.
 

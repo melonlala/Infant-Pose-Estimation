@@ -49,7 +49,10 @@ accuracy than the paper's numbers (see `STUDENT_GUIDE.md`, Part 7).
 | F1 | 2026-11-03 | D1 replicate (run-to-run noise on fixed data) | `submit_run.sh F1` (D1 config, `data/syrip_fixed`) | 11603301 → t5b 11603312, t5f 11603317 | 93.7 | 98.5 | 98.5 | 94.8 | done (best @ 15, final 93.5); **Test500f 91.2 best / 91.2 final** |
 | F2 | 2026-11-03 | D1 + DA (`LAMBDA 0.0005`, `PRE_EPOCH 1`) | `submit_run.sh F2 ...` | 11603328 → 11603329, 11603330 | 93.8 | 98.5 | 98.5 | 94.7 | done (best @ 17, final 93.5); **Test500f 90.9 / 91.0** |
 | F3 | 2026-11-03 | D1 + LR 1e-3 (paper LR) | `submit_run.sh F3 ... TRAIN.LR 0.001` | 11603335 → 11603336, 11603337 | 93.3 | 98.4 | 98.4 | 94.7 | done (best @ 13, final 92.9); **Test500f 89.9 / 90.6** |
-| F4 | 2026-11-03 | D1 + 100 epochs (LR drop ×0.1 at ep 40) | `submit_run.sh F4 ... TRAIN.END_EPOCH 100` | 11603343 → 11603344, 11603345 | — | — | — | — | queued |
+| F4 | 2026-11-03 | D1 + 100 epochs (LR drop ×0.1 at ep 40) | `submit_run.sh F4 ... TRAIN.END_EPOCH 100` | 11603343 → 11603344, 11603345 | 94.1 | — | — | 95.1 | done (best @ 20, final 94.0); **Test500f 91.0 best / 91.7 final** |
+| G1 | 2026-11-03 | D1 + `TRAIN.BALANCED_SHUFFLE True` (sampler fix) | `submit_run.sh G1 ...` | 11606776 → 11606777, 11606778 | — | — | — | — | queued |
+| G2 | 2026-11-03 | **real-only** 200R, 200 ep (= 2000 iters like D1), no LR drop | `ROOT=data/syrip_fixed_200R/ submit_run.sh G2 ... TRAIN.END_EPOCH 200 TRAIN.LR_STEP [400,500]` | 11606811 → 11606812, 11606813 | — | — | — | — | queued |
+| G3 | 2026-11-03 | D1 + LR 5e-5 | `submit_run.sh G3 ... TRAIN.LR 0.00005` | 11606822 → 11606823, 11606824 | — | — | — | — | queued |
 
 ---
 
@@ -301,6 +304,23 @@ accuracy than the paper's numbers (see `STUDENT_GUIDE.md`, Part 7).
     200 ep with LR_STEP 400,500; ×5 if B is 100-ep) → value of synthetic data / 7.1.
   - **G3 = B + LR 5e-5** (F3 showed 1e-3 overfits; check the other side).
   - Afterwards: adopt whatever is significant into B and continue (augmentation strength, λ sweep only if DA ever helps, MobileNet comparison).
+
+### 2026-11-03 — F4 result and automatic decision -> G-track
+- **F4 (100 ep):** Test100 rises to 94.1 at epoch 20 (0-idx) and then sits flat at 93.8–94.1 for 80 epochs (final 94.0). The LR drop at 40 changes nothing on val.
+  Val loss keeps creeping down (3.10e-4 -> 3.02e-4) while train loss falls faster (2.8e-4 -> 1.9e-4; ratio 1.11 -> 1.58): a growing generalisation gap, but no
+  val degradation (`figures/F4_curves.png`).
+  Test500f: **model_best 91.0, final_state 91.7**.
+- **Rule applied (pre-registered above):** the metric is Test500f of `model_best`. 91.0 < 91.4 + 0.3, so **not significant → base B = D1 (20 ep)**. Submitted
+  G1 (shuffle), G2 (real-only), G3 (LR 5e-5) unchanged from the rule.
+- **Observation that changes future rules:** F4's *final* checkpoint (91.7) beats its Test100-selected *best* (91.0) on Test500f, and beats F1-final (91.2) by +0.5.
+  Picking the best epoch on Test100 (which is also part of Test500) is a biased, noisy selector. For later decisions both checkpoints are reported, and
+  adoption needs **≥ 0.3 on final_state Test500f** (no test-set selection). This is stated before seeing the G results.
+- **Pre-registered rule for the H-track (applied automatically when G1–G3 finish):**
+  - Adopt into B every G change whose final_state Test500f ≥ B's final + 0.3. B's final is F1-final 91.2 for the 20-ep D1 config.
+  - **H1 = F4 replicate (100 ep)**, to check whether the +0.5 final-checkpoint gain is real (one run can't distinguish it from noise).
+  - **H2 = B + stronger augmentation** (`DATASET.ROT_FACTOR 60 DATASET.SCALE_FACTOR 0.45`): the 200 real images are seen 5×/epoch, and the train/val gap grows.
+  - G2 interpretation: if real-only is within 0.3 of D1 (final), synthetic data adds ~nothing → 7.1 (generate more synthetic) deprioritised. If clearly worse,
+    synthetic data matters → 7.1 is worth the SMIL setup.
 
 ---
 
