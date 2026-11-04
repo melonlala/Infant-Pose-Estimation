@@ -33,6 +33,9 @@ accuracy than the paper's numbers (see `STUDENT_GUIDE.md`, Part 7).
 |----|------|-------------|--------|--------------|----|------|------|----|--------|
 | E0 | 2026-10-30 | Pretrained FiDIP eval (`hrnet_fidip.pth`, GT bbox) | `w48_384x288_adam_lr1e-3_infant.yaml` | 11509270 | 92.1 | 97.1 | 97.1 | 93.6 | done |
 | E1 | 2026-10-30 | Reproduce FiDIP training (init: DarkPose `coco/w48_384x288.pth`) | `w48_384x288_adam_lr1e-3_infant.yaml` + `TRAIN.CHECKPOINT` | 11509271 | — | — | — | — | **failed** (no `tensorboard`, 9 s) |
+| E0-500 | 2026-11-03 | E0 model on **Test500** | baseline + `DATASET.ROOT data/syrip500/` | 11602004 | 98.4 | 98.9 | 98.7 | 99.3 | done |
+| E1b-500 | 2026-11-03 | E1b `model_best` on **Test500** | same | 11602005 | 98.5 | 98.9 | 98.8 | 99.3 | done |
+| E1b-F-500 | 2026-11-03 | E1b `final_state` (ep 20) on **Test500** | same | 11602006 | 98.3 | 98.9 | 98.8 | 99.1 | done |
 | E1b | 2026-11-03 | E1 resubmitted after env fix, W&B logging | same as E1 | 11601446 (pip) → 11601467 (train, afterok) | 91.1 | 97.0 | 97.0 | 92.7 | done (best @ epoch 6 of 20; final 90.3) |
 
 ---
@@ -145,6 +148,16 @@ accuracy than the paper's numbers (see `STUDENT_GUIDE.md`, Part 7).
   ids verified: 500 images `test{id}.jpg`, all present). Submitted evals of E0 / E1b best / E1b final with `DATASET.ROOT data/syrip500/`.
 - **Result:** 11601956-58 all FAILED at start: `FileNotFoundError: 'output_test500/E0'`. `create_logger` calls `mkdir()` without
   `parents=True` for `OUTPUT_DIR`, so the parent must already exist. Created `output_test500/` and resubmitted as 11602004 (E0), 11602005 (E1b best), 11602006 (E1b final).
+
+### 2026-11-03 — Test500 results: saturated, so not useful for comparing models
+- **Result (Test500, GT bbox, flip):** E0 98.4 / E1b best 98.5 / E1b final 98.3 AP (AR 99.1–99.3). On Test100 the same models score
+  92.1 / 91.1 / 90.3. All three are within 0.2 AP on Test500.
+- **Checked with md5 of image bytes (server `data/`):** Test100 ⊂ Test500 (99 unique of 100). The other ~400 images score ≈ 100 AP.
+  Exact overlap with **annotated** training images: only 4 (test20/42/46/50, all in Test100), so exact leakage does not explain the saturation.
+  203 Test500 images are byte-identical to *unannotated* `train_infant/train00xxx.jpg` files, which are unused in training. Test500 also has internal
+  duplicates (e.g. test345 = test349). Near-duplicate video frames between Test500 and the real training images are possible but unchecked.
+- **Decision:** use **Test100** as the primary metric (hard and discriminative). Report Test500 only as a secondary sanity number.
+  The 1-AP gap of E1b vs E0 on Test100 does not show up on Test500, so the gap is in the hard images.
 
 ---
 

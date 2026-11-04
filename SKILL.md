@@ -87,4 +87,5 @@ Keep this table and the `AGENT.md` summary table in sync whenever you submit, fi
   and before deleting anything (never delete outside `/home/hou.yuchen/courses/eece7373`).
 - No heavy compute on the login node: no training, no unzip of the big archives (the login node kills it). Use `sbatch`.
 - Report the job ID right after `sbatch`. Log every experiment (including failures) in `AGENT.md`.
-- Paper target: Test100 AP 93.6. Released checkpoint in our env: AP 92.1 (E0).
+- Paper target: Test100 AP 93.6. Released checkpoint in our env: AP 92.1 (E0). **Test100 is the primary metric**: Test500 is saturated (~98.4 for every model).
+- Test500 eval: `mkdir -p output_test500 && sbatch slurm/eval.sh <model> DATASET.ROOT data/syrip500/ OUTPUT_DIR output_test500/<run>`.

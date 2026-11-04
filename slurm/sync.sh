@@ -8,11 +8,13 @@ set -euo pipefail
 SERVER=/home/yuchen/courses/EECE7373/hands_on_project
 CLUSTER=explorer:/home/hou.yuchen/courses/eece7373
 cd "$SERVER"
+# the Explorer login node sometimes drops rsync connections ("connection unexpectedly closed"); rsync is incremental, so retry
+rs() { local i; for i in 1 2 3; do rsync --partial "$@" && return 0; echo "rsync failed (try $i), retrying" >&2; sleep 5; done; return 1; }
 
 case "${1:-}" in
 push)
   # Never overwrite cluster-only state: data, models, env, outputs, results, secrets, nms build products, cluster .git
-  rsync -az --itemize-changes \
+  rs -az --itemize-changes \
     --exclude='.git/' --exclude='.claude/' --exclude='.codex/' \
     --exclude='data/' --exclude='models/' --exclude='envs/' \
     --exclude='output/' --exclude='output_*/' --exclude='log/' --exclude='logs/' --exclude='wandb/' \
@@ -21,11 +23,11 @@ push)
     ./ "$CLUSTER/"
   ;;
 pull)
-  rsync -az --itemize-changes "$CLUSTER/logs/" logs/
-  rsync -az --itemize-changes "$CLUSTER/log/" log/
+  rs -az --itemize-changes "$CLUSTER/logs/" logs/
+  rs -az --itemize-changes "$CLUSTER/log/" log/
   # text results only from output dirs (no checkpoints / feature.npy / debug images)
   for d in $(ssh explorer 'cd /home/hou.yuchen/courses/eece7373 && ls -d output output_* 2>/dev/null'); do
-    rsync -az --itemize-changes --prune-empty-dirs \
+    rs -az --itemize-changes --prune-empty-dirs \
       --include='*/' --include='*.log' --include='*.json' --include='*.txt' --exclude='*' \
       "$CLUSTER/$d/" "$d/"
   done

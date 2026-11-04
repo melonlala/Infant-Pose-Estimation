@@ -43,7 +43,8 @@ Local copy under `data/` (git-ignored); cluster copy: `data/SyRIP` via rsync (15
 | `data/syrip/annotations/person_keypoints_train_infant.json` | 1200 annotated / 1500 files (`images/train_infant/`) | 1200 | present | 200 real + 1000 synthetic |
 | `data/syrip/annotations/person_keypoints_validate_infant.json` | 100 (`images/validate_infant/`) | 100 | present | = Test100 in paper; default val set |
 | `data/SyRIP/annotations/{200R,1000S,200R_1000S}/` | — | 200 / 1000 / 1200 | present | original SyRIP train subsets |
-| `data/SyRIP/annotations/validate500/` | 500 (`data/SyRIP/images/validate_infant/`) | 500 | present | = Test500 in paper |
+| `data/SyRIP/annotations/validate500/` | 500 (`data/SyRIP/images/validate_infant/`) | 500 | present | = Test500 in paper; ⊃ Test100; saturated (~98.4 AP), see AGENT.md |
+| `data/syrip500/` (cluster only) | symlinks | — | present | eval root for Test500: `DATASET.ROOT data/syrip500/` |
 | `data/SyRIP/annotations/validate100/` | — | 100 | present | = Test100 |
 | Expanded SyRIP (optional) | https://coe.northeastern.edu/Research/AClab/Expanded_SyRIP/ | — | — | for extensions |
 
@@ -80,6 +81,7 @@ All annotations are COCO format, 17 keypoints.
 |--------|-------------|--------------------|--------------|-----------------|----------|----|
 | E0 | Pretrained FiDIP eval | baseline, `TEST.USE_GT_BBOX True` | 11509270 | `models/hrnet_fidip.pth` | `logs/fidip-eval-11509270.out` | 92.1 |
 | E1 | Reproduce FiDIP training | baseline + `TRAIN.CHECKPOINT models/coco/w48_384x288.pth WORKERS 8` | 11509271 (**failed**: no tensorboard) | — | `logs/fidip-train-11509271.out` | — |
+| E0/E1b on Test500 | evals with `DATASET.ROOT data/syrip500/` (symlink root -> `data/SyRIP/annotations/validate500`, `data/SyRIP/images/validate_infant`) | `OUTPUT_DIR output_test500/{E0,E1b,E1b_final}` | 11602004 / 11602005 / 11602006 | — | `logs/fidip-eval500-*-1160200[4-6].out` | 98.4 / 98.5 / 98.3 |
 | E1b | E1 resubmitted after env fix | same as E1, `WANDB_NAME=E1b-reproduce` | 11601446 → 11601467 | `output/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/model_best.pth` (ep 6; also `final_state.pth` ep 20, `checkpoint.pth`) | `logs/fidip-train-11601467.out`, `output/.../w48_384x288_adam_lr1e-3_infant_2026-11-03-19-28_train.log`, TB `log/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant_2026-11-03-19-28/` (no W&B) | 91.1 |
 
 ## 8. Final reported result
