@@ -280,6 +280,28 @@ accuracy than the paper's numbers (see `STUDENT_GUIDE.md`, Part 7).
   2e-3) if DA is to be argued at all, real-only vs real+syn ablation (paper Table III), MobileNet (`mobile_fidip.pth`) as a backbone comparison,
   and Test96 (drop the 4 leaked images) for final numbers.
 
+### 2026-11-03 — Part 3 notes, 7.3 video/webcam app, 7.1 assessment, sampler finding
+- **Asked:** write the Part 3 notes, try 7.1 (synthetic generation) and 7.3 (webcam / video batch). After Part 7's current batch, evaluate
+  automatically and choose the next direction.
+- **Part 3:** `docs/part3_model_notes.md` covers the HRNet-W48 stages and params, the DC architecture, the alternating stage I/II with `−λ·BCE`, augmentation,
+  targets, DarkPose decoding and OKS/AP. Measured: pose net 63.6 M params; frozen `idx <= 108` = stem..stage2 + 1 conv = **1.72 M (2.7 %)**; DC 0.75 M;
+  feature tap 48×96×72.
+- **New finding:** `BalancedBatchSampler` **never shuffles**. Every epoch uses the same order and the same 100 batches, and the real oversampling is drawn once.
+  Added opt-in `TRAIN.BALANCED_SHUFFLE` (default False = identical to before; verified the default sequence is unchanged and the shuffled one keeps the
+  real/syn alternation and full coverage).
+- **7.3:** `tools/video_infer.py` (file / folder batch / webcam; keypoint-hull tracking; jsonl + csv + annotated mp4). On 3 synthetic pan/zoom clips with
+  known GT, tracking beats the whole-frame box by +0.010…+0.024 mean OKS. ~20 fps with flip, 32 fps without (RTX 6000 Ada). Details in
+  `docs/part7_synthetic_and_apps.md`.
+- **7.1:** blocked. `smil_web.pkl` and the pose prior are licence-gated (user must register). OpenDR 0.78 is not installable on our pythons, and the paths are hard-coded.
+  Documented the steps and a pyrender port. A cheap proxy experiment (real-only vs real+syn) decides whether more synthetic data is worth it.
+- **Pre-registered rule for the next batch (G-track), applied automatically when F4 finishes.** Metric: Test500f AP of `model_best`.
+  Significant = beats D1 (91.4) by ≥ 0.3 (noise D1 vs F1 = 0.2).
+  - Base config B = F4's 100-epoch setting if F4 is significant, else D1 (20 ep).
+  - Always run **G1 = B + `TRAIN.BALANCED_SHUFFLE True`** (sampler fix) and **G2 = real-only 200R** (`data/syrip_fixed_200R`, matched 2000 iters:
+    200 ep with LR_STEP 400,500; ×5 if B is 100-ep) → value of synthetic data / 7.1.
+  - **G3 = B + LR 5e-5** (F3 showed 1e-3 overfits; check the other side).
+  - Afterwards: adopt whatever is significant into B and continue (augmentation strength, λ sweep only if DA ever helps, MobileNet comparison).
+
 ---
 
 ## Dead ends & lessons learned
