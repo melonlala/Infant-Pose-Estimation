@@ -108,6 +108,26 @@ def main():
         os.path.join(this_dir, '../lib/models', cfg.MODEL.NAME + '.py'),
         final_output_dir)
 
+    # W&B (optional): enabled when WANDB_API_KEY is set (slurm/train.sh sources .env).
+    # Must start before SummaryWriter so sync_tensorboard mirrors its scalars.
+    # The run id is stored in final_output_dir so AUTO_RESUME jobs continue the same run.
+    wandb_run = None
+    if os.environ.get('WANDB_API_KEY') and os.environ.get('WANDB_MODE') != 'disabled':
+        import wandb
+        id_file = os.path.join(final_output_dir, 'wandb_run_id.txt')
+        if os.path.exists(id_file):
+            run_id = open(id_file).read().strip()
+        else:
+            run_id = wandb.util.generate_id()
+            with open(id_file, 'w') as f:
+                f.write(run_id)
+        wandb_run = wandb.init(
+            project=os.environ.get('WANDB_PROJECT', 'fidip'),
+            name=os.environ.get('WANDB_NAME') or os.path.basename(final_output_dir),
+            id=run_id, resume='allow', sync_tensorboard=True,
+            config={'cfg': dict(cfg), 'slurm_job_id': os.environ.get('SLURM_JOB_ID')},
+        )
+
     writer_dict = {
         'writer': SummaryWriter(log_dir=tb_log_dir),
         'pre_train_global_steps': 0,
@@ -318,6 +338,10 @@ def main():
         else:
             best_model = False
 
+        if wandb_run is not None:
+            wandb_run.log({'val/AP': perf_indicator, 'val/best_AP': best_perf,
+                           'epoch': epoch + 1})
+
         logger.info('=> saving checkpoint to {}'.format(final_output_dir))
         save_checkpoint({
             'epoch': epoch + 1,
@@ -334,6 +358,9 @@ def main():
         final_model_state_file))
     torch.save(model_p.module.state_dict(), final_model_state_file)
     writer_dict['writer'].close()
+    if wandb_run is not None:
+        wandb_run.summary['best_AP'] = best_perf
+        wandb_run.finish()
 
     np.save('./losses_D.npy', np.array(losses_D_list))  # Adversarial-D
     np.save('./losses_P.npy', np.array(losses_P_list))   # P
