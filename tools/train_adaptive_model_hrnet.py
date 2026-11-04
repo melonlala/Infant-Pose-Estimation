@@ -338,9 +338,12 @@ def main():
         else:
             best_model = False
 
+        max_mem_gb = torch.cuda.max_memory_allocated() / 1024 ** 3
+        logger.info('=> epoch {} val AP {:.4f} (best {:.4f}), peak GPU mem {:.2f} GiB'.format(
+            epoch, perf_indicator, best_perf, max_mem_gb))
         if wandb_run is not None:
             wandb_run.log({'val/AP': perf_indicator, 'val/best_AP': best_perf,
-                           'epoch': epoch + 1})
+                           'gpu/peak_mem_gib': max_mem_gb, 'epoch': epoch + 1})
 
         logger.info('=> saving checkpoint to {}'.format(final_output_dir))
         save_checkpoint({
