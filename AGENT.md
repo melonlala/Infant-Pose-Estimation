@@ -46,9 +46,9 @@ accuracy than the paper's numbers (see `STUDENT_GUIDE.md`, Part 7).
 | D0 | 2026-11-03 | *(user)* E0 `hrnet_fidip.pth` on **fixed Test100** (`data/syrip_fixed`, correct test11) | `DATASET.ROOT data/syrip_fixed/` | 11602447 | **93.6** | 98.5 | 98.5 | 94.6 | done; = paper's 93.6 |
 | D0b | 2026-11-03 | *(user)* E1b `model_best` on fixed Test100 | same | 11602449 | 92.6 | 98.5 | 98.5 | 93.7 | done |
 | D1 | 2026-11-03 | *(user)* retrain E1b config on **fixed labels** (`200R_1000S`), DA off, 20 ep | `train.sh DATASET.ROOT data/syrip_fixed/ OUTPUT_DIR output/D1` | 11602450 | **93.8** | 98.5 | 98.5 | 94.9 | done (best @ epoch 16, 0-idx; final 93.6); W&B run 0997f45c |
-| F1 | 2026-11-03 | D1 replicate (run-to-run noise on fixed data) | `submit_run.sh F1` (D1 config, `data/syrip_fixed`) | 11603301 → t5b 11603312, t5f 11603317 | — | — | — | — | running |
-| F2 | 2026-11-03 | D1 + DA (`LAMBDA 0.0005`, `PRE_EPOCH 1`) | `submit_run.sh F2 ...` | 11603328 → 11603329, 11603330 | — | — | — | — | queued |
-| F3 | 2026-11-03 | D1 + LR 1e-3 (paper LR) | `submit_run.sh F3 ... TRAIN.LR 0.001` | 11603335 → 11603336, 11603337 | — | — | — | — | queued |
+| F1 | 2026-11-03 | D1 replicate (run-to-run noise on fixed data) | `submit_run.sh F1` (D1 config, `data/syrip_fixed`) | 11603301 → t5b 11603312, t5f 11603317 | 93.7 | 98.5 | 98.5 | 94.8 | done (best @ 15, final 93.5); **Test500f 91.2 best / 91.2 final** |
+| F2 | 2026-11-03 | D1 + DA (`LAMBDA 0.0005`, `PRE_EPOCH 1`) | `submit_run.sh F2 ...` | 11603328 → 11603329, 11603330 | 93.8 | 98.5 | 98.5 | 94.7 | done (best @ 17, final 93.5); **Test500f 90.9 / 91.0** |
+| F3 | 2026-11-03 | D1 + LR 1e-3 (paper LR) | `submit_run.sh F3 ... TRAIN.LR 0.001` | 11603335 → 11603336, 11603337 | 93.3 | 98.4 | 98.4 | 94.7 | done (best @ 13, final 92.9); **Test500f 89.9 / 90.6** |
 | F4 | 2026-11-03 | D1 + 100 epochs (LR drop ×0.1 at ep 40) | `submit_run.sh F4 ... TRAIN.END_EPOCH 100` | 11603343 → 11603344, 11603345 | — | — | — | — | queued |
 
 ---
@@ -258,6 +258,27 @@ accuracy than the paper's numbers (see `STUDENT_GUIDE.md`, Part 7).
   destabilise fine-tuning from COCO weights. F4: D1 was still improving at epoch ~16, so longer training plus the LR drop at 40 should help.
 - **Note:** F1's first `submit_run.sh` call hit the local 100 s SSH timeout but kept running on the cluster and submitted its evals (11603312/17).
   My manual re-submits (11603316/23) were duplicates and were cancelled.
+
+### 2026-11-03 — F1–F3 results (fixed data; F4 still running)
+| Run | change vs D1 | Test100 best / final | Test500f best / final |
+|---|---|---|---|
+| D1 | — | 93.8 / 93.6 | 91.4 / — |
+| F1 | none (replicate) | 93.7 / 93.5 | 91.2 / 91.2 |
+| F2 | DA on (λ 0.0005, PRE_EPOCH 1) | 93.8 / 93.5 | 90.9 / 91.0 |
+| F3 | LR 1e-3 | 93.3 / 92.9 | 89.9 / 90.6 |
+- **Noise:** D1 vs F1 differ by 0.1–0.2 AP on both test sets. Changes ≤ ~0.3 are not significant from single runs.
+- **DA (F2): no gain, maybe a slight loss on Test500f (−0.2…−0.5).** It does what it is meant to do: domain-classifier accuracy stays at 0.58–0.67 vs
+  0.46→0.82 in F1, so features become more domain-invariant. But invariance does not translate into keypoint accuracy here.
+  The paper's Finetune→FiDIP +0.9 (Table IV) is **not reproduced** on correct labels. Possible reasons: a single λ (paper value), only 20 epochs, and
+  stage I/II here alternate every iteration, not as in the paper (not stated). Logged train loss for DA runs is `MSE − λ·BCE` (goes negative), so
+  it is not comparable with the other runs (`plot_curves.py` now labels this).
+- **LR 1e-3 (F3): worse (−0.5 Test100, −1.5 Test500f best) and noisier.** It also has the lowest train MSE (2.1e-4) and highest train PCK (0.947)
+  while val is worse. This is **clear overfitting**: the val/train loss ratio is 1.56 vs 1.25 for F1. The paper's LR is too high for fine-tuning from COCO weights
+  in this code. Keep 1e-4.
+- **Best so far:** D1/F1/F2 are tied within noise. No ablation beats D1 yet.
+- **Next:** wait for F4 (100 ep). Then candidates: lower LR (5e-5) or cosine schedule, stronger augmentation for the 200 real images, λ sweep (1e-4,
+  2e-3) if DA is to be argued at all, real-only vs real+syn ablation (paper Table III), MobileNet (`mobile_fidip.pth`) as a backbone comparison,
+  and Test96 (drop the 4 leaked images) for final numbers.
 
 ---
 

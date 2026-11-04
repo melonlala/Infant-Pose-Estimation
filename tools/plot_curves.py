@@ -66,7 +66,8 @@ def main():
     fig.suptitle(f'{name}: FiDIP training on SyRIP (val = Test100)', x=0.01, ha='left', fontsize=12, color=INK)
 
     # 1. pose loss: train (per-epoch mean, raw samples faint) vs val
-    ax = axs[0, 0]; style(ax, 'Pose heatmap loss (MSE)', 'loss')
+    da = d['train_loss_P'][1].min() < 0   # with DA the logged train loss is MSE - lambda*BCE, not pure MSE
+    ax = axs[0, 0]; style(ax, 'Pose loss' + (' (train = MSE - λ·BCE, DA on; val = MSE)' if da else ' (heatmap MSE)'), 'loss')
     ax.plot(tr_ep('train_loss_P'), d['train_loss_P'][1], color=C[0], lw=0.8, alpha=0.25)
     tl, vl = per_epoch('train_loss_P'), d['valid_loss'][1]
     ax.plot(ep + 1, tl, color=C[0], lw=2, label='train (epoch mean)')
