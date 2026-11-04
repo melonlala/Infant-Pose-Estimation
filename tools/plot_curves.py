@@ -66,13 +66,14 @@ def main():
     fig.suptitle(f'{name}: FiDIP training on SyRIP (val = Test100)', x=0.01, ha='left', fontsize=12, color=INK)
 
     # 1. pose loss: train (per-epoch mean, raw samples faint) vs val
-    ax = axs[0, 0]; style(ax, 'Pose heatmap loss (MSE)', 'loss')
+    da = d['train_loss_P'][1].min() < 0   # with DA the logged train loss is MSE - lambda*BCE, not pure MSE
+    ax = axs[0, 0]; style(ax, 'Pose loss' + (' (train = MSE - λ·BCE, DA on; val = MSE)' if da else ' (heatmap MSE)'), 'loss')
     ax.plot(tr_ep('train_loss_P'), d['train_loss_P'][1], color=C[0], lw=0.8, alpha=0.25)
     tl, vl = per_epoch('train_loss_P'), d['valid_loss'][1]
     ax.plot(ep + 1, tl, color=C[0], lw=2, label='train (epoch mean)')
     ax.plot(ep + 1, vl, color=C[1], lw=2, label='val')
     label_end(ax, ep + 1, tl, 'train', C[0]); label_end(ax, ep + 1, vl, 'val', C[1])
-    ax.legend(frameon=False, fontsize=8, loc='upper right')
+    ax.legend(frameon=False, fontsize=8, loc='best')
 
     # 2. keypoint accuracy (PCK-style, from the training code) train vs val
     ax = axs[0, 1]; style(ax, 'Keypoint accuracy (PCK@0.5 heatmap)', 'accuracy')
@@ -84,10 +85,21 @@ def main():
 
     # 3. val COCO metrics
     ax = axs[1, 0]; style(ax, 'Validation keypoint AP / AR (Test100)', 'score')
+    ends = []
     for i, (tag, lab) in enumerate([('valid_AP', 'AP'), ('valid_Ap .5', 'AP50'), ('valid_AP .75', 'AP75'), ('valid_AR', 'AR')]):
         if tag in d:
             y = d[tag][1]; ax.plot(ep + 1, y, color=C[i], lw=2, label=lab, marker='o', ms=3.5, mec=SURF, mew=1)
-            label_end(ax, ep + 1, y, f'{lab} {y[-1]:.3f}', C[i])
+            ends.append([y[-1], lab, C[i], y])
+    # merge end labels that would collide (e.g. AP50 == AP75) into one "AP50 = AP75 0.985" label
+    span = max(e[0] for e in ends) - min(e[0] for e in ends) or 1.0
+    ends.sort(key=lambda e: -e[0]); groups = []
+    for e in ends:
+        if groups and abs(groups[-1][-1][0] - e[0]) < 0.04 * span + 1e-3:
+            groups[-1].append(e)
+        else:
+            groups.append([e])
+    for g in groups:
+        label_end(ax, ep + 1, g[0][3], ' = '.join(e[1] for e in g) + f' {g[0][0]:.3f}', g[0][2])
     b = int(np.argmax(d['valid_AP'][1]))
     ax.annotate(f'best AP {d["valid_AP"][1][b]:.3f} @ epoch {b + 1}', (b + 1, d['valid_AP'][1][b]),
                 xytext=(28, -24), textcoords='offset points', ha='left', fontsize=8, color=INK2,
@@ -103,7 +115,7 @@ def main():
     ax.axhline(0.5, color=INK2, lw=0.8, ls=(0, (3, 3)))
     ax.annotate('chance = 0.5', (1, 0.5), xytext=(2, 3), textcoords='offset points', fontsize=7.5, color=INK2)
     label_end(ax, ep + 1, da, 'acc', C[2]); label_end(ax, ep + 1, dl, 'loss', C[3])
-    ax.legend(frameon=False, fontsize=8, loc='center right')
+    ax.legend(frameon=False, fontsize=8, loc='best')
 
     for ax in axs.flat:
         ax.set_xticks(range(0, n_ep + 1, max(1, n_ep // 10)))

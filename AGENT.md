@@ -43,12 +43,22 @@ accuracy than the paper's numbers (see `STUDENT_GUIDE.md`, Part 7).
 | E4 | 2026-11-03 | E1b + 100 ep | `output/E4` | 11602175 | — | — | — | — | **failed** (same W&B bug), superseded |
 | E5–E8 | 2026-11-03 | clean-data runs (`data/syrip_clean`): E5 plain, E6 +DA, E7 paper-like, E8 100 ep | `output/E5..E8` | 11602485, 11602498/11602574 (dup), 11602575, 11602580 | — | — | — | — | **cancelled** by request: the user is retraining on their own fix (D-track, `data/syrip_fixed`) |
 | P100 probe | 2026-11-03 | 1 epoch on P100-16GB, E2 settings | `output/probe_p100` | 11602176 | — | — | — | — | **CUDA OOM** → P100 not usable at batch 20 (V100 peak 12.6 GiB plain / 17.2 GiB with DA) |
-| D0 | 2026-11-03 | Released `hrnet_fidip.pth` on **fixed** Test100 (correct test11) | baseline + `DATASET.ROOT data/syrip_fixed/` | 11602447 | 93.6 | 98.5 | 98.5 | 94.6 | done (= paper; offline estimate was 92.7) |
-| D0b | 2026-11-03 | E1b `model_best` on **fixed** Test100 | same | 11602449 | — | — | — | — | queued (offline estimate 92.7) |
-| D1 | 2026-11-03 | E1b config, **fixed train labels** (only data changed) | baseline + `DATASET.ROOT data/syrip_fixed/`, `OUTPUT_DIR output/D1` | 11602450 | — | — | — | — | queued |
-| T5f-E0 | 2026-11-03 | Released `hrnet_fidip.pth` on **Test500, area fixed** | baseline + `DATASET.ROOT data/syrip500_fixed/`, `OUTPUT_DIR output_test500f/E0` | 11602599 | — | — | — | — | queued (offline estimate 90.9) |
-| T5f-E1b | 2026-11-03 | E1b `model_best` on Test500, area fixed | same, `output_test500f/E1b` | 11602600 | — | — | — | — | queued (offline estimate 89.7) |
-| T5f-D1 | 2026-11-03 | D1 `model_best` on Test500, area fixed | same, `output_test500f/D1` | 11602601 (afterok 11602450) | — | — | — | — | waiting on D1 |
+| D0 | 2026-11-03 | *(user)* E0 `hrnet_fidip.pth` on **fixed Test100** (`data/syrip_fixed`, correct test11) | `DATASET.ROOT data/syrip_fixed/` | 11602447 | **93.6** | 98.5 | 98.5 | 94.6 | done; = paper's 93.6 |
+| D0b | 2026-11-03 | *(user)* E1b `model_best` on fixed Test100 | same | 11602449 | 92.6 | 98.5 | 98.5 | 93.7 | done |
+| D1 | 2026-11-03 | *(user)* retrain E1b config on **fixed labels** (`200R_1000S`), DA off, 20 ep | `train.sh DATASET.ROOT data/syrip_fixed/ OUTPUT_DIR output/D1` | 11602450 | **93.8** | 98.5 | 98.5 | 94.9 | done (best @ epoch 16, 0-idx; final 93.6); W&B run 0997f45c |
+| F1 | 2026-11-03 | D1 replicate (run-to-run noise on fixed data) | `submit_run.sh F1` (D1 config, `data/syrip_fixed`) | 11603301 → t5b 11603312, t5f 11603317 | 93.7 | 98.5 | 98.5 | 94.8 | done (best @ 15, final 93.5); **Test500f 91.2 best / 91.2 final** |
+| F2 | 2026-11-03 | D1 + DA (`LAMBDA 0.0005`, `PRE_EPOCH 1`) | `submit_run.sh F2 ...` | 11603328 → 11603329, 11603330 | 93.8 | 98.5 | 98.5 | 94.7 | done (best @ 17, final 93.5); **Test500f 90.9 / 91.0** |
+| F3 | 2026-11-03 | D1 + LR 1e-3 (paper LR) | `submit_run.sh F3 ... TRAIN.LR 0.001` | 11603335 → 11603336, 11603337 | 93.3 | 98.4 | 98.4 | 94.7 | done (best @ 13, final 92.9); **Test500f 89.9 / 90.6** |
+| F4 | 2026-11-03 | D1 + 100 epochs (LR drop ×0.1 at ep 40) | `submit_run.sh F4 ... TRAIN.END_EPOCH 100` | 11603343 → 11603344, 11603345 | 94.1 | — | — | 95.1 | done (best @ 20, final 94.0); **Test500f 91.0 best / 91.7 final** |
+| G1 | 2026-11-03 | D1 + `TRAIN.BALANCED_SHUFFLE True` (sampler fix) | `submit_run.sh G1 ...` | 11606776 → 11606777, 11606778 | 94.2 | — | — | — | done (best @ 12, final 94.0); **Test500f 91.4 / 91.5** → adopted |
+| G2 | 2026-11-03 | **real-only** 200R, 200 ep (= 2000 iters like D1), no LR drop | `ROOT=data/syrip_fixed_200R/ submit_run.sh G2 ... TRAIN.END_EPOCH 200 TRAIN.LR_STEP [400,500]` | 11606811 → 11606812, 11606813 | 93.9 | — | — | — | done (best = final @ 199); **Test500f 91.3 / 91.3** |
+| G3 | 2026-11-03 | D1 + LR 5e-5 | `submit_run.sh G3 ... TRAIN.LR 0.00005` | 11606822 → 11606823, 11606824 | 93.4 | — | — | — | done (best @ 17, final 93.3); **Test500f 90.9 / 91.0** |
+| H1 | 2026-11-04 | F4 replicate (100 ep, no shuffle) | `submit_run.sh H1 ... TRAIN.END_EPOCH 100` | 11607648 → 11607652, 11607654 | 94.3 | — | — | — | done (best @ 30, final 93.9); **Test500f 91.4 / 91.6** → with F4: confirmed |
+| H2 | 2026-11-04 | B (= D1 + shuffle) + stronger aug (`ROT_FACTOR 60`, `SCALE_FACTOR 0.45`) | `submit_run.sh H2 ...` | 11607656 → 11607658, 11607659 | 94.0 | — | — | — | done (best @ 14, final 93.9); **Test500f 91.4 / 91.6** (single run, not confirmable) |
+| H3 | 2026-11-04 | G1 replicate (D1 + shuffle); *extra confirmation run, not in the rule* | `submit_run.sh H3 ... TRAIN.BALANCED_SHUFFLE True` | 11607662 → 11607664, 11607666 | 94.2 | — | — | — | done (best @ 12, final 93.9); **Test500f 91.3 / 91.3** → shuffle pair mean 91.4 < 91.5, not confirmed |
+| T5f-E0 | 2026-11-03 | Released `hrnet_fidip.pth` on **Test500f** (Test500, `area` = bbox w*h) | `DATASET.ROOT data/syrip500_fixed/`, `OUTPUT_DIR output_test500f/E0` | 11602599 | 90.9 | 98.7 | 96.7 | 92.3 | done |
+| T5f-E1b | 2026-11-03 | E1b `model_best` on Test500f | same, `output_test500f/E1b` | 11602600 | 89.7 | 98.8 | 95.7 | 91.4 | done |
+| T5f-D1 | 2026-11-03 | D1 `model_best` on Test500f | same, `output_test500f/D1` | 11602601 (afterok 11602450) | 91.4 | 98.8 | 96.7 | 92.6 | done |
 
 ---
 
@@ -201,6 +211,9 @@ accuracy than the paper's numbers (see `STUDENT_GUIDE.md`, Part 7).
   and val does not, but val loss and AP do not degrade, so it is a plateau, not classic overfitting. Best-epoch selection on Test100 picks noise
   (best epochs 6, 18, 9 across E1b/E1c/E2). Report best and final. The plateau is partly explained by the label defect below: half of every batch
   carried wrong targets.
+- **Superseded (2026-11-04, see "Part 4.5 corrected" below):** this reading was made on broken data and is wrong in its cause. The
+  plateau after epoch 6 and the slowly falling, high train loss come from the **wrong synthetic labels** (half of every batch had unlearnable targets)
+  plus the swapped `test11.jpg` capping val AP. With correct labels (D1) train loss is 2.5× lower and val AP keeps rising to epoch ~17.
 
 ### 2026-11-03 — Part 4 visualisation + data audit: synthetic training labels in syrip_for_train are wrong
 - **Did:** `tools/fidip_infer.py` (shared inference = eval path), `tools/visualize_preds.py` (GT vs pred grids for worst/best OKS, per-keypoint
@@ -273,7 +286,7 @@ accuracy than the paper's numbers (see `STUDENT_GUIDE.md`, Part 7).
 - **Note:** a parallel sweep (E1c/E2/E3/E4/p100probe, submitted 20:12 from another session) still trains on `data/syrip/`,
   i.e. with the broken synthetic labels. Its results are not comparable with track D. The QOS allows 2 running jobs per user, so D jobs queue behind it.
 - **Hypothesis:** about half of every batch had wrong pose targets. With correct targets, the synthetic half should help instead of hurting,
-  so D1 should beat E1b (92.7 on fixed Test100) and may reach or exceed the paper's 93.6.
+  so D1 should beat E1b (92.6 on fixed Test100, D0b) and may reach or exceed the paper's 93.6. *(Result: D1 93.8 best / 93.6 final; see the next entries.)*
 - **Compare against:** D0 / D0b (same fixed Test100), not the old 92.1 / 91.1.
 
 ### 2026-11-03 — Test500 with a valid `area` (third data fix)
@@ -284,6 +297,184 @@ accuracy than the paper's numbers (see `STUDENT_GUIDE.md`, Part 7).
 - **Note:** the offline Test100 estimate (92.7) was too low. The real D0 eval on `data/syrip_fixed` gave **93.6 / 98.5 / 98.5 / AR 94.6**, which matches the paper.
   The whole E0 gap (92.1 vs 93.6) was the wrong `test11.jpg`.
 - **Next:** Test500 (area fixed) is now usable as a second metric. It is not used for model selection, so it avoids the Test100 `model_best` bias.
+
+### 2026-11-03 — Check of the user's data fix (`data/syrip_fixed`) and D-track results
+- **Asked:** check the updated fixed data and the model trained on it.
+- **Audit of `data/syrip_fixed` (server and cluster):** train ann -> `SyRIP/annotations/200R_1000S` (the correct synthetic labels). `train_pre`
+  and val ann are unchanged. `validate_infant/test11.jpg` -> SyRIP's 1536×2048 file (md5 0161fbed on both machines). 0 size mismatches in train/val.
+  It is functionally identical to `data/syrip_clean`. Still present: the 4 Test100 <-> annotated-train duplicates (test20/42/46/50).
+- **Results (Test100 fixed):** released E0 **93.6** (exactly the paper's DarkPose+FiDIP number; the earlier 92.1 came entirely from the swapped
+  test11, not the environment). E1b 92.6. **D1 93.8** best / 93.6 final. Fixing the labels is worth **+1.2 AP** over E1b, and D1 matches or slightly beats
+  the released checkpoint (+0.2, within the ±0.3 run noise from E1b vs E1c).
+- **Results (Test500 with fixed area, T5f jobs of the 原始数据标注检查 session, not used for model selection):** E0 90.9, E1b 89.7, **D1 91.4**
+  (AP50 98.8, AP75 96.7, AR 92.6). D1 beats the released checkpoint by **+0.5** on the larger set.
+- **Curves (`figures/D1_curves.png` vs `figures/E1b_curves.png`):** with correct targets the train MSE ends at 2.7e-4 (E1b 6.7e-4) and train PCK at
+  0.92 (E1b 0.65). Val AP keeps rising to epoch ~16 instead of plateauing at ~5, so the E1b "plateau" was mostly label noise. Now val loss > train loss
+  (ratio 1.16), a normal small generalisation gap with no sign of over/underfitting in 20 epochs. The domain classifier only reaches 0.6–0.83
+  accuracy (E1b 1.0) even with DA off; with correct synthetic poses, real and synthetic features are less separable.
+- **Decision / next:** D1 is the new reproduction baseline (93.8 Test100 / 91.4 Test500f). Part 7 ablations should restart from D1 on
+  `data/syrip_fixed`: replicate D1 (noise), +DA (λ 0.0005, PRE_EPOCH 1), LR 1e-3, 100 epochs. Report Test500f alongside Test100, and consider
+  removing the 4 leaked Test100 images (or reporting Test96) for the final numbers.
+
+### 2026-11-03 — Part 7 restarted from D1 on fixed data (F-track)
+- **Asked:** restart the Part 7 experiments from D1 on `data/syrip_fixed`.
+- **Did:** `slurm/submit_run.sh <NAME> <TIME> [overrides]` (commit cfc5da2) submits the train job plus two `afterok` Test500-fixed-area evals
+  (`model_best` -> `output_test500f/<NAME>`, `final_state` -> `output_test500f/<NAME>_final`), and refuses a reused `output/<NAME>`.
+  Each run changes one factor vs D1: F1 replicate, F2 +DA, F3 LR 1e-3, F4 100 epochs. W&B is on (project `fidip`, run names = F1..F4).
+- **Hypotheses:** F1 measures noise on clean data (E1b vs E1c gave ±0.3 on broken data). F2: with correct labels the DC is no longer trivially
+  separating domains (D1 acc_D 0.6–0.83), so λ = 0.0005 should give a small gain, as in paper Table IV (+0.9 Finetune -> FiDIP). F3: the paper's 1e-3 may
+  destabilise fine-tuning from COCO weights. F4: D1 was still improving at epoch ~16, so longer training plus the LR drop at 40 should help.
+- **Note:** F1's first `submit_run.sh` call hit the local 100 s SSH timeout but kept running on the cluster and submitted its evals (11603312/17).
+  My manual re-submits (11603316/23) were duplicates and were cancelled.
+
+### 2026-11-03 — F1–F3 results (fixed data; F4 still running)
+| Run | change vs D1 | Test100 best / final | Test500f best / final |
+|---|---|---|---|
+| D1 | — | 93.8 / 93.6 | 91.4 / — |
+| F1 | none (replicate) | 93.7 / 93.5 | 91.2 / 91.2 |
+| F2 | DA on (λ 0.0005, PRE_EPOCH 1) | 93.8 / 93.5 | 90.9 / 91.0 |
+| F3 | LR 1e-3 | 93.3 / 92.9 | 89.9 / 90.6 |
+- **Noise:** D1 vs F1 differ by 0.1–0.2 AP on both test sets. Changes ≤ ~0.3 are not significant from single runs.
+- **DA (F2): no gain, maybe a slight loss on Test500f (−0.2…−0.5).** It does what it is meant to do: domain-classifier accuracy stays at 0.58–0.67 vs
+  0.46→0.82 in F1, so features become more domain-invariant. But invariance does not translate into keypoint accuracy here.
+  The paper's Finetune→FiDIP +0.9 (Table IV) is **not reproduced** on correct labels. Possible reasons: a single λ (paper value), only 20 epochs, and
+  stage I/II here alternate every iteration, not as in the paper (not stated). Logged train loss for DA runs is `MSE − λ·BCE` (goes negative), so
+  it is not comparable with the other runs (`plot_curves.py` now labels this).
+- **LR 1e-3 (F3): worse (−0.5 Test100, −1.5 Test500f best) and noisier.** It also has the lowest train MSE (2.1e-4) and highest train PCK (0.947)
+  while val is worse. This is **clear overfitting**: the val/train loss ratio is 1.56 vs 1.25 for F1. The paper's LR is too high for fine-tuning from COCO weights
+  in this code. Keep 1e-4.
+- **Best so far:** D1/F1/F2 are tied within noise. No ablation beats D1 yet.
+- **Next:** wait for F4 (100 ep). Then candidates: lower LR (5e-5) or cosine schedule, stronger augmentation for the 200 real images, λ sweep (1e-4,
+  2e-3) if DA is to be argued at all, real-only vs real+syn ablation (paper Table III), MobileNet (`mobile_fidip.pth`) as a backbone comparison,
+  and Test96 (drop the 4 leaked images) for final numbers.
+
+### 2026-11-03 — Part 3 notes, 7.3 video/webcam app, 7.1 assessment, sampler finding
+- **Asked:** write the Part 3 notes, try 7.1 (synthetic generation) and 7.3 (webcam / video batch). After Part 7's current batch, evaluate
+  automatically and choose the next direction.
+- **Part 3:** `docs/part3_model_notes.md` covers the HRNet-W48 stages and params, the DC architecture, the alternating stage I/II with `−λ·BCE`, augmentation,
+  targets, DarkPose decoding and OKS/AP. Measured: pose net 63.6 M params; frozen `idx <= 108` = stem..stage2 + 1 conv = **1.72 M (2.7 %)**; DC 0.75 M;
+  feature tap 48×96×72.
+- **New finding:** `BalancedBatchSampler` **never shuffles**. Every epoch uses the same order and the same 100 batches, and the real oversampling is drawn once.
+  Added opt-in `TRAIN.BALANCED_SHUFFLE` (default False = identical to before; verified the default sequence is unchanged and the shuffled one keeps the
+  real/syn alternation and full coverage).
+- **7.3:** `tools/video_infer.py` (file / folder batch / webcam; keypoint-hull tracking; jsonl + csv + annotated mp4). On 3 synthetic pan/zoom clips with
+  known GT, tracking beats the whole-frame box by +0.010…+0.024 mean OKS. ~20 fps with flip, 32 fps without (RTX 6000 Ada). Details in
+  `docs/part7_synthetic_and_apps.md`.
+- **7.1:** blocked. `smil_web.pkl` and the pose prior are licence-gated (user must register). OpenDR 0.78 is not installable on our pythons, and the paths are hard-coded.
+  Documented the steps and a pyrender port. A cheap proxy experiment (real-only vs real+syn) decides whether more synthetic data is worth it.
+- **Pre-registered rule for the next batch (G-track), applied automatically when F4 finishes.** Metric: Test500f AP of `model_best`.
+  Significant = beats D1 (91.4) by ≥ 0.3 (noise D1 vs F1 = 0.2).
+  - Base config B = F4's 100-epoch setting if F4 is significant, else D1 (20 ep).
+  - Always run **G1 = B + `TRAIN.BALANCED_SHUFFLE True`** (sampler fix) and **G2 = real-only 200R** (`data/syrip_fixed_200R`, matched 2000 iters:
+    200 ep with LR_STEP 400,500; ×5 if B is 100-ep) → value of synthetic data / 7.1.
+  - **G3 = B + LR 5e-5** (F3 showed 1e-3 overfits; check the other side).
+  - Afterwards: adopt whatever is significant into B and continue (augmentation strength, λ sweep only if DA ever helps, MobileNet comparison).
+
+### 2026-11-03 — F4 result and automatic decision -> G-track
+- **F4 (100 ep):** Test100 rises to 94.1 at epoch 20 (0-idx) and then sits flat at 93.8–94.1 for 80 epochs (final 94.0). The LR drop at 40 changes nothing on val.
+  Val loss keeps creeping down (3.10e-4 -> 3.02e-4) while train loss falls faster (2.8e-4 -> 1.9e-4; ratio 1.11 -> 1.58): a growing generalisation gap, but no
+  val degradation (`figures/F4_curves.png`).
+  Test500f: **model_best 91.0, final_state 91.7**.
+- **Rule applied (pre-registered above):** the metric is Test500f of `model_best`. 91.0 < 91.4 + 0.3, so **not significant → base B = D1 (20 ep)**. Submitted
+  G1 (shuffle), G2 (real-only), G3 (LR 5e-5) unchanged from the rule.
+- **Observation that changes future rules:** F4's *final* checkpoint (91.7) beats its Test100-selected *best* (91.0) on Test500f, and beats F1-final (91.2) by +0.5.
+  Picking the best epoch on Test100 (which is also part of Test500) is a biased, noisy selector. For later decisions both checkpoints are reported, and
+  adoption needs **≥ 0.3 on final_state Test500f** (no test-set selection). This is stated before seeing the G results.
+- **Pre-registered rule for the H-track (applied automatically when G1–G3 finish):**
+  - Adopt into B every G change whose final_state Test500f ≥ B's final + 0.3. B's final is F1-final 91.2 for the 20-ep D1 config.
+  - **H1 = F4 replicate (100 ep)**, to check whether the +0.5 final-checkpoint gain is real (one run can't distinguish it from noise).
+  - **H2 = B + stronger augmentation** (`DATASET.ROT_FACTOR 60 DATASET.SCALE_FACTOR 0.45`): the 200 real images are seen 5×/epoch, and the train/val gap grows.
+  - G2 interpretation: if real-only is within 0.3 of D1 (final), synthetic data adds ~nothing → 7.1 (generate more synthetic) deprioritised. If clearly worse,
+    synthetic data matters → 7.1 is worth the SMIL setup.
+
+### 2026-11-04 — G-track results and automatic decision -> H-track
+| Run | change vs D1 | Test100 best / final | Test500f best / **final** |
+|---|---|---|---|
+| F1 (D1 replicate, reference) | — | 93.7 / 93.5 | 91.2 / **91.2** |
+| G1 | sampler reshuffle per epoch | **94.2 / 94.0** | 91.4 / **91.5** |
+| G2 | real-only 200R (matched 2000 iters) | 93.9 / 93.9 | 91.3 / **91.3** |
+| G3 | LR 5e-5 | 93.4 / 93.3 | 90.9 / **91.0** |
+- **Rule (adopt if final Test500f ≥ 91.2 + 0.3 = 91.5):** **G1 adopted** (91.5, exactly at the bar; it also has the best Test100 of any run, +0.5 vs F1).
+  It is borderline from a single run, so H3 replicates it (extra run, outside the rule). New base **B = D1 + `TRAIN.BALANCED_SHUFFLE True`**. G3 is not adopted;
+  together with F3 this means LR 1e-4 is a sweet spot (5e-5 underfits slightly, 1e-3 overfits).
+- **G2 (value of synthetic data): real-only reaches 91.3, within 0.1 of real+syn (F1 91.2).** At matched iterations the 1000 synthetic images add
+  nothing measurable for a COCO-pretrained HRNet-W48. That is unlike the paper's Table III (SimpleBaseline-50: 200 real 87.1 vs 1200 R+S 90.1).
+  Per the rule, **7.1 (generating more synthetic data with SMIL) is deprioritised**. G2's best epoch is its last, so real-only may not have saturated yet.
+- **H-track submitted per rule:** H1 = F4 replicate (does 100 ep really help on the final checkpoint?), H2 = B + stronger augmentation, plus H3 = G1 replicate.
+- **Pre-registered wrap-up after H (no more automatic batches after that):** a config counts as *confirmed* if its replicate pair has mean final
+  Test500f ≥ 91.5 and both runs ≥ 91.2. Pick the final model = best mean final Test500f among confirmed configs (else D1). Report Test100,
+  Test500f and Test96 (Test100 minus the 4 leaked images), then stop and ask the user before launching anything else.
+- **H-track results / wrap-up applied (2026-11-04).** Final-checkpoint Test500f: H1 91.6, H2 91.6, H3 91.3.
+  - **100 ep (F4/H1): 91.7 / 91.6, mean 91.65, both ≥ 91.2 → confirmed.** Only confirmed config.
+  - Shuffle (G1/H3): 91.5 / 91.3, mean 91.4 → **not confirmed**; G1's gain was mostly noise. Base reverts to D1.
+  - H2 (shuffle + strong aug): 91.6 from one run; promising but unconfirmed and on the unconfirmed shuffle base.
+  - **Final model = F4 `final_state.pth`** (higher of the pair). Test100 94.0 / Test500f 91.7 / Test96 93.2, vs D1 93.6 / 91.4 / 92.9 and
+    released E0 93.6 / 90.9 / 92.9 (Test96 via `tools/eval_test96.py`, all final-epoch predictions).
+  - Lesson: for 100-ep runs the Test100-selected `model_best` is *worse* on Test500f (F4 91.0, H1 91.4) than `final_state`; selecting on the
+    100-image test set overfits it. Report final checkpoints.
+  - Test96 is ~0.7 below Test100 for every run (the 4 leaked images are easy); ranking unchanged.
+  - Automatic batches stopped here, per rule; next steps need the user's go-ahead.
+
+### 2026-11-04: Part 4 and Part 6 redone with the final model (user: "you didn't really do 6. update 4")
+- **Part 4:** checkpoints are now copied from the cluster (`models/F4`, `models/D1`, both `final_state.pth`).
+  - `tools/visualize_preds.py` compares E0/D1/F4 on fixed Test100 → `figures/viz_final/`.
+  - F4 gains on hips, left ankle and left elbow. test33 and test41 (self-occlusion) remain the worst images for every model.
+  - The 4.5 table now covers all runs and H1–H3 curves are drawn. Write-up: `docs/part4_results_and_fitting.md`.
+  - Legend fixes in both plot tools.
+- **Part 6:** earlier, 6.1/6.2 had only been tested on a SyRIP image (6.2 only through AppTest), and 6.3 had no images.
+  - Added a person detector (`fidip_infer.detect_people`, torchvision Faster R-CNN) with `--box-mode/--person` in the CLI and a box/person picker
+    in Streamlit. F4 is the default model.
+  - 6.3 uses 12 Commons photos that are not in SyRIP (`temp_uploads/`, licences in `SOURCES.md`).
+  - Streamlit was actually served and driven with headless Chromium (3 screenshots).
+  - Finding: the box matters more than the model (whole image 0.77 → detected box 0.86 mean confidence). F4 is more confident than E0 on 11/12.
+  - Failure modes: picking an adult as the "largest person", swaddling, foreshortening, side-view occlusion. Write-up: `docs/part6_demos.md`.
+
+### 2026-11-04 — test11 dropped from eval, Part 4.5 corrected, Part 7 target fixed at 93.6 on fixed data
+- **Asked:** test11's GT is wrong, drop it. 6.3 with images from the web. Correct the 4.5 analysis. Update AGENT.md and MANIFEST.md.
+  Part 7 must beat 93.6, compared on the fixed data.
+- **test11 check before dropping:** the GT (1536×2048, supine, 17 kps v=2) lines up with SyRIP's `test11.jpg` for head, arms and left leg;
+  left ear, both hips and the right knee/ankle are off by 50–90 px (`left_ear` is drawn on the face). Every fixed-data model scores it OKS ≈ 1 at all
+  thresholds, so it is an *easy* image under this loose GT. **Dropping it lowers every model's AP by ~1.0** (one perfect image out of 100).
+  Decision (user): drop it from all reported numbers.
+- **New eval subsets** (`tools/eval_subsets.py`, rescoring saved prediction JSONs with pycocotools, no re-inference):
+  Test99 = fixed Test100 − test11; Test95 = Test99 − 4 train-leaked images (test20/42/46/50); Test499f = Test500f − test11.
+  Test100-family predictions are each run's last training-loop validation (= `final_state`), Test500-family are `<run>_final` evals
+  (D1, E0, E1b: their only Test500f eval, `model_best` for D1/E1b).
+
+| run | what | Test100 | **Test99** | Test95 | Test500f | **Test499f** |
+|---|---|---|---|---|---|---|
+| E0 (D0) | released `hrnet_fidip.pth` = paper's model | 93.6 | **92.6** | 92.8 | 90.9 | **90.7** |
+| E1b (D0b) | our repro on broken labels | 92.6 | 91.6 | 91.8 | 89.7 | 89.6 |
+| D1 | repro on fixed labels, 20 ep | 93.6 | 92.7 | 92.9 | 91.4* | 91.2* |
+| F1 | D1 replicate | 93.5 | 92.5 | 92.7 | 91.2 | 91.1 |
+| F2 | + DA | 93.5 | 92.5 | 92.8 | 91.0 | 90.9 |
+| F3 | LR 1e-3 | 92.9 | 92.0 | 92.1 | 90.6 | 90.6 |
+| **F4** | 100 ep (final model) | **94.0** | **93.0** | **93.2** | **91.7** | **91.4** |
+| G1 | shuffle | 94.0 | 93.0 | 93.2 | 91.5 | 91.2 |
+| G2 | real-only 200R | 93.9 | 93.0 | 93.1 | 91.3 | 91.1 |
+| G3 | LR 5e-5 | 93.3 | 92.3 | 92.5 | 91.0 | 90.9 |
+| H1 | F4 replicate | 93.9 | 93.0 | 93.2 | 91.6 | 91.4 |
+| H2 | shuffle + strong aug | 93.9 | 92.9 | 93.0 | 91.6 | 91.5 |
+| H3 | G1 replicate | 93.9 | 92.9 | 93.1 | 91.3 | 91.3 |
+
+  \* D1 Test500f is `model_best` (no final-state Test500f eval).
+- **Part 7 target:** the paper's **93.6** is DarkPose+FiDIP on Test100. On the fixed Test100 the released checkpoint reproduces it exactly (93.6), so the
+  fixed data is the right place to compare. **F4 final = 94.0 > 93.6 (+0.4).** Once test11 is dropped, 93.6 is no longer the comparable number (it
+  includes test11). The equivalent bar is the released model on the same subset: **Test99 92.6 → F4 93.0 (+0.4)**, Test95 92.8 → 93.2 (+0.4),
+  Test499f 90.7 → 91.4 (+0.7). The F4/H1 replicate pair agrees to 0.0 on Test99 and Test499f, so the gain is not single-run noise (noise ≈ 0.2).
+  The ranking of all runs is unchanged by dropping test11 (every run loses 0.9–1.0 on Test100→Test99).
+- **Part 4.5 corrected** (`tools/plot_compare.py` → `figures/compare_4_5.png`; E1b vs D1 vs F3 vs F4 on one set of axes; write-up in
+  `docs/part4_results_and_fitting.md` §4.5.0):
+  - The original observation (E1b: "AP stalls after epoch 6, train loss stays flat") is real, but the earlier explanation (mild overfitting onset) was wrong.
+    E1b's train loss starts at 1.02e-3 and ends at 6.7e-4, 2.5× above D1 (4.2e-4 → 2.7e-4). E1b's val loss is *below* its train loss (ratio 0.59),
+    which is impossible for a healthy fit. Both are signatures of **label noise**: 1000 of the 1200 training targets were MINI-RGBD poses that do not match the
+    images, so half of every batch is unlearnable. Its val AP (on the swapped-test11 Test100) peaks at 0.911 @ ep 7 and then wanders.
+  - With correct labels (D1) val AP keeps rising to ep 17 (0.938) and val loss falls monotonically; val/train = 1.16, a normal small gap.
+  - Real fitting regimes, on fixed data: LR 1e-3 (F3) **overfits** (lowest train loss, val loss rises after ep 6, ratio 1.56, AP 0.929).
+    100 ep (F4) widens the gap to 1.58 but val loss keeps creeping *down* (3.02e-4), and AP holds at 0.94 → **benign plateau, not harmful overfitting**.
+    LR 5e-5 (G3) mildly underfits. Nothing at LR 1e-4 underfits.
+- **6.3:** already done earlier on 2026-11-04 (12 Wikimedia Commons infant photos, not in SyRIP, in `temp_uploads/` with licences in
+  `temp_uploads/SOURCES.md`; results in `docs/part6_demos.md`). Nothing re-run.
 
 ---
 
@@ -296,11 +487,14 @@ _(Record approaches that didn't work and why, so they aren't repeated.)_
   because the login node kills `unzip` for exceeding resource limits.
 - `gdown` has no `--remaining-ok` flag (folder download failed in job 11509124).
 - **A nested `OUTPUT_DIR` must already exist** (`lib/utils/utils.py:27` uses `mkdir()` without parents). `mkdir -p` the parent before `sbatch`.
+- **Val loss below train loss for a whole run is a red flag for label noise**, not just augmentation (E1b: ratio 0.59 with broken labels vs 1.16 with fixed).
 - **Don't trust `syrip_for_train.zip` labels blindly**: its synthetic keypoints are wrong and test11.jpg is swapped. Audit images vs annotations
   (size check, overlay a few, score a trusted model against each label set) before training.
 - **`wandb.util.generate_id` no longer exists** (wandb 0.31) → E3/E4 died at start. Run `tools/wandb_smoke.py` after any W&B code change.
 - **P100 (16 GB) OOMs** at batch 20 for W48 384×288 (V100 peak 12.6 GiB without DA, 17.2 GiB with DA pre-stage). Stay on V100/A100 or lower the batch.
 - **courses-gpu QoS: max 2 running jobs and 2 GPUs per user.** Submitting 4 jobs does not parallelise; plan chains accordingly.
+- **The login node is slow at `sbatch` (~30–60 s each)**: use `timeout 280` for `ssh explorer 'bash slurm/submit_run.sh ...'`. A local timeout
+  does not stop the remote script.
 - **An SSH timeout after `sbatch` does not mean the job was not submitted** (E6 got submitted twice). Check `sacct -S now-10minutes` before resubmitting.
 - `sync.sh push` once copied `.venv-demo/` to the cluster. It now applies `.gitignore` rules (`--filter=':- .gitignore'`).
 - **`pip install` on the login node gets killed** (exit 143). Run installs with `sbatch slurm/install_pkgs.sh <pkgs>`.

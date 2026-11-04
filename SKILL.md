@@ -56,6 +56,8 @@ The experiment log is in `AGENT.md`, and the inventory of artifacts is in `MANIF
 | `train.sh [cfg overrides]` | `train_adaptive_model_hrnet.py`, init DarkPose W48, W&B if key present | courses-gpu, V100-SXM2, 8:00 | `sbatch slurm/train.sh` |
 | `sync.sh push\|pull\|env` | rsync code to / results from the cluster (run on the **server**) | - | `bash slurm/sync.sh push` |
 
+- **Preferred for new experiments:** `ssh explorer 'bash /home/hou.yuchen/courses/eece7373/slurm/submit_run.sh <NAME> <TIME> [cfg overrides]'`
+  (train on `data/syrip_fixed` + Test500f evals of best/final; refuses existing `output/<NAME>`). Use `timeout 280`.
 - Name the W&B run per experiment: `sbatch --export=ALL,WANDB_NAME=E2-lr5e-4 slurm/train.sh TRAIN.LR 0.0005`.
 - Different experiments must use different `OUTPUT_DIR`s (cfg override). Otherwise AUTO_RESUME picks up another run's `checkpoint.pth`.
 - `AUTO_RESUME` is on: resubmitting the same command continues from `output/.../checkpoint.pth`
@@ -77,7 +79,7 @@ Poll at most every 30 s. A training epoch prints an AP table; `model_best.pth` t
 
 | ID | Slurm job | Status | Notes |
 |--|--|--|--|
-| — | none from this session | | E5–E8 cancelled 2026-11-03 at the user's request. The user's D-track (D0/D0b/D1, `data/syrip_fixed`) and the T5f evals (原始数据标注检查 session) belong to others; don't touch them |
+| — | none | all F/G/H runs done 2026-11-04 | Final model F4 `final_state.pth`; no automatic batches — ask the user before submitting more |
 
 Keep this table and the `AGENT.md` summary table in sync whenever you submit, finish, or cancel a job.
 
@@ -85,10 +87,12 @@ Keep this table and the `AGENT.md` summary table in sync whenever you submit, fi
 
 - The server has 2× RTX 6000 Ada. Use `.venv-demo/bin/python` (base python 3.13 + torch, plus yacs/streamlit/dsntnn/pycocotools).
 - Weights: `rsync explorer:/home/hou.yuchen/courses/eece7373/<ckpt> models/...` (git-ignored).
-- `tools/demo.py --image <img> --model models/hrnet_fidip.pth --output figures/demo/x.jpg`
-- `.venv-demo/bin/streamlit run tools/streamlit_demo.py` -> http://localhost:8501
+- `tools/demo.py --image temp_uploads/own05.jpg --model models/F4/final_state.pth --output figures/demo/x.jpg` (person detector by default; `--person K`, `--box-mode full`, `--bbox`)
+- `.venv-demo/bin/streamlit run tools/streamlit_demo.py --server.headless true` -> http://localhost:8501 (deep link `?src=temp_uploads/&img=own05.jpg`); stop it afterwards, it holds GPU memory
+- `.venv-demo/bin/python tools/video_infer.py --source <video|folder|0> --out figures/video/ [--no-flip] [--show]` (7.3; no webcam on the server)
 - `python3 tools/plot_curves.py log/<RUN>/syrip/adaptive_pose_hrnet/<dir> --name <RUN>` after `sync.sh pull`
 - `.venv-demo/bin/python tools/visualize_preds.py --models E0=models/hrnet_fidip.pth ...` (add `--ann`/`--images` for `data/syrip_clean`)
+- `.venv-demo/bin/python tools/eval_test96.py D1 F4 ...`: Test100 vs Test96 (minus 4 leaked images) from saved final-epoch prediction JSONs (CPU, no checkpoint needed)
 
 ## Data
 

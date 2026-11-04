@@ -208,7 +208,7 @@ def main():
     syn_labels = train_dataset._load_syrip_syn_annotations()
     train_loader = torch.utils.data.DataLoader(   
         train_dataset,
-        sampler=BalancedBatchSampler(train_dataset, syn_labels),
+        sampler=BalancedBatchSampler(train_dataset, syn_labels, shuffle=cfg.TRAIN.BALANCED_SHUFFLE),
         batch_size=cfg.TRAIN.BATCH_SIZE_PER_GPU*len(cfg.GPUS),
         num_workers=cfg.WORKERS,
         pin_memory=cfg.PIN_MEMORY

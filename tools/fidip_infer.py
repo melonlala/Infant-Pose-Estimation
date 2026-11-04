@@ -56,6 +56,28 @@ def load_model(cfg_file, model_file, device='cuda'):
     return model_p, cfg
 
 
+_DET = {}
+
+
+@torch.no_grad()
+def detect_people(img_bgr, device='cuda', min_score=0.5):
+    """Person boxes [(x, y, w, h, score), ...] from torchvision Faster R-CNN (COCO), largest first.
+
+    FiDIP is a top-down model: it needs a box around the infant. For real photos where the infant does not fill
+    the frame, this supplies one (weights download once to ~/.cache/torch). Returns [] if nobody is found.
+    """
+    import torchvision
+    if device not in _DET:
+        w = torchvision.models.detection.FasterRCNN_ResNet50_FPN_V2_Weights.DEFAULT
+        _DET[device] = torchvision.models.detection.fasterrcnn_resnet50_fpn_v2(weights=w).to(device).eval()
+    x = torch.from_numpy(cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB).astype(np.float32).transpose(2, 0, 1) / 255.0)
+    out = _DET[device]([x.to(device)])[0]
+    keep = (out['labels'] == 1) & (out['scores'] >= min_score)
+    boxes = [(float(a), float(b), float(c - a), float(d - b), float(sc))
+             for (a, b, c, d), sc in zip(out['boxes'][keep].cpu().numpy(), out['scores'][keep].cpu().numpy())]
+    return sorted(boxes, key=lambda t: -t[2] * t[3])
+
+
 def box_to_cs(box, cfg):
     """(x, y, w, h) -> center, scale exactly as lib/dataset/syrip.py::_xywh2cs (pixel_std 200, x1.25)."""
     x, y, w, h = box

@@ -113,7 +113,7 @@ def main():
     ax.set_title('Which joints are hardest? (Test100)', loc='left', fontsize=11, color=INK)
     ax.grid(axis='x', color=GRID); ax.set_axisbelow(True)
     for s in ('top', 'right'): ax.spines[s].set_visible(False)
-    ax.legend(frameon=False, fontsize=9, loc='lower left')
+    ax.legend(frameon=False, fontsize=9, loc='lower right', bbox_to_anchor=(1.0, 1.0), ncol=len(names), borderaxespad=0.2)
     fig.tight_layout(); fig.savefig(f'{a.out}/per_keypoint.png', dpi=140, facecolor=SURF)
     print('per-keypoint similarity:'); print('  ' + ' '.join(f'{n:>6}' for n in names))
     for j, k in enumerate(KEYPOINTS):

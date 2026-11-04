@@ -96,6 +96,7 @@ _C.TRAIN.CHECKPOINT = ''
 _C.TRAIN.PRE_BATCH_SIZE_PER_GPU = 64
 _C.TRAIN.BATCH_SIZE_PER_GPU = 32
 _C.TRAIN.SHUFFLE = True
+_C.TRAIN.BALANCED_SHUFFLE = False  # reshuffle BalancedBatchSampler every epoch (off = original FiDIP order)
 
 # testing
 _C.TEST = CN()
