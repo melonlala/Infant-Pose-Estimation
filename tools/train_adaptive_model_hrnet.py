@@ -113,12 +113,13 @@ def main():
     # The run id is stored in final_output_dir so AUTO_RESUME jobs continue the same run.
     wandb_run = None
     if os.environ.get('WANDB_API_KEY') and os.environ.get('WANDB_MODE') != 'disabled':
+        import uuid
         import wandb
         id_file = os.path.join(final_output_dir, 'wandb_run_id.txt')
         if os.path.exists(id_file):
             run_id = open(id_file).read().strip()
         else:
-            run_id = wandb.util.generate_id()
+            run_id = uuid.uuid4().hex[:8]   # wandb>=0.2x has no wandb.util.generate_id
             with open(id_file, 'w') as f:
                 f.write(run_id)
         wandb_run = wandb.init(
