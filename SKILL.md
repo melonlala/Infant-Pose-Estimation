@@ -77,7 +77,7 @@ Poll at most every 30 s. A training epoch prints an AP table; `model_best.pth` t
 
 | ID | Slurm job | Status | Notes |
 |--|--|--|--|
-| E1b | 11601446 (pip, short) → 11601467 (train, afterok) | queued 2026-11-03 | reproduce FiDIP training; E1 = 11509271 failed |
+| — | none running | | E1b (11601467) done: AP 91.1. Its output dir holds `checkpoint.pth` at epoch 20, so new runs need a new `OUTPUT_DIR` |
 
 Keep this table and the `AGENT.md` summary table in sync whenever you submit, finish, or cancel a job.
 

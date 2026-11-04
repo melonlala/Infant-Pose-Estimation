@@ -79,14 +79,14 @@ All annotations are COCO format, 17 keypoints.
 |--------|-------------|--------------------|--------------|-----------------|----------|----|
 | E0 | Pretrained FiDIP eval | baseline, `TEST.USE_GT_BBOX True` | 11509270 | `models/hrnet_fidip.pth` | `logs/fidip-eval-11509270.out` | 92.1 |
 | E1 | Reproduce FiDIP training | baseline + `TRAIN.CHECKPOINT models/coco/w48_384x288.pth WORKERS 8` | 11509271 (**failed**: no tensorboard) | — | `logs/fidip-train-11509271.out` | — |
-| E1b | E1 resubmitted after env fix | same as E1, `WANDB_NAME=E1b-reproduce` | 11601446 → 11601467 | `output/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/model_best.pth` | `logs/fidip-train-<id>.out`, `log/syrip/adaptive_pose_hrnet/`, W&B `fidip` | — |
+| E1b | E1 resubmitted after env fix | same as E1, `WANDB_NAME=E1b-reproduce` | 11601446 → 11601467 | `output/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/model_best.pth` (ep 6; also `final_state.pth` ep 20, `checkpoint.pth`) | `logs/fidip-train-11601467.out`, `output/.../w48_384x288_adam_lr1e-3_infant_2026-11-03-19-28_train.log`, TB `log/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant_2026-11-03-19-28/` (no W&B) | 91.1 |
 
 ## 8. Final reported result
 
 | | Value |
 |--|-------|
 | Published FiDIP baseline (paper) | DarkPose+FiDIP, Test100: AP 93.6 / AP50 98.5 / AP75 98.5 / AR 94.6 |
-| Reproduced baseline run | _TBD_ |
+| Reproduced baseline run | E1b (11601467): Test100 AP 91.1 / 97.0 / 97.0 / AR 92.7 (best epoch 6; selected on Test100) |
 | Best improved run | _TBD_ |
 | Checkpoint | _TBD_ |
 | Exact reproduce command | _TBD_ |
