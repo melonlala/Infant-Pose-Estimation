@@ -22,7 +22,7 @@ conda activate "$ENV"
 pip install --no-cache-dir torch==2.3.1 torchvision==0.18.1 --index-url https://download.pytorch.org/whl/cu121
 pip install --no-cache-dir numpy==1.26.4 opencv-python-headless==4.10.0.84 pycocotools==2.0.8 \
   json-tricks==3.17.3 yacs==0.1.8 easydict==1.13 cython==3.0.10 scipy==1.14.0 shapely==2.0.4 \
-  tensorboardx==2.6.2.2 tensorboard wandb matplotlib==3.9.1 dsntnn==0.5.3 pyyaml==6.0.1 setuptools gdown
+  tensorboardx==2.6.2.2 tensorboard==2.21.0 wandb==0.31.0 matplotlib==3.9.1 dsntnn==0.5.3 pyyaml==6.0.1 setuptools gdown
 
 (cd lib && make)
 

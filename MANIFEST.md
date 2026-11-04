@@ -24,7 +24,7 @@ reproduce the final reported result from this file alone.
 | Conda env | `/home/hou.yuchen/courses/eece7373/envs/fidip` (prefix env) | built by `slurm/setup_env.sh`; pip pins mirror `fidip_env.yml` |
 | Python / PyTorch / CUDA | 3.12.16 / 2.3.1+cu121 / 12.1 | verified on V100-SXM2-32GB (job 11509124) |
 | Cluster modules | `anaconda3/2024.06`, `cuda/12.1.1` | |
-| Logging | `tensorboard` + `wandb` (added 2026-11-03 after E1 failure) | W&B project `fidip`; key from `.env` |
+| Logging | `tensorboard` 2.21.0 + `wandb` 0.31.0 (added 2026-11-03 after E1 failure, job 11601446) | W&B project `fidip`; key from `.env` |
 
 ## 3. Datasets
 
