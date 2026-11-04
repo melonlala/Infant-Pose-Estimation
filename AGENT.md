@@ -50,9 +50,12 @@ accuracy than the paper's numbers (see `STUDENT_GUIDE.md`, Part 7).
 | F2 | 2026-11-03 | D1 + DA (`LAMBDA 0.0005`, `PRE_EPOCH 1`) | `submit_run.sh F2 ...` | 11603328 → 11603329, 11603330 | 93.8 | 98.5 | 98.5 | 94.7 | done (best @ 17, final 93.5); **Test500f 90.9 / 91.0** |
 | F3 | 2026-11-03 | D1 + LR 1e-3 (paper LR) | `submit_run.sh F3 ... TRAIN.LR 0.001` | 11603335 → 11603336, 11603337 | 93.3 | 98.4 | 98.4 | 94.7 | done (best @ 13, final 92.9); **Test500f 89.9 / 90.6** |
 | F4 | 2026-11-03 | D1 + 100 epochs (LR drop ×0.1 at ep 40) | `submit_run.sh F4 ... TRAIN.END_EPOCH 100` | 11603343 → 11603344, 11603345 | 94.1 | — | — | 95.1 | done (best @ 20, final 94.0); **Test500f 91.0 best / 91.7 final** |
-| G1 | 2026-11-03 | D1 + `TRAIN.BALANCED_SHUFFLE True` (sampler fix) | `submit_run.sh G1 ...` | 11606776 → 11606777, 11606778 | — | — | — | — | queued |
-| G2 | 2026-11-03 | **real-only** 200R, 200 ep (= 2000 iters like D1), no LR drop | `ROOT=data/syrip_fixed_200R/ submit_run.sh G2 ... TRAIN.END_EPOCH 200 TRAIN.LR_STEP [400,500]` | 11606811 → 11606812, 11606813 | — | — | — | — | queued |
-| G3 | 2026-11-03 | D1 + LR 5e-5 | `submit_run.sh G3 ... TRAIN.LR 0.00005` | 11606822 → 11606823, 11606824 | — | — | — | — | queued |
+| G1 | 2026-11-03 | D1 + `TRAIN.BALANCED_SHUFFLE True` (sampler fix) | `submit_run.sh G1 ...` | 11606776 → 11606777, 11606778 | 94.2 | — | — | — | done (best @ 12, final 94.0); **Test500f 91.4 / 91.5** → adopted |
+| G2 | 2026-11-03 | **real-only** 200R, 200 ep (= 2000 iters like D1), no LR drop | `ROOT=data/syrip_fixed_200R/ submit_run.sh G2 ... TRAIN.END_EPOCH 200 TRAIN.LR_STEP [400,500]` | 11606811 → 11606812, 11606813 | 93.9 | — | — | — | done (best = final @ 199); **Test500f 91.3 / 91.3** |
+| G3 | 2026-11-03 | D1 + LR 5e-5 | `submit_run.sh G3 ... TRAIN.LR 0.00005` | 11606822 → 11606823, 11606824 | 93.4 | — | — | — | done (best @ 17, final 93.3); **Test500f 90.9 / 91.0** |
+| H1 | 2026-11-04 | F4 replicate (100 ep, no shuffle) | `submit_run.sh H1 ... TRAIN.END_EPOCH 100` | 11607648 → 11607652, 11607654 | — | — | — | — | queued |
+| H2 | 2026-11-04 | B (= D1 + shuffle) + stronger aug (`ROT_FACTOR 60`, `SCALE_FACTOR 0.45`) | `submit_run.sh H2 ...` | 11607656 → 11607658, 11607659 | — | — | — | — | queued |
+| H3 | 2026-11-04 | G1 replicate (D1 + shuffle); *extra confirmation run, not in the rule* | `submit_run.sh H3 ... TRAIN.BALANCED_SHUFFLE True` | 11607662 → 11607664, 11607666 | — | — | — | — | queued |
 
 ---
 
@@ -321,6 +324,24 @@ accuracy than the paper's numbers (see `STUDENT_GUIDE.md`, Part 7).
   - **H2 = B + stronger augmentation** (`DATASET.ROT_FACTOR 60 DATASET.SCALE_FACTOR 0.45`): the 200 real images are seen 5×/epoch, and the train/val gap grows.
   - G2 interpretation: if real-only is within 0.3 of D1 (final), synthetic data adds ~nothing → 7.1 (generate more synthetic) deprioritised. If clearly worse,
     synthetic data matters → 7.1 is worth the SMIL setup.
+
+### 2026-11-04 — G-track results and automatic decision -> H-track
+| Run | change vs D1 | Test100 best / final | Test500f best / **final** |
+|---|---|---|---|
+| F1 (D1 replicate, reference) | — | 93.7 / 93.5 | 91.2 / **91.2** |
+| G1 | sampler reshuffle per epoch | **94.2 / 94.0** | 91.4 / **91.5** |
+| G2 | real-only 200R (matched 2000 iters) | 93.9 / 93.9 | 91.3 / **91.3** |
+| G3 | LR 5e-5 | 93.4 / 93.3 | 90.9 / **91.0** |
+- **Rule (adopt if final Test500f ≥ 91.2 + 0.3 = 91.5):** **G1 adopted** (91.5, exactly at the bar; it also has the best Test100 of any run, +0.5 vs F1).
+  It is borderline from a single run, so H3 replicates it (extra run, outside the rule). New base **B = D1 + `TRAIN.BALANCED_SHUFFLE True`**. G3 is not adopted;
+  together with F3 this means LR 1e-4 is a sweet spot (5e-5 underfits slightly, 1e-3 overfits).
+- **G2 (value of synthetic data): real-only reaches 91.3, within 0.1 of real+syn (F1 91.2).** At matched iterations the 1000 synthetic images add
+  nothing measurable for a COCO-pretrained HRNet-W48. That is unlike the paper's Table III (SimpleBaseline-50: 200 real 87.1 vs 1200 R+S 90.1).
+  Per the rule, **7.1 (generating more synthetic data with SMIL) is deprioritised**. G2's best epoch is its last, so real-only may not have saturated yet.
+- **H-track submitted per rule:** H1 = F4 replicate (does 100 ep really help on the final checkpoint?), H2 = B + stronger augmentation, plus H3 = G1 replicate.
+- **Pre-registered wrap-up after H (no more automatic batches after that):** a config counts as *confirmed* if its replicate pair has mean final
+  Test500f ≥ 91.5 and both runs ≥ 91.2. Pick the final model = best mean final Test500f among confirmed configs (else D1). Report Test100,
+  Test500f and Test96 (Test100 minus the 4 leaked images), then stop and ask the user before launching anything else.
 
 ---
 
