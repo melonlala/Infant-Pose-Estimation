@@ -103,6 +103,7 @@ All annotations are COCO format, 17 keypoints.
 | `tools/streamlit_demo.py` | Part 6.2 web demo (`.venv-demo/bin/streamlit run tools/streamlit_demo.py`) | browser UI; uploads to `temp_uploads/` |
 | `tools/plot_curves.py` | Part 4.5 curves from TB logs | `figures/<run>_curves.png` |
 | `tools/visualize_preds.py` | Part 4 GT-vs-pred grids, per-keypoint similarity, pycocotools AP | `figures/viz/` |
+| `tools/eval_test96.py` | Test100 vs Test96 AP from final-epoch prediction JSONs in `output/<run>/` | stdout |
 | `tools/wandb_smoke.py` | offline check of the W&B code path | — |
 | `tools/video_infer.py` | 7.3 video file / folder batch / webcam inference with tracking | `<out>/<name>_pose.mp4`, `_keypoints.jsonl/.csv` |
 | `docs/part3_model_notes.md`, `docs/part7_synthetic_and_apps.md` | Part 3 notes; 7.1 status + 7.3 results | — |
@@ -116,9 +117,9 @@ Server copies of weights (git-ignored): `models/hrnet_fidip.pth`, `models/E1b/mo
 | Published FiDIP baseline (paper) | DarkPose+FiDIP, Test100: AP 93.6 / AP50 98.5 / AP75 98.5 / AR 94.6 |
 | Reproduced baseline run | **D1** (11602450, user, `data/syrip_fixed`): fixed Test100 AP 93.8 / 98.5 / 98.5 / AR 94.9 (best epoch 16); Test500 (fixed area) AP 91.4. Ckpt `output/D1/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/model_best.pth`. Superseded: E1b 91.1 (broken labels, swapped test11) |
 | Released checkpoint, same eval | E0 on fixed Test100: 93.6 (= paper); Test500 fixed area: 90.9 |
-| Best improved run | _TBD_ |
-| Checkpoint | _TBD_ |
-| Exact reproduce command | _TBD_ |
+| Best improved run | **F4** (11603343, D1 config + `TRAIN.END_EPOCH 100`), confirmed by replicate H1 (Test500f 91.6). F4 final: Test100 AP 94.0, Test96 93.2, Test500 (fixed area) 91.7 — vs D1 final 93.6 / 92.9 / 91.4 |
+| Checkpoint | cluster `output/F4/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/final_state.pth` (use `final_state`, not `model_best`) |
+| Exact reproduce command | `bash slurm/submit_run.sh F4 02:45:00 TRAIN.END_EPOCH 100` (train on `data/syrip_fixed/` + chained Test500f evals); Test96: `.venv-demo/bin/python tools/eval_test96.py F4` |
 
 ## 9. Secrets
 

@@ -79,7 +79,7 @@ Poll at most every 30 s. A training epoch prints an AP table; `model_best.pth` t
 
 | ID | Slurm job | Status | Notes |
 |--|--|--|--|
-| H1–H3 | H1 11607648, H2 11607656, H3 11607662 (+2 chained Test500f evals each) | submitted 2026-11-04 | G1–G3 done; wrap-up rule in AGENT.md (stop and ask after H) |
+| — | none | all F/G/H runs done 2026-11-04 | Final model F4 `final_state.pth`; no automatic batches — ask the user before submitting more |
 
 Keep this table and the `AGENT.md` summary table in sync whenever you submit, finish, or cancel a job.
 
@@ -92,6 +92,7 @@ Keep this table and the `AGENT.md` summary table in sync whenever you submit, fi
 - `.venv-demo/bin/python tools/video_infer.py --source <video|folder|0> --out figures/video/ [--no-flip] [--show]` (7.3; no webcam on the server)
 - `python3 tools/plot_curves.py log/<RUN>/syrip/adaptive_pose_hrnet/<dir> --name <RUN>` after `sync.sh pull`
 - `.venv-demo/bin/python tools/visualize_preds.py --models E0=models/hrnet_fidip.pth ...` (add `--ann`/`--images` for `data/syrip_clean`)
+- `.venv-demo/bin/python tools/eval_test96.py D1 F4 ...`: Test100 vs Test96 (minus 4 leaked images) from saved final-epoch prediction JSONs (CPU, no checkpoint needed)
 
 ## Data
 

@@ -53,9 +53,9 @@ accuracy than the paper's numbers (see `STUDENT_GUIDE.md`, Part 7).
 | G1 | 2026-11-03 | D1 + `TRAIN.BALANCED_SHUFFLE True` (sampler fix) | `submit_run.sh G1 ...` | 11606776 → 11606777, 11606778 | 94.2 | — | — | — | done (best @ 12, final 94.0); **Test500f 91.4 / 91.5** → adopted |
 | G2 | 2026-11-03 | **real-only** 200R, 200 ep (= 2000 iters like D1), no LR drop | `ROOT=data/syrip_fixed_200R/ submit_run.sh G2 ... TRAIN.END_EPOCH 200 TRAIN.LR_STEP [400,500]` | 11606811 → 11606812, 11606813 | 93.9 | — | — | — | done (best = final @ 199); **Test500f 91.3 / 91.3** |
 | G3 | 2026-11-03 | D1 + LR 5e-5 | `submit_run.sh G3 ... TRAIN.LR 0.00005` | 11606822 → 11606823, 11606824 | 93.4 | — | — | — | done (best @ 17, final 93.3); **Test500f 90.9 / 91.0** |
-| H1 | 2026-11-04 | F4 replicate (100 ep, no shuffle) | `submit_run.sh H1 ... TRAIN.END_EPOCH 100` | 11607648 → 11607652, 11607654 | — | — | — | — | queued |
-| H2 | 2026-11-04 | B (= D1 + shuffle) + stronger aug (`ROT_FACTOR 60`, `SCALE_FACTOR 0.45`) | `submit_run.sh H2 ...` | 11607656 → 11607658, 11607659 | — | — | — | — | queued |
-| H3 | 2026-11-04 | G1 replicate (D1 + shuffle); *extra confirmation run, not in the rule* | `submit_run.sh H3 ... TRAIN.BALANCED_SHUFFLE True` | 11607662 → 11607664, 11607666 | — | — | — | — | queued |
+| H1 | 2026-11-04 | F4 replicate (100 ep, no shuffle) | `submit_run.sh H1 ... TRAIN.END_EPOCH 100` | 11607648 → 11607652, 11607654 | 94.3 | — | — | — | done (best @ 30, final 93.9); **Test500f 91.4 / 91.6** → with F4: confirmed |
+| H2 | 2026-11-04 | B (= D1 + shuffle) + stronger aug (`ROT_FACTOR 60`, `SCALE_FACTOR 0.45`) | `submit_run.sh H2 ...` | 11607656 → 11607658, 11607659 | 94.0 | — | — | — | done (best @ 14, final 93.9); **Test500f 91.4 / 91.6** (single run, not confirmable) |
+| H3 | 2026-11-04 | G1 replicate (D1 + shuffle); *extra confirmation run, not in the rule* | `submit_run.sh H3 ... TRAIN.BALANCED_SHUFFLE True` | 11607662 → 11607664, 11607666 | 94.2 | — | — | — | done (best @ 12, final 93.9); **Test500f 91.3 / 91.3** → shuffle pair mean 91.4 < 91.5, not confirmed |
 
 ---
 
@@ -342,6 +342,16 @@ accuracy than the paper's numbers (see `STUDENT_GUIDE.md`, Part 7).
 - **Pre-registered wrap-up after H (no more automatic batches after that):** a config counts as *confirmed* if its replicate pair has mean final
   Test500f ≥ 91.5 and both runs ≥ 91.2. Pick the final model = best mean final Test500f among confirmed configs (else D1). Report Test100,
   Test500f and Test96 (Test100 minus the 4 leaked images), then stop and ask the user before launching anything else.
+- **H-track results / wrap-up applied (2026-11-04).** Final-checkpoint Test500f: H1 91.6, H2 91.6, H3 91.3.
+  - **100 ep (F4/H1): 91.7 / 91.6, mean 91.65, both ≥ 91.2 → confirmed.** Only confirmed config.
+  - Shuffle (G1/H3): 91.5 / 91.3, mean 91.4 → **not confirmed**; G1's gain was mostly noise. Base reverts to D1.
+  - H2 (shuffle + strong aug): 91.6 from one run; promising but unconfirmed and on the unconfirmed shuffle base.
+  - **Final model = F4 `final_state.pth`** (higher of the pair). Test100 94.0 / Test500f 91.7 / Test96 93.2, vs D1 93.6 / 91.4 / 92.9 and
+    released E0 93.6 / 90.9 / 92.9 (Test96 via `tools/eval_test96.py`, all final-epoch predictions).
+  - Lesson: for 100-ep runs the Test100-selected `model_best` is *worse* on Test500f (F4 91.0, H1 91.4) than `final_state`; selecting on the
+    100-image test set overfits it. Report final checkpoints.
+  - Test96 is ~0.7 below Test100 for every run (the 4 leaked images are easy); ranking unchanged.
+  - Automatic batches stopped here, per rule; next steps need the user's go-ahead.
 
 ---
 
