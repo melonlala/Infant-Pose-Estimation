@@ -6,7 +6,7 @@ reproduce the final reported result from this file alone.
 - **Local repo:** `/home/yuchen/courses/EECE7373/hands_on_project`
 - **Cluster project root:** `explorer:/home/hou.yuchen/courses/eece7373`
 - **Code:** GitHub `git@github.com:melonlala/Infant-Pose-Estimation.git` (private, branch `main`; code only, pushed from the server). `upstream` = ostadabbas
-- **Server <-> cluster:** `rsync` via `slurm/sync.sh push|pull|env` (cluster does not use git). See `SKILL.md` § Sync model
+- **Server <-> cluster:** `rsync` via `slurm/sync.sh push|pull|env` through the transfer node **`hou.yuchen@xfer.discovery.neu.edu`** (same `/home`; never copy through the login node). Slurm commands use `ssh explorer`. The cluster does not use git. See `SKILL.md` § Sync model
 - **Status legend:** `planned` · `present` · `missing` · `deprecated`
 
 ---
@@ -95,7 +95,9 @@ All annotations are COCO format, 17 keypoints.
 | `slurm/make_clean_data.sh` | build `data/syrip_clean/` symlink root | either machine | no copying |
 | `tools/make_syrip_fixed.sh` / `tools/make_syrip500_fixed.py` | build `data/syrip_fixed/` / `data/syrip500_fixed/` | either machine, from project root | no copying of images |
 | `tools/check_annotations.py` | annotation audit (`--data data --out <dir>`) | server | CPU, ~30 s |
-| `slurm/sync.sh push\|pull\|env` | rsync code -> cluster, results -> server, WANDB key -> cluster | server | no `--delete` |
+| `slurm/sync.sh push\|pull\|env` | rsync code -> cluster, results -> server, WANDB key -> cluster, all via `xfer.discovery.neu.edu` | server | no `--delete` |
+| `slurm/submit_x.sh` / `slurm/train_x.sh` | F4-style run with `tools/train_adaptive_model_hrnet_x.py` (adds `LOSS.USE_OHKM`); `PART=` picks partitions (default `gpu,courses-gpu`) | V100-SXM2 | B3/B4 |
+| `slurm/eval_ens.sh` | ensemble/TTA eval (`tools/eval_ensemble_tta.py`); pass lists as `--rots=` | gpu / gpu-short, 1 GPU, 1:30 | A0–A3 |
 
 ## 7. Runs & checkpoints
 
@@ -124,6 +126,7 @@ All annotations are COCO format, 17 keypoints.
 | `docs/part6_demos.md` | Part 6.1–6.3 commands, Streamlit test, own-image results | — |
 | `figures/viz_final/`, `figures/demo/`, `temp_uploads/` (server only) | final-model viz; demo outputs + Streamlit screenshots; 12 CC infant photos (`SOURCES.md`) | — |
 | `models/F4/final_state.pth`, `models/D1/final_state.pth` (server only) | copies of the cluster checkpoints for demos/viz | — |
+| `tools/eval_ensemble_tta.py` | heatmap-level model ensemble + scale/rotation TTA on the official eval path (identity + 1 model = official eval, checked by A0) | `<out>/results/keypoints_validate_infant_results_0.json` |
 | `tools/eval_subsets.py` | Test100 / **Test99** / Test95 / Test500f / **Test499f** AP from saved prediction JSONs (`run[:test500f_run]` args) | stdout |
 | `tools/plot_compare.py` | Part 4.5 overlay of several runs (train loss, val loss, val AP) | `figures/compare_4_5.png` |
 | `tools/eval_test96.py` | (superseded by `eval_subsets.py`) | Test100 vs Test96 AP from final-epoch prediction JSONs in `output/<run>/` | stdout |

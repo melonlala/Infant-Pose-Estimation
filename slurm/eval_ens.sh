@@ -16,4 +16,4 @@ conda activate /home/hou.yuchen/courses/eece7373/envs/fidip
 nvidia-smi --query-gpu=name,memory.total --format=csv
 M=${1:?models}; SC=${2:?scales}; RO=${3:?rots}; OUT=${4:?out}; shift 4
 python tools/eval_ensemble_tta.py --cfg experiments/coco/hrnet/w48_384x288_adam_lr1e-3_infant.yaml \
-  --models "$M" --scales "$SC" --rots "$RO" --out "$OUT" TEST.USE_GT_BBOX True WORKERS 4 "$@"
+  --models "$M" --scales="$SC" --rots="$RO" --out "$OUT" TEST.USE_GT_BBOX True WORKERS 4 "$@"

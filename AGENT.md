@@ -595,6 +595,19 @@ accuracy than the paper's numbers (see `STUDENT_GUIDE.md`, Part 7).
   B3a 11625832 → 11625833, 11625835. B3b 11625837 → 11625839, 11625840. B4a 11625841 → 11625842, 11625844. B4b 11625846 → 11625847, 11625859
   (`PART=courses-gpu slurm/submit_x.sh`: the gpu QOS caps *submitted* jobs at 8 per user and the 8 evals filled it).
 - **A0 sanity check passed:** Test100 93.99 (official F4 94.0), Test500f 91.73 (official 91.7). The tool matches the official eval, so A1–A3 are valid.
+- **Bug, fixed:** `slurm/eval_ens.sh` passed `--rots -30,0,30`, and argparse read `-30,...` as an option flag. A3-t500 (11625804) failed at argument parsing.
+  The other first-round A2/A3 jobs were left to fail on their own (no scancel). The fix is `--rots=...`/`--scales=...`, resubmitted on `gpu-short`:
+  A2 t100 11625924, t500 11625943; A3 t100 11625950, t500 11625953.
+- **Interim (17:50):** A1 (4-model ensemble) Test100 94.2 / Test99 93.2 / Test500f 91.8 / **Test499f 91.5** (F4 91.4) → +0.1, below the 91.7 bar.
+  A2 (F4 + 9-way TTA) Test100 94.4 / Test99 93.4; Test500f pending. B3a and B3b are training; B4a and B4b are queued.
+
+### 2026-11-04 — File transfers go through the xfer node
+- **Asked:** copy files between the server and the cluster through `xfer.discovery.neu.edu`, and add this to SKILL.md.
+- **Did:** checked key login (`hou.yuchen@xfer.discovery.neu.edu`, host `xfer-00`, host key added with `accept-new`). It mounts the same `/discovery/home`, so
+  paths are identical. `slurm/sync.sh` now runs every rsync and its helper ssh calls (listing `output*`, writing `.env`) against the xfer node. Slurm commands still use
+  `ssh explorer`. Tested `sync.sh pull`: 14.5 s. Rule added to `SKILL.md` (Hosts table, Sync model, weights copy) and `.claude/skills/use_explorer_cluster/SKILL.md`.
+- **Note:** the main checkout's `slurm/sync.sh` is still the old login-node version until this branch is merged. Until then, run this branch's copy
+  (`bash .claude/worktrees/raw-data-annotation-check-23431c/slurm/sync.sh pull`; it `cd`s to the main checkout anyway).
 
 ---
 
@@ -610,6 +623,8 @@ _(Record approaches that didn't work and why, so they aren't repeated.)_
 - **Val loss below train loss for a whole run is a red flag for label noise**, not just augmentation (E1b: ratio 0.59 with broken labels vs 1.16 with fixed).
 - **One-off rsync of a *tracked* file to the cluster is not durable:** any `slurm/sync.sh push` from the main checkout reverts it, even in the middle of a submit
   loop (M1/M2 ran as HRNet). Put experimental cluster code in new files, or commit it to main first. sbatch snapshots the batch script, but not the Python it calls.
+- **Negative numbers as CLI values:** `--rots -30,0,30` is parsed as an option by argparse. Always pass list arguments as `--rots=-30,0,30`.
+- **Copy files through `xfer.discovery.neu.edu`, not the login node** (user rule, 2026-11-04). `slurm/sync.sh` now does this; `pull` took 14.5 s vs minutes before.
 - **Don't trust `syrip_for_train.zip` labels blindly**: its synthetic keypoints are wrong and test11.jpg is swapped. Audit images vs annotations
   (size check, overlay a few, score a trusted model against each label set) before training.
 - **`wandb.util.generate_id` no longer exists** (wandb 0.31) → E3/E4 died at start. Run `tools/wandb_smoke.py` after any W&B code change.
