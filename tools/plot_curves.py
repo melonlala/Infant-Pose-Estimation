@@ -73,7 +73,7 @@ def main():
     ax.plot(ep + 1, tl, color=C[0], lw=2, label='train (epoch mean)')
     ax.plot(ep + 1, vl, color=C[1], lw=2, label='val')
     label_end(ax, ep + 1, tl, 'train', C[0]); label_end(ax, ep + 1, vl, 'val', C[1])
-    ax.legend(frameon=False, fontsize=8, loc='upper right')
+    ax.legend(frameon=False, fontsize=8, loc='best')
 
     # 2. keypoint accuracy (PCK-style, from the training code) train vs val
     ax = axs[0, 1]; style(ax, 'Keypoint accuracy (PCK@0.5 heatmap)', 'accuracy')
@@ -115,7 +115,7 @@ def main():
     ax.axhline(0.5, color=INK2, lw=0.8, ls=(0, (3, 3)))
     ax.annotate('chance = 0.5', (1, 0.5), xytext=(2, 3), textcoords='offset points', fontsize=7.5, color=INK2)
     label_end(ax, ep + 1, da, 'acc', C[2]); label_end(ax, ep + 1, dl, 'loss', C[3])
-    ax.legend(frameon=False, fontsize=8, loc='center right')
+    ax.legend(frameon=False, fontsize=8, loc='best')
 
     for ax in axs.flat:
         ax.set_xticks(range(0, n_ep + 1, max(1, n_ep // 10)))

@@ -353,6 +353,20 @@ accuracy than the paper's numbers (see `STUDENT_GUIDE.md`, Part 7).
   - Test96 is ~0.7 below Test100 for every run (the 4 leaked images are easy); ranking unchanged.
   - Automatic batches stopped here, per rule; next steps need the user's go-ahead.
 
+### 2026-11-04: Part 4 and Part 6 redone with the final model (user: "you didn't really do 6. update 4")
+- **Part 4:** checkpoints are now copied from the cluster (`models/F4`, `models/D1`, both `final_state.pth`).
+  - `tools/visualize_preds.py` compares E0/D1/F4 on fixed Test100 → `figures/viz_final/`.
+  - F4 gains on hips, left ankle and left elbow. test33 and test41 (self-occlusion) remain the worst images for every model.
+  - The 4.5 table now covers all runs and H1–H3 curves are drawn. Write-up: `docs/part4_results_and_fitting.md`.
+  - Legend fixes in both plot tools.
+- **Part 6:** earlier, 6.1/6.2 had only been tested on a SyRIP image (6.2 only through AppTest), and 6.3 had no images.
+  - Added a person detector (`fidip_infer.detect_people`, torchvision Faster R-CNN) with `--box-mode/--person` in the CLI and a box/person picker
+    in Streamlit. F4 is the default model.
+  - 6.3 uses 12 Commons photos that are not in SyRIP (`temp_uploads/`, licences in `SOURCES.md`).
+  - Streamlit was actually served and driven with headless Chromium (3 screenshots).
+  - Finding: the box matters more than the model (whole image 0.77 → detected box 0.86 mean confidence). F4 is more confident than E0 on 11/12.
+  - Failure modes: picking an adult as the "largest person", swaddling, foreshortening, side-view occlusion. Write-up: `docs/part6_demos.md`.
+
 ---
 
 ## Dead ends & lessons learned

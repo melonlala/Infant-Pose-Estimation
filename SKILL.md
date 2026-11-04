@@ -87,8 +87,8 @@ Keep this table and the `AGENT.md` summary table in sync whenever you submit, fi
 
 - The server has 2× RTX 6000 Ada. Use `.venv-demo/bin/python` (base python 3.13 + torch, plus yacs/streamlit/dsntnn/pycocotools).
 - Weights: `rsync explorer:/home/hou.yuchen/courses/eece7373/<ckpt> models/...` (git-ignored).
-- `tools/demo.py --image <img> --model models/hrnet_fidip.pth --output figures/demo/x.jpg`
-- `.venv-demo/bin/streamlit run tools/streamlit_demo.py` -> http://localhost:8501
+- `tools/demo.py --image temp_uploads/own05.jpg --model models/F4/final_state.pth --output figures/demo/x.jpg` (person detector by default; `--person K`, `--box-mode full`, `--bbox`)
+- `.venv-demo/bin/streamlit run tools/streamlit_demo.py --server.headless true` -> http://localhost:8501 (deep link `?src=temp_uploads/&img=own05.jpg`); stop it afterwards, it holds GPU memory
 - `.venv-demo/bin/python tools/video_infer.py --source <video|folder|0> --out figures/video/ [--no-flip] [--show]` (7.3; no webcam on the server)
 - `python3 tools/plot_curves.py log/<RUN>/syrip/adaptive_pose_hrnet/<dir> --name <RUN>` after `sync.sh pull`
 - `.venv-demo/bin/python tools/visualize_preds.py --models E0=models/hrnet_fidip.pth ...` (add `--ann`/`--images` for `data/syrip_clean`)

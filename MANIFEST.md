@@ -103,6 +103,10 @@ All annotations are COCO format, 17 keypoints.
 | `tools/streamlit_demo.py` | Part 6.2 web demo (`.venv-demo/bin/streamlit run tools/streamlit_demo.py`) | browser UI; uploads to `temp_uploads/` |
 | `tools/plot_curves.py` | Part 4.5 curves from TB logs | `figures/<run>_curves.png` |
 | `tools/visualize_preds.py` | Part 4 GT-vs-pred grids, per-keypoint similarity, pycocotools AP | `figures/viz/` |
+| `docs/part4_results_and_fitting.md` | Part 4 viz (E0/D1/F4) + 4.5 fit diagnosis for all runs | — |
+| `docs/part6_demos.md` | Part 6.1–6.3 commands, Streamlit test, own-image results | — |
+| `figures/viz_final/`, `figures/demo/`, `temp_uploads/` (server only) | final-model viz; demo outputs + Streamlit screenshots; 12 CC infant photos (`SOURCES.md`) | — |
+| `models/F4/final_state.pth`, `models/D1/final_state.pth` (server only) | copies of the cluster checkpoints for demos/viz | — |
 | `tools/eval_test96.py` | Test100 vs Test96 AP from final-epoch prediction JSONs in `output/<run>/` | stdout |
 | `tools/wandb_smoke.py` | offline check of the W&B code path | — |
 | `tools/video_infer.py` | 7.3 video file / folder batch / webcam inference with tracking | `<out>/<name>_pose.mp4`, `_keypoints.jsonl/.csv` |
