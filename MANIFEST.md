@@ -103,6 +103,9 @@ All annotations are COCO format, 17 keypoints.
 | `tools/streamlit_demo.py` | Part 6.2 web demo (`.venv-demo/bin/streamlit run tools/streamlit_demo.py`) | browser UI; uploads to `temp_uploads/` |
 | `tools/plot_curves.py` | Part 4.5 curves from TB logs | `figures/<run>_curves.png` |
 | `tools/visualize_preds.py` | Part 4 GT-vs-pred grids, per-keypoint similarity, pycocotools AP | `figures/viz/` |
+| `data/syrip_syn_new/` (server only) | 7.1: 522 SMIL-rendered synthetic images + COCO json (`is_synthetic: true`, ids 20001+), `render_meta.json`, `label_check.json` | — |
+| `syn_generation/tools/*.py`, `.venv-smil` (server only) | 7.1 pipeline: convert SMIL → fit (`fit_parallel.py`) → hip calibration → render (`render_synthetic.py`) → `check_syn_labels.py`; commands in `docs/part7_synthetic_and_apps.md` | `figures/syn/` |
+| `syn_generation/smil/`, `models/smil_web*.{pkl,npz}`, `priors/` (server only, **licensed, never commit**) | SMIL model (Fraunhofer IOSB licence), downloaded by the user | — |
 | `docs/part4_results_and_fitting.md` | Part 4 viz (E0/D1/F4) + 4.5 fit diagnosis for all runs | — |
 | `docs/part6_demos.md` | Part 6.1–6.3 commands, Streamlit test, own-image results | — |
 | `figures/viz_final/`, `figures/demo/`, `temp_uploads/` (server only) | final-model viz; demo outputs + Streamlit screenshots; 12 CC infant photos (`SOURCES.md`) | — |

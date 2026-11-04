@@ -116,6 +116,7 @@ class MaxMixturePrior(nn.Module):
             sys.exit(-1)
 
         self.num_gaussians = num_gaussians
+        self.prior_folder = prior_folder
         self.epsilon = epsilon
         self.use_merged = use_merged
         gmm_fn = 'gmm_{:02d}.pkl'.format(num_gaussians)
@@ -178,10 +179,12 @@ class MaxMixturePrior(nn.Module):
     def get_mean(self):
         ''' Returns the mean of the mixture '''
         mean_pose = torch.matmul(self.weights, self.means)
-        prior_filename = 'priors/smil_pose_prior.pkl'
-        prior = pickle.load(open(prior_filename, 'rb'), encoding='latin1')
+        # SMIL pose prior mean (plain-numpy copy written by tools/convert_smil.py;
+        # the original pickle needs chumpy and a __main__.Mahalanobis class)
+        prior_filename = os.path.join(self.prior_folder, 'smil_pose_prior_np.npz')
+        prior_mean = np.load(prior_filename)['mean']
 
-        mean_pose = torch.tensor([prior.mean], dtype=DEFAULT_DTYPE)
+        mean_pose = torch.tensor(prior_mean[None], dtype=self.means.dtype)
         return mean_pose
 
     def merged_log_likelihood(self, pose, betas):

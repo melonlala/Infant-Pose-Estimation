@@ -367,6 +367,25 @@ accuracy than the paper's numbers (see `STUDENT_GUIDE.md`, Part 7).
   - Finding: the box matters more than the model (whole image 0.77 → detected box 0.86 mean confidence). F4 is more confident than E0 on 11/12.
   - Failure modes: picking an adult as the "largest person", swaddling, foreshortening, side-view occlusion. Write-up: `docs/part6_demos.md`.
 
+### 2026-11-04: Part 7.1 synthetic generation with SMIL (user downloaded `syn_generation/models/smil.zip`)
+- Delegated to a subagent; I checked the result (figures, json bounds, git staging).
+- **Model conversion:** chumpy pickles → numpy npz through a restricted unpickler, so chumpy isn't needed. Fitting is in float64 with SMIL's own
+  1-Gaussian prior and small torch-2 fixes. The renderer is ported from OpenDR to pyrender EGL. Everything runs in `.venv-smil`.
+- **Fits:** SMIL fitted to all 200 real training images. Reprojection error: mean 3.0%, median 2.1% of the box diagonal.
+  - 174 fits at ≤ 5% are kept; some fits between 5% and 8% were wrong in 3D.
+  - About 3 s per image with 20 CPU jobs.
+- **New finding, hips:** SMIL hip joints sit inside the pelvis, only 0.39× the annotated hip width.
+  - A calibrated outward offset of 2.8 cm brings the ratio to 0.89 and cuts cross-validated hip error from 6.0% to 3.8%.
+  - The original 1000S set has narrow hips too (hip/shoulder 0.64 vs real 0.75), which may be one reason it helps little (G2).
+- **New set `data/syrip_syn_new/`:** 522 images (174 poses × 3 variants). COCO json with the same fields as `syrip_fixed`; ids start at 20001.
+- **Label checks:** 0 keypoints out of bounds (checked again independently); left/right agrees with the 3D body direction in 445/445.
+  Visual grid: `figures/syn/syn_label_check.jpg`.
+- **Limitations:** no LSUN backgrounds (generated textures and blurred crops of real scenes instead); 12 diaper textures; top-down views only;
+  poses are the real poses plus jitter, so it adds appearance and viewpoint, not new poses.
+- **Not trained yet.** Proposed experiment: F4 config with the new set added, run as a replicated pair and compared with F4/H1 on final Test500f.
+  Awaiting the user's go-ahead per the stop-and-ask rule.
+- Licensed SMIL files are kept out of git by `syn_generation/.gitignore`. Write-up: `docs/part7_synthetic_and_apps.md` §7.1.
+
 ---
 
 ## Dead ends & lessons learned

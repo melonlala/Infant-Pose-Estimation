@@ -148,9 +148,16 @@ class SMIL(nn.Module):
             assert osp.exists(smil_path), 'Path {} does not exist!'.format(
                 smil_path)
 
-            with open(smil_path, 'rb') as smil_file:
-                data_struct = Struct(**pickle.load(smil_file,
-                                                   encoding='latin1'))
+            # The original smil_web.pkl holds chumpy objects (chumpy does not
+            # work on python 3.13 / numpy 2). tools/convert_smil.py writes a
+            # plain-numpy copy next to it; prefer that one.
+            np_path = osp.splitext(smil_path)[0] + '_np.npz'
+            if osp.exists(np_path):
+                data_struct = Struct(**dict(np.load(np_path)))
+            else:
+                with open(smil_path, 'rb') as smil_file:
+                    data_struct = Struct(**pickle.load(smil_file,
+                                                       encoding='latin1'))
 
         super(SMIL, self).__init__()
         self.batch_size = batch_size

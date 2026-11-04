@@ -90,6 +90,7 @@ Keep this table and the `AGENT.md` summary table in sync whenever you submit, fi
 - `tools/demo.py --image temp_uploads/own05.jpg --model models/F4/final_state.pth --output figures/demo/x.jpg` (person detector by default; `--person K`, `--box-mode full`, `--bbox`)
 - `.venv-demo/bin/streamlit run tools/streamlit_demo.py --server.headless true` -> http://localhost:8501 (deep link `?src=temp_uploads/&img=own05.jpg`); stop it afterwards, it holds GPU memory
 - `.venv-demo/bin/python tools/video_infer.py --source <video|folder|0> --out figures/video/ [--no-flip] [--show]` (7.3; no webcam on the server)
+- 7.1: `cd syn_generation && ../.venv-smil/bin/python tools/<step>.py ...` (fit on CPU `--jobs 20`, render with `EGL_DEVICE_ID=1 CUDA_VISIBLE_DEVICES=1`); SMIL files are licensed: never commit them (`syn_generation/.gitignore`)
 - `python3 tools/plot_curves.py log/<RUN>/syrip/adaptive_pose_hrnet/<dir> --name <RUN>` after `sync.sh pull`
 - `.venv-demo/bin/python tools/visualize_preds.py --models E0=models/hrnet_fidip.pth ...` (add `--ann`/`--images` for `data/syrip_clean`)
 - `.venv-demo/bin/python tools/eval_test96.py D1 F4 ...`: Test100 vs Test96 (minus 4 leaked images) from saved final-epoch prediction JSONs (CPU, no checkpoint needed)
