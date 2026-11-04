@@ -79,7 +79,7 @@ Poll at most every 30 s. A training epoch prints an AP table; `model_best.pth` t
 
 | ID | Slurm job | Status | Notes |
 |--|--|--|--|
-| SY1, SY2 | SY1 11618211, SY2 11618217 (+2 chained Test500f evals each) | submitted 2026-11-04 | F4 config + 522 new SMIL renders (`data/syrip_fixed_plus522/`); S*/L*/M* jobs in the queue belong to another session, don't touch them |
+| — | none from this session | SY1/SY2 done 2026-11-04 (no effect; F4 stays final) | S*/L*/M* jobs in the queue belong to another session; don't touch them |
 
 Keep this table and the `AGENT.md` summary table in sync whenever you submit, finish, or cancel a job.
 

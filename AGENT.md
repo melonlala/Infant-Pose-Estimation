@@ -56,8 +56,8 @@ accuracy than the paper's numbers (see `STUDENT_GUIDE.md`, Part 7).
 | H1 | 2026-11-04 | F4 replicate (100 ep, no shuffle) | `submit_run.sh H1 ... TRAIN.END_EPOCH 100` | 11607648 → 11607652, 11607654 | 94.3 | — | — | — | done (best @ 30, final 93.9); **Test500f 91.4 / 91.6** → with F4: confirmed |
 | H2 | 2026-11-04 | B (= D1 + shuffle) + stronger aug (`ROT_FACTOR 60`, `SCALE_FACTOR 0.45`) | `submit_run.sh H2 ...` | 11607656 → 11607658, 11607659 | 94.0 | — | — | — | done (best @ 14, final 93.9); **Test500f 91.4 / 91.6** (single run, not confirmable) |
 | H3 | 2026-11-04 | G1 replicate (D1 + shuffle); *extra confirmation run, not in the rule* | `submit_run.sh H3 ... TRAIN.BALANCED_SHUFFLE True` | 11607662 → 11607664, 11607666 | 94.2 | — | — | — | done (best @ 12, final 93.9); **Test500f 91.3 / 91.3** → shuffle pair mean 91.4 < 91.5, not confirmed |
-| SY1 | 2026-11-04 | F4 config (100 ep) + **522 new SMIL renders** (7.1) → train = 200R + 1000S + 522S | `ROOT=data/syrip_fixed_plus522/ submit_run.sh SY1 03:30:00 TRAIN.END_EPOCH 100` | 11618211 → 11618213, 11618215 | — | — | — | — | queued (behind the other session's S/L/M jobs) |
-| SY2 | 2026-11-04 | SY1 replicate | same, `SY2` | 11618217 → 11618218, 11618220 | — | — | — | — | queued |
+| SY1 | 2026-11-04 | F4 config (100 ep) + **522 new SMIL renders** (7.1) → train = 200R + 1000S + 522S | `ROOT=data/syrip_fixed_plus522/ submit_run.sh SY1 03:30:00 TRAIN.END_EPOCH 100` | 11618211 → 11618213, 11618215 | 93.8 | — | — | — | done (best @ Test100 93.8, final 93.2, Test96 92.6); **Test500f 91.4 / 91.7** (best / final) |
+| SY2 | 2026-11-04 | SY1 replicate | same, `SY2` | 11618217 → 11618218, 11618220 | 93.5 | — | — | — | done (best 93.5, final 93.1, Test96 92.5); **Test500f 90.9 / 91.5** → with SY1: no effect (rule) |
 
 ---
 
@@ -399,6 +399,23 @@ accuracy than the paper's numbers (see `STUDENT_GUIDE.md`, Part 7).
   - If within ±0.3 of 91.65: no measurable effect, consistent with G2 (synthetic data adds nothing here).
   - If ≤ 91.35: it hurts (likely the synthetic/real appearance gap).
   - Report Test100 / Test96 / Test500f either way, and stop and ask before more runs.
+
+### 2026-11-04: SY-track result: no effect; F4 stays final
+| Run | Test100 best | Test100 final | Test96 final | Test500f best | Test500f final |
+|--|--|--|--|--|--|
+| F4 | 94.1 | 94.0 | 93.2 | 91.0 | 91.7 |
+| H1 | 94.3 | 93.9 | 93.3 | 91.4 | 91.6 |
+| SY1 | 93.8 | 93.2 | 92.6 | 91.4 | 91.7 |
+| SY2 | 93.5 | 93.1 | 92.5 | 90.9 | 91.5 |
+- **Pre-registered verdict:** the SY mean final Test500f is 91.6. That is within ±0.3 of 91.65, so **no measurable effect**.
+  - The 522 new SMIL renders add nothing on the large test set, which matches G2.
+- **Secondary signal (not the decision metric):** both replicates are about 0.8 lower on Test100 final and 0.7 lower on Test96.
+  - The drop is consistent (the F4/H1 spread is 0.1, the SY spread 0.1), so on the small test set extra synthetic data mildly hurts.
+- **Confounds:**
+  - SY took 1.52× more iterations per epoch.
+  - Real images were oversampled 7.6× instead of 5×, so each real image is seen more often.
+  - Synthetic diversity is limited: 174 poses × 3 variants.
+- **Final model unchanged: F4 final_state.** No further runs without the user's go-ahead.
 
 ---
 

@@ -1,6 +1,6 @@
 # Part 7.1 (synthetic data generation) and 7.3 (applications)
 
-## 7.1 Synthetic infant data generation — status: runs on the server (2026-11-04); new set not yet used in training
+## 7.1 Synthetic infant data generation — status: runs on the server (2026-11-04); trained on in SY1/SY2: no effect
 
 **What the pipeline does** (`syn_generation/`):
 1. **Fit SMIL to 2D poses:** `smplifyx/main.py` (SMPLify-X adapted to the infant SMIL model). It optimises SMIL shape (20 betas) and pose (69 = 23 joints × 3)
@@ -108,7 +108,21 @@ implausible in 3D (2D error cannot detect depth ambiguities). (5) The hip offset
 
 **Is it worth it? Test first, cheaply:** G2 = **real-only (200R)** training vs D1 (200R + 1000S), at matched iterations (2000). If the
 synthetic data adds little, generating more of the same kind will add little too, and Part 7 effort should go elsewhere. Result: see AGENT.md G-track.
-A follow-up test for this set: 200R + 1000S + 522 new vs D1.
+**Training test (SY1/SY2, 2026-11-04):** F4 config (100 epochs) on 200R + 1000S + 522 new, as two replicates; compared with F4/H1.
+
+| Run | Test100 final | Test96 final | Test500f final |
+|--|--|--|--|
+| F4 / H1 (no new data) | 94.0 / 93.9 | 93.2 / 93.3 | 91.7 / 91.6 |
+| SY1 / SY2 (+522 new) | 93.2 / 93.1 | 92.6 / 92.5 | 91.7 / 91.5 |
+
+- **Verdict:** no effect on Test500f. The mean is 91.6 against 91.65, inside the pre-registered ±0.3 band.
+- **Smaller sets:** both replicates are about 0.8 lower on Test100 and Test96.
+- **Consistent with G2:** more synthetic data of this kind does not help.
+- **Confounds:**
+  - The balanced sampler gives 1.52× more iterations.
+  - Real images are oversampled 7.6× instead of 5×.
+  - The set covers only 174 distinct poses.
+- **What might help instead:** more diverse poses, realistic textures and backgrounds, or a closer match to real hip geometry.
 
 ## 7.3 Applications — video batch processing and webcam
 
