@@ -106,6 +106,8 @@ All annotations are COCO format, 17 keypoints.
 | E0/E1b on Test500 | evals with `DATASET.ROOT data/syrip500/` (symlink root -> `data/SyRIP/annotations/validate500`, `data/SyRIP/images/validate_infant`) | `OUTPUT_DIR output_test500/{E0,E1b,E1b_final}` | 11602004 / 11602005 / 11602006 | — | `logs/fidip-eval500-*-1160200[4-6].out` | 98.4 / 98.5 / 98.3 |
 | D0 / D0b | released E0 / E1b `model_best` on fixed Test100 | `DATASET.ROOT data/syrip_fixed/` | 11602447 / 11602449 | — | `output/D0_E0`, `output/D0b_E1b` | 93.6 / 92.6 |
 | D1 | E1b config on fixed labels, 20 ep | `train.sh DATASET.ROOT data/syrip_fixed/ OUTPUT_DIR output/D1` | 11602450 | `output/D1/.../{model_best,final_state}.pth` (server copy `models/D1/final_state.pth`) | TB `log/D1/`, W&B 0997f45c | 93.8 best / 93.6 final |
+| L1–L3, S1/S2 | λ sweep (1e-4/2e-3/5e-3) and 100 ep + shuffle pair (HRNet) | `slurm/submit_run.sh` | 11617341 … 11617437 | `output/<NAME>/.../final_state.pth` | TB `log/<NAME>/`, W&B | Test499f L 91.1/89.6/87.2, S 91.4/91.6 (no change of final model) |
+| M0 / M1 / M2 | MobileNet: released / fixed labels 20 ep / 100 ep | `CFG=... eval.sh`; `slurm/submit_mobile.sh` | 11617333/6, 11618020, 11618140 | `output/M{1,2}/syrip/adaptive_pose_mobile/.../final_state.pth` | TB `log/M{1,2}/` | Test99 78.2 / 74.0 / 78.6; Test499f 69.7 / 69.0 / 73.1 |
 | F1–F4, G1–G3, H1–H3 | single-factor ablations from D1 (see AGENT.md table) | `slurm/submit_run.sh <NAME> <TIME> [overrides]` | 11603301 … 11607666 | `output/<NAME>/.../final_state.pth` | TB `log/<NAME>/`, W&B project `fidip` | see AGENT.md |
 | E1b | E1 resubmitted after env fix | same as E1, `WANDB_NAME=E1b-reproduce` | 11601446 → 11601467 | `output/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/model_best.pth` (ep 6; also `final_state.pth` ep 20, `checkpoint.pth`) | `logs/fidip-train-11601467.out`, `output/.../w48_384x288_adam_lr1e-3_infant_2026-11-03-19-28_train.log`, TB `log/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant_2026-11-03-19-28/` (no W&B) | 91.1 |
 
@@ -125,6 +127,7 @@ All annotations are COCO format, 17 keypoints.
 | `tools/eval_subsets.py` | Test100 / **Test99** / Test95 / Test500f / **Test499f** AP from saved prediction JSONs (`run[:test500f_run]` args) | stdout |
 | `tools/plot_compare.py` | Part 4.5 overlay of several runs (train loss, val loss, val AP) | `figures/compare_4_5.png` |
 | `tools/eval_test96.py` | (superseded by `eval_subsets.py`) | Test100 vs Test96 AP from final-epoch prediction JSONs in `output/<run>/` | stdout |
+| `slurm/submit_mobile.sh`, `slurm/train_mobile.sh`, `slurm/eval_mobile.sh`, `tools/train_adaptive_model_mobile_wb.py` | MobileNet train + Test500f evals (upstream mobile script + W&B); separate files so `sync.sh push` cannot revert them | cluster `output/<NAME>/syrip/adaptive_pose_mobile/` |
 | `tools/wandb_smoke.py` | offline check of the W&B code path | — |
 | `tools/video_infer.py` | 7.3 video file / folder batch / webcam inference with tracking | `<out>/<name>_pose.mp4`, `_keypoints.jsonl/.csv` |
 | `docs/part3_model_notes.md`, `docs/part7_synthetic_and_apps.md` | Part 3 notes; 7.1 status + 7.3 results | — |
@@ -143,6 +146,8 @@ bar on each subset is the released checkpoint (= the paper's model, which reprod
 | Reproduced baseline **D1** (fixed labels, 20 ep) | 93.6 | 92.7 | 92.9 | 91.4 (`model_best`) | 91.2 |
 | **Best improved: F4** (D1 + `TRAIN.END_EPOCH 100`) | **94.0** | **93.0** | **93.2** | **91.7** | **91.4** |
 | F4 replicate H1 | 93.9 | 93.0 | 93.2 | 91.6 | 91.4 |
+| F4 + shuffle, S1 / S2 (not confirmed: pair mean 91.5 < 91.7) | 94.3 / 94.2 | 93.3 / 93.2 | 93.5 / 93.4 | 91.5 / 91.7 | 91.4 / 91.6 |
+| Best MobileNet M2 (100 ep) vs released `mobile_fidip.pth` | 79.4 vs 79.2 | 78.6 vs 78.2 | 78.3 vs 77.9 | 73.2 vs 69.8 | 73.1 vs 69.7 |
 | F4 vs released | +0.4 | **+0.4** | +0.4 | +0.8 | **+0.7** |
 
 | | Value |

@@ -56,6 +56,14 @@ accuracy than the paper's numbers (see `STUDENT_GUIDE.md`, Part 7).
 | H1 | 2026-11-04 | F4 replicate (100 ep, no shuffle) | `submit_run.sh H1 ... TRAIN.END_EPOCH 100` | 11607648 → 11607652, 11607654 | 94.3 | — | — | — | done (best @ 30, final 93.9); **Test500f 91.4 / 91.6** → with F4: confirmed |
 | H2 | 2026-11-04 | B (= D1 + shuffle) + stronger aug (`ROT_FACTOR 60`, `SCALE_FACTOR 0.45`) | `submit_run.sh H2 ...` | 11607656 → 11607658, 11607659 | 94.0 | — | — | — | done (best @ 14, final 93.9); **Test500f 91.4 / 91.6** (single run, not confirmable) |
 | H3 | 2026-11-04 | G1 replicate (D1 + shuffle); *extra confirmation run, not in the rule* | `submit_run.sh H3 ... TRAIN.BALANCED_SHUFFLE True` | 11607662 → 11607664, 11607666 | 94.2 | — | — | — | done (best @ 12, final 93.9); **Test500f 91.3 / 91.3** → shuffle pair mean 91.4 < 91.5, not confirmed |
+| L1 | 2026-11-04 | D1 + DA λ 1e-4 (`PRE_EPOCH 1`) | `submit_run.sh L1 ... TRAIN.LAMBDA 0.0001 TRAIN.PRE_EPOCH 1` | 11617341 → 11617348, 11617351 | 93.7 | — | — | — | done (final); **Test99 92.8 / Test499f 91.1** |
+| L2 | 2026-11-04 | D1 + DA λ 2e-3 | same, `TRAIN.LAMBDA 0.002` | 11617353 → 11617376, 11617492 | 92.4 | — | — | — | done; Test99 91.4 / Test499f 89.6 |
+| L3 | 2026-11-04 | D1 + DA λ 5e-3 | same, `TRAIN.LAMBDA 0.005` | 11617418 → 11617494, 11617495 | 89.7 | — | — | — | done; Test99 88.8 / Test499f 87.2 → **DA never helps** |
+| S1 | 2026-11-04 | F4 (100 ep) + `BALANCED_SHUFFLE True` | `submit_run.sh S1 02:45:00 TRAIN.END_EPOCH 100 TRAIN.BALANCED_SHUFFLE True` | 11617384 → 11617393, 11617423 | 94.3 | — | — | — | done; Test99 93.3 / Test499f 91.4 |
+| S2 | 2026-11-04 | S1 replicate | same | 11617427 → 11617435, 11617437 | 94.2 | — | — | — | done; Test99 93.2 / Test499f 91.6 → pair mean 91.5 < 91.7, **not confirmed** |
+| M0 | 2026-11-04 | released `mobile_fidip.pth`, fixed data | `CFG=<mobile yaml> eval.sh` | 11617333, 11617336 | 79.2 | 99.0 | 89.4 | 84.1 | done; Test99 78.2 / Test499f 69.7 |
+| M1 | 2026-11-04 | MobileNet on fixed labels, own yaml, 20 ep | `submit_mobile.sh M1 01:00:00` | 11618020 → 11618092, 11618105 | 74.7 | — | — | — | done; Test99 74.0 / Test499f 69.0 (first attempt 11617422 ran as HRNet by mistake, cancelled) |
+| M2 | 2026-11-04 | M1 + 100 ep | `submit_mobile.sh M2 03:00:00 TRAIN.END_EPOCH 100` | 11618140 → 11618148, 11618151 | 79.4 | — | — | — | done; Test99 78.6 / Test499f 73.1 (+3.4 vs released MobileNet) |
 | T5f-E0 | 2026-11-03 | Released `hrnet_fidip.pth` on **Test500f** (Test500, `area` = bbox w*h) | `DATASET.ROOT data/syrip500_fixed/`, `OUTPUT_DIR output_test500f/E0` | 11602599 | 90.9 | 98.7 | 96.7 | 92.3 | done |
 | T5f-E1b | 2026-11-03 | E1b `model_best` on Test500f | same, `output_test500f/E1b` | 11602600 | 89.7 | 98.8 | 95.7 | 91.4 | done |
 | T5f-D1 | 2026-11-03 | D1 `model_best` on Test500f | same, `output_test500f/D1` | 11602601 (afterok 11602450) | 91.4 | 98.8 | 96.7 | 92.6 | done |
@@ -476,6 +484,77 @@ accuracy than the paper's numbers (see `STUDENT_GUIDE.md`, Part 7).
 - **6.3:** already done earlier on 2026-11-04 (12 Wikimedia Commons infant photos, not in SyRIP, in `temp_uploads/` with licences in
   `temp_uploads/SOURCES.md`; results in `docs/part6_demos.md`). Nothing re-run.
 
+### 2026-11-04 — L/M/S-track: λ sweep, MobileNet comparison, 100 ep + shuffle (rules pre-registered before results)
+- **Asked:** sweep λ, compare against MobileNet, and run long training with the reshuffled sampler. Monitor progress every 10 min.
+- **Code (new files only, see the incident below):** `slurm/submit_mobile.sh` → `slurm/train_mobile.sh` (`tools/train_adaptive_model_mobile_wb.py` =
+  upstream mobile script + W&B + per-epoch `val AP` line; 224×224 yaml; init `models/coco/posemobile.pth`) and `slurm/eval_mobile.sh`.
+  `tools/eval_subsets.py` now also finds `adaptive_pose_mobile` outputs. These were pushed to the cluster by one-off rsync from this worktree (branch
+  `claude/raw-data-annotation-check-23431c`).
+- **Runs** (all `data/syrip_fixed`, single factor vs the named base):
+  - **L1 / L2 / L3**: D1 + DA with `PRE_EPOCH 1`, λ = 1e-4 / 2e-3 / 5e-3, 20 ep. Together with F1 (λ = 0) and F2 (λ = 5e-4) this gives a 5-point sweep.
+  - **M0**: released `mobile_fidip.pth` on fixed Test100 and Test500f (eval only).
+  - **M1**: MobileNet on fixed labels, its own yaml (LR 1e-3, 20 ep, DA off). **M2**: M1 + 100 ep (LR drop at 90).
+  - **S1 / S2**: F4 (100 ep) + `TRAIN.BALANCED_SHUFFLE True`, two runs (pair), so the rule can be applied without another round.
+- **Metric:** final_state AP on **Test499f**, with Test99 as a secondary metric (`tools/eval_subsets.py`). Noise ≈ 0.2, so the significance bar is +0.3.
+- **Pre-registered rules:**
+  - **λ:** baseline F1 final Test499f 91.1. A λ is *promising* if it scores ≥ 91.4. Then it gets one replicate, and it is adopted only if the pair mean is ≥ 91.4
+    and both runs are ≥ 91.1. If no λ is promising, the conclusion is that **DA does not help on fixed labels at any λ in [1e-4, 5e-3]**. Separately, report
+    whether the domain-classifier accuracy falls toward 0.5 as λ grows (a sanity check that the adversarial term works).
+  - **Shuffle at 100 ep:** baseline F4/H1 pair mean 91.4 (91.4 / 91.4). *Confirmed* if the S1/S2 mean is ≥ 91.7 and both runs are ≥ 91.4. If confirmed, the final model
+    becomes the better of S1/S2. Otherwise F4 stays the final model.
+  - **MobileNet:** a comparison, not a candidate for the final model. Report M0 vs M1 (does the label fix help MobileNet as it did HRNet, +1.2?),
+    M1 vs M2 (does 100 ep help, ≥ +0.3?), and the gap between HRNet and MobileNet at matched settings (D1 vs M1, F4 vs M2).
+  - After these runs, stop and report. Nothing new is launched without the user.
+- **Job ids:** M0 t100 11617333, t500f 11617336. L1 11617341 → t5b 11617348, t5f 11617351. L2 11617353 → 11617376, 11617492.
+  L3 11617418 → 11617494, 11617495. S1 11617384 → 11617393, 11617423. S2 11617427 → 11617435, 11617437.
+  M1 11617422 and M2 11617442 (→ 11617447/49) were wrong (HRNet, see the incident): held, then cancelled with the user's OK and resubmitted with
+  `slurm/submit_mobile.sh`: **M1 11618020 → 11618092, 11618105; M2 11618140 → 11618148, 11618151** (arch=mobile).
+- **Incident (11:05):** in the middle of the submit loop, the cluster's `slurm/submit_run.sh`, `slurm/eval.sh` and `tools/train_adaptive_model_mobile.py` reverted to
+  main's versions, most likely because another session ran `slurm/sync.sh push` from the main checkout. So `ARCH=mobile` was ignored: **M1 and M2 were submitted as HRNet
+  runs (`slurm/train.sh`)**. Both were held (`scontrol hold`) before starting. Three sbatch calls also failed with "Unexpected message received"
+  (L2-t5f, L3-t5b/t5f); they were resubmitted by hand. L1–L3 and S1/S2 are HRNet by design, so they are unaffected. M0 is unaffected too, because sbatch snapshots the
+  batch script at submit time. Fix: the MobileNet path now lives only in new files that main does not have, so a push cannot revert them.
+- **M0 (released `mobile_fidip.pth`, fixed data):** Test100 **79.2** (AP50 99.0, AP75 89.4, AR 84.1). Test500f **69.8** (96.2 / 79.9 / AR 78.1).
+  That is 14–21 AP below HRNet (93.6 / 90.9).
+- **λ sweep result (done 2026-11-04 16:20; all final_state, 20 ep, `PRE_EPOCH 1` for λ > 0):**
+
+| run | λ | Test100 | Test99 | Test95 | Test500f | **Test499f** | DC acc (mean of last 5 ep) |
+|---|---|---|---|---|---|---|---|
+| F1 | 0 | 93.5 | 92.5 | 92.7 | 91.2 | **91.1** | 0.78 |
+| L1 | 1e-4 | 93.7 | 92.8 | 92.9 | 91.4 | **91.1** | 0.71 |
+| F2 | 5e-4 (paper) | 93.5 | 92.5 | 92.8 | 91.0 | **90.9** | 0.69 |
+| L2 | 2e-3 | 92.4 | 91.4 | 91.7 | 89.6 | **89.6** | 0.60 |
+| L3 | 5e-3 | 89.7 | 88.8 | 89.3 | 87.3 | **87.2** | 0.54 |
+
+  - **Rule applied:** no λ reaches 91.4 (the best is L1 at 91.1, equal to F1), so none is promising. **DA does not help on fixed labels at any λ in [1e-4, 5e-3].** Replicates are not needed.
+  - **Sanity check passes:** domain-classifier accuracy falls steadily toward chance (0.78 → 0.54) as λ grows, so the adversarial term does make the
+    features domain-invariant. Pose AP falls with it (−0.2 at the paper's λ, −1.5 at 2e-3, −3.9 at 5e-3). On correct labels, real-vs-synthetic invariance
+    costs keypoint accuracy instead of helping. The paper's Finetune→FiDIP +0.9 (Table IV) does not reproduce in this code at any λ.
+- **100 ep + shuffle result (S1/S2, final_state):**
+
+| run | Test100 | Test99 | Test95 | Test500f | **Test499f** |
+|---|---|---|---|---|---|
+| F4 / H1 (100 ep, no shuffle) | 94.0 / 93.9 | 93.0 / 93.0 | 93.2 / 93.2 | 91.7 / 91.6 | **91.4 / 91.4** |
+| S1 / S2 (100 ep + shuffle) | 94.3 / 94.2 | 93.3 / 93.2 | 93.5 / 93.4 | 91.5 / 91.7 | **91.4 / 91.6** |
+
+  - **Rule applied:** the pair mean is 91.5, below the 91.7 bar (both runs are ≥ 91.4) → **shuffle not confirmed**, **F4 stays the final model**. This is the same outcome as G1/H3 at 20 ep.
+    The shuffle pair is consistently a little higher (+0.25 Test99, +0.1 Test499f), but the gain is below the pre-registered significance bar.
+- **MobileNet result (final_state, `mobile_224x224` yaml: LR 1e-3, LR drop at ep 90, DA off):**
+
+| run | what | Test100 | Test99 | Test95 | Test500f | **Test499f** |
+|---|---|---|---|---|---|---|
+| M0 | released `mobile_fidip.pth` | 79.2 | 78.2 | 77.9 | 69.8 | **69.7** |
+| M1 | fixed labels, 20 ep | 74.7 | 74.0 | 73.9 | 69.2 | **69.0** |
+| M2 | fixed labels, 100 ep | 79.4 | 78.6 | 78.3 | 73.2 | **73.1** |
+
+  - **The label fix alone does not help MobileNet at 20 ep** (M1 vs M0: −4.2 Test99, −0.7 Test499f). For HRNet it was worth +1.2. A 224×224 MobileNet initialised from
+    COCO is still far from converged after 20 epochs (val AP is still rising at ep 19: best 76.4).
+  - **100 epochs is worth +4.6 Test99 / +4.1 Test499f** (M2 vs M1, ≫ 0.3), and M2 beats the released MobileNet by +0.4 Test99 and **+3.4 Test499f**. MobileNet needs the long schedule. HRNet needs it much less (F4 vs D1: +0.3 / +0.2).
+  - **HRNet vs MobileNet at matched settings:** D1 vs M1 = 92.7 vs 74.0 Test99 (−18.7), 91.2 vs 69.0 Test499f (−22.2). F4 vs M2 = 93.0 vs 78.6 (−14.4), 91.4 vs 73.1 (−18.3).
+    The gap is larger on Test500, where poses are more varied. AP50 stays high for MobileNet (≥ 96), so the loss comes from localisation precision
+    (224 input, 56×56 heatmaps vs 384×288 / 96×72), not from missed detections.
+- **Wrap-up (per the pre-registered stop rule):** no change to the final model (**F4 `final_state`**). Nothing new launched. The P100 test job 11619062 is still queued (it only checks that a P100 can run CUDA).
+
 ---
 
 ## Dead ends & lessons learned
@@ -488,6 +567,8 @@ _(Record approaches that didn't work and why, so they aren't repeated.)_
 - `gdown` has no `--remaining-ok` flag (folder download failed in job 11509124).
 - **A nested `OUTPUT_DIR` must already exist** (`lib/utils/utils.py:27` uses `mkdir()` without parents). `mkdir -p` the parent before `sbatch`.
 - **Val loss below train loss for a whole run is a red flag for label noise**, not just augmentation (E1b: ratio 0.59 with broken labels vs 1.16 with fixed).
+- **One-off rsync of a *tracked* file to the cluster is not durable:** any `slurm/sync.sh push` from the main checkout reverts it, even in the middle of a submit
+  loop (M1/M2 ran as HRNet). Put experimental cluster code in new files, or commit it to main first. sbatch snapshots the batch script, but not the Python it calls.
 - **Don't trust `syrip_for_train.zip` labels blindly**: its synthetic keypoints are wrong and test11.jpg is swapped. Audit images vs annotations
   (size check, overlay a few, score a trusted model against each label set) before training.
 - **`wandb.util.generate_id` no longer exists** (wandb 0.31) → E3/E4 died at start. Run `tools/wandb_smoke.py` after any W&B code change.

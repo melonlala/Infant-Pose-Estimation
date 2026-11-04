@@ -29,7 +29,7 @@ from pycocotools.cocoeval import COCOeval
 
 DROP = {'test11.jpg'}
 LEAK = {'test20.jpg', 'test42.jpg', 'test46.jpg', 'test50.jpg'}
-REL = 'syrip/adaptive_pose_hrnet/*/results/keypoints_validate_infant_results_0.json'
+REL = 'syrip/*/*/results/keypoints_validate_infant_results_0.json'   # hrnet or mobile
 
 
 def subset(gt, drop_files):
