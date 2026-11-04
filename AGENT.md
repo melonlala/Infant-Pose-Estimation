@@ -600,6 +600,22 @@ accuracy than the paper's numbers (see `STUDENT_GUIDE.md`, Part 7).
   A2 t100 11625924, t500 11625943; A3 t100 11625950, t500 11625953.
 - **Interim (17:50):** A1 (4-model ensemble) Test100 94.2 / Test99 93.2 / Test500f 91.8 / **Test499f 91.5** (F4 91.4) → +0.1, below the 91.7 bar.
   A2 (F4 + 9-way TTA) Test100 94.4 / Test99 93.4; Test500f pending. B3a and B3b are training; B4a and B4b are queued.
+- **A result (all done 18:05; 3-decimal values from the same rescoring):**
+
+| config | models × transforms | forward passes / person | Test100 | Test99 | Test95 | Test500f | **Test499f** |
+|---|---|---|---|---|---|---|---|
+| F4 = A0 (flip only) | 1 × 1 | 2 | 93.99 | 92.99 | 93.20 | 91.73 | **91.43** |
+| A1 ensemble {F4,H1,S1,S2} | 4 × 1 | 8 | 94.23 | 93.22 | 93.39 | 91.79 | **91.49** |
+| A2 F4 + TTA (s 0.9/1/1.1 × r ±30°/0) | 1 × 9 | 18 | 94.42 | 93.42 | 93.62 | 92.16 | **91.96** |
+| A3 ensemble + TTA | 4 × 9 | 72 | 94.45 | 93.45 | 93.60 | 92.24 | **92.04** |
+
+  - **Rule applied:** A2 (91.96) and A3 (92.04) both pass the 91.7 bar. A1 (+0.06) does not. **Highest wins → A3 is adopted as the final reported
+    system**: Test99 **93.4** / Test499f **92.0**, vs F4 93.0 / 91.4 and vs the released checkpoint 92.6 / 90.7.
+  - **TTA does almost all the work.** On top of TTA, the 4-model ensemble adds only +0.08 Test499f at 4× the cost. A2 (single F4 model, 18 passes) is the practical choice
+    and is within 0.1 of A3. The ensemble members are near-copies (same data, same config family, plateaued), so their errors are correlated. TTA's
+    scale/rotation views see the infant differently, which suits the arbitrary orientations of lying infants.
+  - Caveat: the TTA grid was fixed in advance and not tuned, so it is not selected on the test set. Only the A1–A3 choice among 3 pre-listed configs touches
+    the test set, and the winner clears the bar by 0.3.
 
 ### 2026-11-04 — File transfers go through the xfer node
 - **Asked:** copy files between the server and the cluster through `xfer.discovery.neu.edu`, and add this to SKILL.md.

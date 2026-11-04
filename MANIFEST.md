@@ -152,12 +152,16 @@ bar on each subset is the released checkpoint (= the paper's model, which reprod
 | F4 + shuffle, S1 / S2 (not confirmed: pair mean 91.5 < 91.7) | 94.3 / 94.2 | 93.3 / 93.2 | 93.5 / 93.4 | 91.5 / 91.7 | 91.4 / 91.6 |
 | Best MobileNet M2 (100 ep) vs released `mobile_fidip.pth` | 79.4 vs 79.2 | 78.6 vs 78.2 | 78.3 vs 77.9 | 73.2 vs 69.8 | 73.1 vs 69.7 |
 | F4 vs released | +0.4 | **+0.4** | +0.4 | +0.8 | **+0.7** |
+| **Final reported system: A3** = ensemble {F4, H1, S1, S2} + TTA (flip × scale 0.9/1/1.1 × rot ±30°/0; 72 passes) | **94.4** | **93.4** | **93.6** | **92.2** | **92.0** |
+| Cheaper equivalent: A2 = F4 + the same TTA (18 passes) | 94.4 | 93.4 | 93.6 | 92.2 | 92.0 (91.96) |
+| A3 vs released | +0.8 | **+0.8** | +0.8 | +1.3 | **+1.3** |
 
 Shuffle (`TRAIN.BALANCED_SHUFFLE True`) shows a **consistent small positive trend (about +0.1–0.3) that does not reach the significance bar**: +0.25–0.35 on Test99 and +0.1 on
 Test499f, over 4 runs at 20 and 100 ep, with every shuffle run ≥ its matched no-shuffle run. It is not adopted, so the final model stays F4.
 
 | | Value |
 |--|-------|
+| System (A3) | `sbatch slurm/eval_ens.sh <F4,H1,S1,S2 final_state.pth> 0.9,1.0,1.1 -30,0,30 <out> DATASET.ROOT data/syrip_fixed/` (tools/eval_ensemble_tta.py), then `tools/eval_subsets.py` |
 | Checkpoint | cluster `output/F4/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/final_state.pth` (server copy `models/F4/final_state.pth`; use `final_state`, not `model_best`) |
 | Exact reproduce command | `bash slurm/submit_run.sh F4 02:45:00 TRAIN.END_EPOCH 100` (train on `data/syrip_fixed/` + chained Test500f evals), then `.venv-demo/bin/python tools/eval_subsets.py D0_E0:E0 F4` on the server after `slurm/sync.sh pull` |
 | Superseded | E1b 91.1 / E0 92.1 (broken labels / swapped test11); Test500 98.x (constant area) |
