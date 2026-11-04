@@ -5,7 +5,8 @@ reproduce the final reported result from this file alone.
 
 - **Local repo:** `/home/yuchen/courses/EECE7373/hands_on_project`
 - **Cluster project root:** `explorer:/home/hou.yuchen/courses/eece7373`
-- **Code sync:** GitHub `git@github.com:melonlala/Infant-Pose-Estimation.git` (private, branch `main`). `upstream` = ostadabbas. See `SKILL.md` § Sync model
+- **Code:** GitHub `git@github.com:melonlala/Infant-Pose-Estimation.git` (private, branch `main`; code only, pushed from the server). `upstream` = ostadabbas
+- **Server <-> cluster:** `rsync` via `slurm/sync.sh push|pull|env` (cluster does not use git). See `SKILL.md` § Sync model
 - **Status legend:** `planned` · `present` · `missing` · `deprecated`
 
 ---
@@ -15,7 +16,7 @@ reproduce the final reported result from this file alone.
 | Item | Source | Commit | Location | Notes |
 |------|--------|--------|----------|-------|
 | FiDIP codebase | https://github.com/ostadabbas/Infant-Pose-Estimation (upstream; lacks `gpu_test.py`, `demo.py`, `streamlit_demo.py`, `fidip_simple.yml` referenced by guide; no public fork has them either) | `a76b4f4` + our commits on `main` | server: `/home/yuchen/courses/EECE7373/hands_on_project`; cluster: `/home/hou.yuchen/courses/eece7373/` | `lib/` built with `make` (build products untracked) |
-| Local changes | `tools/train_adaptive_model_hrnet.py` (optional W&B), `slurm/*`, `SKILL.md`, `AGENT.md`, `MANIFEST.md`, `.env.example` | `main` | both | |
+| Local changes | `tools/train_adaptive_model_hrnet.py` (optional W&B), `slurm/*`, `SKILL.md`, `AGENT.md`, `MANIFEST.md`, `.env.example` | `main` | server (git) -> cluster (rsync) | |
 
 ## 2. Environment
 
@@ -71,7 +72,7 @@ All annotations are COCO format, 17 keypoints.
 | `slurm/eval.sh <model> [overrides]` | `test_adaptive_model.py`, GT bbox | courses-gpu / 1 GPU / 0:45 | |
 | `slurm/train.sh [overrides]` | `train_adaptive_model_hrnet.py`, init DarkPose W48 | courses-gpu / v100-sxm2 / 8:00 | AUTO_RESUME on; resubmit to continue; sources `.env` for W&B |
 | `slurm/install_pkgs.sh <pkgs>` | pip install into env + import smoke test | short / CPU / 0:30 | login node kills pip |
-| `slurm/push_results.sh "<msg>"` | commit + push `logs/` from the cluster | login node | results sync to server |
+| `slurm/sync.sh push\|pull\|env` | rsync code -> cluster, results -> server, WANDB key -> cluster | server | no `--delete` |
 
 ## 7. Runs & checkpoints
 

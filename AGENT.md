@@ -99,6 +99,7 @@ accuracy than the paper's numbers (see `STUDENT_GUIDE.md`, Part 7).
 
 ### 2026-11-03 — GitHub sync, W&B, E1 resubmit
 - **Asked:** sync the cluster and the server through GitHub, unblock E1, write the root `SKILL.md`, and use W&B.
+  *(Superseded the same day: see "Sync redesign" below. The cluster no longer uses git.)*
 - **Did:**
   - Made the server project dir a git repo on top of upstream history (`upstream` = ostadabbas, `a76b4f4`), with private
     `origin` = `melonlala/Infant-Pose-Estimation`. Tracked: code, `slurm/`, docs, `logs/` (Slurm stdout = results).
@@ -130,6 +131,21 @@ accuracy than the paper's numbers (see `STUDENT_GUIDE.md`, Part 7).
   paper's FiDIP schedule (pre-train epochs, λ for the domain loss, LR). (3) Every new run needs its own `OUTPUT_DIR`, because this dir now
   holds `checkpoint.pth` at epoch 20 and AUTO_RESUME would end any rerun immediately.
 
+### 2026-11-03 — Sync redesign: GitHub for code only, rsync for the cluster
+- **Asked:** after creating the private repo, push only the server's code to it, and sync the cluster with the server by simple copy.
+- **Did:** removed `slurm/push_results.sh` and the plan for a cluster deploy key. Added `slurm/sync.sh push|pull|env` (rsync, no `--delete`).
+  `push` copies code/scripts/docs to the cluster and excludes data/models/env/outputs/results/`.env`/nms build products. `pull` brings
+  back `logs/`, `log/` (TB), and `*.log|*.json|*.txt` from `output*/`. `env` copies only `WANDB_*` lines. `logs/` and `output_*/` are now git-ignored.
+  Pushed `main` to `origin` (private `melonlala/Infant-Pose-Estimation`).
+- **Why:** simpler. The cluster needs no GitHub credentials and git history stays code-only. The trade-off is that the cluster copy has no
+  version info, so the commit used by a run must be noted in AGENT.md when submitting.
+
+### 2026-11-03 — Test500 evals: first attempt failed
+- **Did:** built `data/syrip500/` (symlinks to `data/SyRIP/annotations/validate500/...json` and `data/SyRIP/images/validate_infant`;
+  ids verified: 500 images `test{id}.jpg`, all present). Submitted evals of E0 / E1b best / E1b final with `DATASET.ROOT data/syrip500/`.
+- **Result:** 11601956-58 all FAILED at start: `FileNotFoundError: 'output_test500/E0'`. `create_logger` calls `mkdir()` without
+  `parents=True` for `OUTPUT_DIR`, so the parent must already exist. Created `output_test500/` and resubmitted as 11602004 (E0), 11602005 (E1b best), 11602006 (E1b final).
+
 ---
 
 ## Dead ends & lessons learned
@@ -140,6 +156,7 @@ _(Record approaches that didn't work and why, so they aren't repeated.)_
   the first time. Fix: `wget` the public zip on the cluster, check sha256, then unzip in a Slurm job,
   because the login node kills `unzip` for exceeding resource limits.
 - `gdown` has no `--remaining-ok` flag (folder download failed in job 11509124).
+- **A nested `OUTPUT_DIR` must already exist** (`lib/utils/utils.py:27` uses `mkdir()` without parents). `mkdir -p` the parent before `sbatch`.
 - **`pip install` on the login node gets killed** (exit 143). Run installs with `sbatch slurm/install_pkgs.sh <pkgs>`.
 - **E1 (11509271) died at import**: the env had `tensorboardx`, but the script imports `torch.utils.tensorboard`. Lesson: smoke-test the
   *training* script's imports in `setup_env.sh`, not just the eval path. Also poll `sacct` after `afterok` chains, and don't log a job as running unchecked.

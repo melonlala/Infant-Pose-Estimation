@@ -69,4 +69,6 @@ lib/nms/gpu_nms.cpp
 # Claude Code worktrees (the skill under .claude/skills is tracked)
 .claude/worktrees/
 .claude/settings.local.json
-# NOTE: logs/ (Slurm stdout, a few KB per job) IS tracked: this is how cluster results reach the server.
+# results pulled from the cluster by `slurm/sync.sh pull` (GitHub holds code only)
+logs/
+output_*/

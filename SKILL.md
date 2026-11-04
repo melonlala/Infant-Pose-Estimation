@@ -1,6 +1,6 @@
 ---
 name: fidip-explorer
-description: Operate the FiDIP (infant pose) project on the Northeastern Explorer cluster - sync code/results via GitHub, submit and monitor Slurm train/eval jobs, log to W&B. Use for any cluster run, job status check, or result sync in this project.
+description: Operate the FiDIP (infant pose) project on the Northeastern Explorer cluster - sync code/results with rsync (code to GitHub), submit and monitor Slurm train/eval jobs, log to W&B. Use for any cluster run, job status check, or result sync in this project.
 ---
 
 # FiDIP on Explorer: agent operating guide
@@ -23,26 +23,26 @@ The experiment log is in `AGENT.md`, and the inventory of artifacts is in `MANIF
 - Code: fork of `ostadabbas/Infant-Pose-Estimation` @ `a76b4f4` (remote `upstream`).
   The guide's `gpu_test.py`, `demo.py`, `streamlit_demo.py`, `fidip_simple.yml` do not exist in any public fork.
 
-## Sync model (GitHub)
+## Sync model
 
-One repo, `origin` = `git@github.com:melonlala/Infant-Pose-Estimation.git` (private), branch `main`, on both machines.
-
-- **Server -> cluster (code, scripts, docs):** edit and commit on the server, `git push`, then
-  `ssh explorer 'cd /home/hou.yuchen/courses/eece7373 && git pull --ff-only'` **before every `sbatch`**.
-  Do not edit tracked files on the cluster.
-- **Cluster -> server (results):** Slurm stdout goes to `logs/<job>-<id>.out` (tracked, a few KB each). After a job
-  finishes: `ssh explorer 'cd /home/hou.yuchen/courses/eece7373 && bash slurm/push_results.sh "E1 done"'`,
-  then `git pull` on the server. The script commits **only `logs/`**.
-- Never commit `data/`, `models/`, `envs/`, `output/`, `log/`, `*.pth`, `*.npy`, `wandb/`, or `.env`
-  (see `.gitignore`). Checkpoints stay on the cluster; record their paths in `MANIFEST.md`.
+- **GitHub = code only**: `origin` = `git@github.com:melonlala/Infant-Pose-Estimation.git` (private, `main`), pushed
+  from the **server only**. `upstream` = ostadabbas. Commit code, scripts, and docs on the server. Never commit `data/`, `models/`,
+  `envs/`, `output*/`, `log/`, `logs/`, `*.pth`, `*.npy`, `wandb/`, `.env` (see `.gitignore`).
+- **Server <-> cluster = plain copy** (`rsync` over `ssh explorer`), via `slurm/sync.sh` run on the server. The cluster never uses GitHub.
+  - `bash slurm/sync.sh push`: server code/scripts/docs -> cluster. **Run before every `sbatch`.** Excludes data, models,
+    env, outputs, results, `.env`, the cluster's `.git`, and the `lib/nms` build products.
+  - `bash slurm/sync.sh pull`: cluster -> server for `logs/` (Slurm stdout), `log/` (TensorBoard events), and only the
+    `*.log`/`*.json`/`*.txt` files from `output*/`. Checkpoints stay on the cluster; record their paths in `MANIFEST.md`.
+  - `bash slurm/sync.sh env`: copies only the `WANDB_*` lines of the server `.env` to the cluster `.env` (mode 600).
+  - No `--delete` in either direction. Never edit files on the cluster: the next `push` overwrites them.
+- The cluster still has the upstream `.git` from the original clone. Ignore it: `git status` there shows our changes as modifications.
 - `lib/nms` build products (`*.so`, `cpu_nms.c`, `gpu_nms.cpp`) are untracked; rebuild with `cd lib && make` (inside a job).
-- Training curves: W&B project `fidip` (live), plus TensorBoard event files in `log/syrip/...` on the cluster.
+- Training curves: W&B project `fidip` (when `.env` is on the cluster), plus TensorBoard events in `log/syrip/...`.
 
 ## Secrets
 
-- `.env` sits at the project root on each machine (git-ignored, `chmod 600`). Template: `.env.example`.
-- The cluster's `.env` holds only `WANDB_API_KEY` (+ `WANDB_PROJECT`). Never put `GITHUB_TOKEN` on the shared cluster:
-  the cluster pushes with its own SSH deploy key (`~/.ssh/id_ed25519_github`).
+- `.env` sits at the project root on the server (git-ignored). Template: `.env.example`.
+- The cluster `.env` gets only the `WANDB_*` lines, via `slurm/sync.sh env`. `GITHUB_TOKEN` never goes to the shared cluster.
 - `slurm/train.sh` and `slurm/eval.sh` source `.env`. Never print, `cat`, or commit it. Check for it with `test -f .env`.
 
 ## Slurm scripts (`slurm/`, run from the cluster project root)
@@ -54,7 +54,7 @@ One repo, `origin` = `git@github.com:melonlala/Infant-Pose-Estimation.git` (priv
 | `eval.sh <model> [cfg overrides]` | `test_adaptive_model.py` on Test100, GT bbox | courses-gpu, 1 GPU, 0:45 | `sbatch slurm/eval.sh models/hrnet_fidip.pth` |
 | `install_pkgs.sh <pkg...>` | pip-install into `envs/fidip` + import smoke test (login node kills pip) | short, CPU, 0:30 | `sbatch slurm/install_pkgs.sh wandb` |
 | `train.sh [cfg overrides]` | `train_adaptive_model_hrnet.py`, init DarkPose W48, W&B if key present | courses-gpu, V100-SXM2, 8:00 | `sbatch slurm/train.sh` |
-| `push_results.sh "<msg>"` | commit + push `logs/` (login node, **not** sbatch) | - | `bash slurm/push_results.sh "E1 done"` |
+| `sync.sh push\|pull\|env` | rsync code to / results from the cluster (run on the **server**) | - | `bash slurm/sync.sh push` |
 
 - Name the W&B run per experiment: `sbatch --export=ALL,WANDB_NAME=E2-lr5e-4 slurm/train.sh TRAIN.LR 0.0005`.
 - Different experiments must use different `OUTPUT_DIR`s (cfg override). Otherwise AUTO_RESUME picks up another run's `checkpoint.pth`.
