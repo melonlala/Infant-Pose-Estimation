@@ -567,6 +567,32 @@ accuracy than the paper's numbers (see `STUDENT_GUIDE.md`, Part 7).
     (224 input, 56×56 heatmaps vs 384×288 / 96×72), not from missed detections.
 - **Wrap-up (per the pre-registered stop rule):** no change to the final model (**F4 `final_state`**). Nothing new launched. The P100 test job 11619062 is still queued (it only checks that a P100 can run CUDA).
 
+### 2026-11-04 — A/B-track: ensemble, TTA, OHKM, stronger rotation (rules pre-registered before any result)
+- **Asked:** try A1 (model ensemble), A2 (test-time augmentation), B3 (OHKM) and B4 (stronger rotation augmentation).
+- **Code (new files only, so `sync.sh push` from main cannot revert them):**
+  - `tools/eval_ensemble_tta.py` + `slurm/eval_ens.sh`: official eval path.
+    - For each transform (scale, rotation), crop → each model + flip (as in `validate_adaptive`) → warp the heatmaps back to the reference frame → average
+      over transforms and models → the same DARK decoding (`get_final_preds`) → `dataset.evaluate`.
+    - With one model and the identity transform it equals the official eval. Sanity run **A0** must reproduce F4 (Test100 94.0 / Test500f 91.7).
+  - `tools/train_adaptive_model_hrnet_x.py` + `slurm/train_x.sh` + `slurm/submit_x.sh`: stock training script, plus `LOSS.USE_OHKM` used for the
+    *training* pose loss (`JointsOHKMMSELoss`, top-8 of 17 joints). Validation stays plain MSE. `submit_x.sh` uses partitions `gpu,courses-gpu` (V100-SXM2, same GPU type as F4).
+- **Runs** (all on fixed data, final_state, base = F4 = D1 + 100 ep):
+  - **A0** = F4 alone, flip only (sanity check).
+  - **A1** = ensemble {F4, H1, S1, S2}, flip only.
+  - **A2** = F4 alone + TTA: flip × scales {0.9, 1.0, 1.1} × rotations {−30°, 0°, +30°} (9 transforms).
+  - **A3** = A1 + A2 (4 models × 9 transforms).
+  - **B3a / B3b** = F4 + `LOSS.USE_OHKM True` (pair).
+  - **B4a / B4b** = F4 + `DATASET.ROT_FACTOR 60` (default 45; pair; scale aug unchanged, unlike H2).
+- **Metric:** Test499f (Test99 secondary), via `tools/eval_subsets.py`.
+- **Pre-registered rules:**
+  - **A (deterministic, no replicate):** a config is adopted if its Test499f ≥ **91.7** (F4 91.4 + 0.3). If several pass, the highest wins. The final *reported
+    system* then becomes "F4-based ensemble/TTA". Its inference cost (number of forward passes) is reported alongside. If A0 does not reproduce F4 within 0.1,
+    every A result is void until the tool is fixed.
+  - **B (training, pair):** confirmed if the pair mean Test499f is ≥ **91.7** and both runs are ≥ 91.4 (same bar as S1/S2). A confirmed B change replaces F4 as the final
+    *single* model (the better of its pair). It is not combined with A unless the user asks.
+  - Stop and report afterwards. Nothing new without the user.
+- **Job ids:** _(below)_
+
 ---
 
 ## Dead ends & lessons learned
