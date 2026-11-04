@@ -591,7 +591,10 @@ accuracy than the paper's numbers (see `STUDENT_GUIDE.md`, Part 7).
   - **B (training, pair):** confirmed if the pair mean Test499f is ≥ **91.7** and both runs are ≥ 91.4 (same bar as S1/S2). A confirmed B change replaces F4 as the final
     *single* model (the better of its pair). It is not combined with A unless the user asks.
   - Stop and report afterwards. Nothing new without the user.
-- **Job ids:** _(below)_
+- **Job ids:** ENS_A0 t100 11625786 / t500 11625787, A1 11625790 / 11625795, A2 11625799 / 11625800, A3 11625802 / 11625804 (`slurm/eval_ens.sh`).
+  B3a 11625832 → 11625833, 11625835. B3b 11625837 → 11625839, 11625840. B4a 11625841 → 11625842, 11625844. B4b 11625846 → 11625847, 11625859
+  (`PART=courses-gpu slurm/submit_x.sh`: the gpu QOS caps *submitted* jobs at 8 per user and the 8 evals filled it).
+- **A0 sanity check passed:** Test100 93.99 (official F4 94.0), Test500f 91.73 (official 91.7). The tool matches the official eval, so A1–A3 are valid.
 
 ---
 
