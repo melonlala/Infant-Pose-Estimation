@@ -150,6 +150,9 @@ bar on each subset is the released checkpoint (= the paper's model, which reprod
 | Best MobileNet M2 (100 ep) vs released `mobile_fidip.pth` | 79.4 vs 79.2 | 78.6 vs 78.2 | 78.3 vs 77.9 | 73.2 vs 69.8 | 73.1 vs 69.7 |
 | F4 vs released | +0.4 | **+0.4** | +0.4 | +0.8 | **+0.7** |
 
+Shuffle (`TRAIN.BALANCED_SHUFFLE True`) shows a **consistent small positive trend (about +0.1–0.3) that does not reach the significance bar**: +0.25–0.35 on Test99 and +0.1 on
+Test499f, over 4 runs at 20 and 100 ep, with every shuffle run ≥ its matched no-shuffle run. It is not adopted, so the final model stays F4.
+
 | | Value |
 |--|-------|
 | Checkpoint | cluster `output/F4/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/final_state.pth` (server copy `models/F4/final_state.pth`; use `final_state`, not `model_best`) |

@@ -539,6 +539,18 @@ accuracy than the paper's numbers (see `STUDENT_GUIDE.md`, Part 7).
 
   - **Rule applied:** the pair mean is 91.5, below the 91.7 bar (both runs are ≥ 91.4) → **shuffle not confirmed**, **F4 stays the final model**. This is the same outcome as G1/H3 at 20 ep.
     The shuffle pair is consistently a little higher (+0.25 Test99, +0.1 Test499f), but the gain is below the pre-registered significance bar.
+  - **Shuffle, pooled over both schedules (report wording):** *shuffle shows a consistent small positive trend (about +0.1–0.3) that does not reach the
+    significance bar.* The 4 shuffle runs vs their matched no-shuffle runs, final_state:
+
+    | schedule | no shuffle (Test99 / Test499f) | shuffle (Test99 / Test499f) | Δ Test99 | Δ Test499f |
+    |---|---|---|---|---|
+    | 20 ep (D1 base) | D1 92.7 / 91.2, F1 92.5 / 91.1 | G1 93.0 / 91.2, H3 92.9 / 91.3 | +0.35 | +0.1 |
+    | 100 ep (F4 base) | F4 93.0 / 91.4, H1 93.0 / 91.4 | S1 93.3 / 91.4, S2 93.2 / 91.6 | +0.25 | +0.1 |
+
+    All 4 shuffle runs are ≥ their no-shuffle counterparts on Test99, and none is lower on Test499f. The effect is too small to confirm with pairs
+    (noise ≈ 0.2, bar 0.3 on Test499f), so it is not adopted and the final model stays F4. Shuffle is a bug fix (the stock `BalancedBatchSampler` uses
+    the same batch order and the same real-image oversampling every epoch), so a small, non-negative effect is what one would expect.
+    *Decision (user, 2026-11-04): report it as a trend, no further replicates.*
 - **MobileNet result (final_state, `mobile_224x224` yaml: LR 1e-3, LR drop at ep 90, DA off):**
 
 | run | what | Test100 | Test99 | Test95 | Test500f | **Test499f** |
