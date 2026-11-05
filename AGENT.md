@@ -417,6 +417,15 @@ accuracy than the paper's numbers (see `STUDENT_GUIDE.md`, Part 7).
   - Synthetic diversity is limited: 174 poses × 3 variants.
 - **Final model unchanged: F4 final_state.** No further runs without the user's go-ahead.
 
+### 2026-11-04: Grading-rubric pass and report draft (`REPORT.md`)
+- **Asked:** organise the existing results against the course rubric (50 pts + 5 bonus), list unfinished items, draft the report.
+- **Did:** rescored every run on Test100/99/95/500f/499f with the annotation branch's `tools/eval_subsets.py` (numbers match the logs). New on
+  this branch: SY1/SY2 on Test99 = 92.4 / 92.3 (F4/H1 93.0), Test499f 91.5 / 91.2. Paired image bootstrap vs the released model
+  (`tools/report_stats_bootstrap.py`, B = 1000): F4 Test99 +0.5 [−0.1, +1.2], Test499f +0.7 [+0.2, +1.3]; A2 (F4 + TTA) +1.0 [+0.2, +1.8] / +1.3 [+0.7, +1.9].
+  Fig. 1 `docs/report_figures/ablation_overview.png` (`tools/plot_report_ablation.py`); curated figures copied to `docs/report_figures/` (figures/ is git-ignored).
+- **Open:** B4a/B4b still training (A100); branch `claude/raw-data-annotation-check-23431c` not merged into main yet, so REPORT.md cites tools that only
+  exist there (`eval_subsets.py`, `eval_ensemble_tta.py`, `eval_ens.sh`, `make_syrip_fixed.sh`, `make_syrip500_fixed.py`, `plot_compare.py`).
+
 ---
 
 ## Dead ends & lessons learned

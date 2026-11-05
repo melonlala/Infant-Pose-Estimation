@@ -111,6 +111,9 @@ All annotations are COCO format, 17 keypoints.
 | `figures/viz_final/`, `figures/demo/`, `temp_uploads/` (server only) | final-model viz; demo outputs + Streamlit screenshots; 12 CC infant photos (`SOURCES.md`) | — |
 | `models/F4/final_state.pth`, `models/D1/final_state.pth` (server only) | copies of the cluster checkpoints for demos/viz | — |
 | `tools/eval_test96.py` | Test100 vs Test96 AP from final-epoch prediction JSONs in `output/<run>/` | stdout |
+| `REPORT.md`, `docs/report_figures/` | course report draft + the figures it embeds (tracked copies) | — |
+| `tools/report_stats_bootstrap.py` | full AP/AP50/AP75/AR on Test99/Test499f + paired bootstrap CIs vs released model | stdout |
+| `tools/plot_report_ablation.py` | report Fig. 1 | `docs/report_figures/ablation_overview.png` |
 | `tools/wandb_smoke.py` | offline check of the W&B code path | — |
 | `tools/video_infer.py` | 7.3 video file / folder batch / webcam inference with tracking | `<out>/<name>_pose.mp4`, `_keypoints.jsonl/.csv` |
 | `docs/part3_model_notes.md`, `docs/part7_synthetic_and_apps.md` | Part 3 notes; 7.1 status + 7.3 results | — |
