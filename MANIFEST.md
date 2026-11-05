@@ -81,6 +81,17 @@ All annotations are COCO format, 17 keypoints.
 |--------|---------|--------------|---------|
 | `experiments/coco/hrnet/w48_384x288_adam_lr1e-3_infant.yaml` | baseline FiDIP train/test | upstream | E0, E1 |
 
+## 5b. Portable reproduction (`reproduce/`, see `REPRODUCE.md`)
+
+| Script | Purpose |
+|---|---|
+| `reproduce/00_env.sh` | conda env `envs/fidip` (same pins as the cluster, `reproduce/requirements.txt`) + `lib/nms` built for the local GPU (`NMS_CUDA_ARCH`) |
+| `reproduce/01_data.sh` | download + sha256-check SyRIP, unpack, build `data/syrip_fixed`, `syrip500_fixed`, `syrip_fixed_200R`, `syrip_fixed_plus522` |
+| `reproduce/02_weights.sh` | Git LFS pull + unzip `checkpoints/fidip_checkpoints.zip` + `sha256sum -c` |
+| `reproduce/03_score_saved.sh` | all report APs + bootstrap + Fig. 1 from tracked predictions (no GPU) |
+| `reproduce/04_eval.sh`, `05_tta.sh` | re-inference of the bundled checkpoints / TTA systems into `repro/` (git-ignored) |
+| `reproduce/06_train.sh <ID>` + `reproduce/experiments.tsv` | retrain any run; the overrides come from each run's train-log Namespace line |
+
 ## 6. Slurm scripts
 
 | Script | Purpose | Partition / GPU / time | Notes |
@@ -171,9 +182,9 @@ Test499f, over 4 runs at 20 and 100 ep, with every shuffle run ≥ its matched n
 
 | | Value |
 |--|-------|
-| System (A3) | `sbatch slurm/eval_ens.sh <F4,H1,S1,S2 final_state.pth> 0.9,1.0,1.1 -30,0,30 <out> DATASET.ROOT data/syrip_fixed/` (tools/eval_ensemble_tta.py), then `tools/eval_subsets.py` |
+| System (A3) | `sbatch slurm/eval_ens.sh <F4,H1,S1,S2 final_state.pth> 0.9,1.0,1.1 -30,0,30 <out>/syrip/ens/x DATASET.ROOT data/syrip_fixed/` (tools/eval_ensemble_tta.py), then `tools/eval_subsets.py`; portable: `bash reproduce/05_tta.sh A2 A3` |
 | Checkpoint | cluster `output/F4/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/final_state.pth` (server copy `models/F4/final_state.pth`; use `final_state`, not `model_best`) |
-| Exact reproduce command | `bash slurm/submit_run.sh F4 02:45:00 TRAIN.END_EPOCH 100` (train on `data/syrip_fixed/` + chained Test500f evals), then `.venv-demo/bin/python tools/eval_subsets.py D0_E0:E0 F4` on the server after `slurm/sync.sh pull` |
+| Exact reproduce command | Any Linux GPU machine: `REPRODUCE.md` (`reproduce/00_env.sh` → `01_data.sh` → `02_weights.sh` → `03_score_saved.sh` / `04_eval.sh E0 F4` / `05_tta.sh A0 A2` / `06_train.sh F4`). Cluster (as run): `bash slurm/submit_run.sh F4 02:45:00 TRAIN.END_EPOCH 100`, then `tools/eval_subsets.py D0_E0:E0 F4` after `slurm/sync.sh pull` |
 | Superseded | E1b 91.1 / E0 92.1 (broken labels / swapped test11); Test500 98.x (constant area) |
 
 ## 9. Secrets

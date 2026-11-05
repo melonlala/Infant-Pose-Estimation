@@ -14,8 +14,9 @@ Predictions used:
   Test500-family: output_test500f/<run>_final/... if present, else output_test500f/<run>/...
 
 Usage (server, project root, .venv-demo):
-  python tools/eval_subsets.py D0_E0:E0 D0b_E1b:E1b D1 F1 F4 ...
-  Each arg is <output/ name>[:<output_test500f/ name>].
+  python tools/eval_subsets.py [--pred DIR] [--pred500 DIR] D0_E0:E0 D0b_E1b:E1b D1 F1 F4 ...
+  Each arg is <output/ name>[:<output_test500f/ name>]. --pred / --pred500 replace the default prediction roots
+  output/ and output_test500f/ (e.g. repro/output, used by reproduce/04_eval.sh).
 """
 import contextlib
 import copy
@@ -58,6 +59,13 @@ def load(pattern):
     return (json.load(open(fs[0])), fs[0]) if fs else (None, None)
 
 
+ROOTS = {'--pred': 'output', '--pred500': 'output_test500f'}
+args = sys.argv[1:]
+while args and args[0] in ROOTS:
+    ROOTS[args[0]] = args[1].rstrip('/')
+    args = args[2:]
+PRED, PRED500 = ROOTS['--pred'], ROOTS['--pred500']
+
 t100 = json.load(open('data/syrip_fixed/annotations/person_keypoints_validate_infant.json'))
 t500 = json.load(open('data/syrip500_fixed/annotations/person_keypoints_validate_infant.json'))
 t99, d99 = subset(t100, DROP)
@@ -66,24 +74,24 @@ t499, d499 = subset(t500, DROP)
 assert (len(t99['images']), len(t95['images']), len(t499['images'])) == (99, 95, 499)
 
 print(f"{'run':10s} {'Test100':>8s} {'Test99':>8s} {'Test95':>8s} {'Test500f':>9s} {'Test499f':>9s}  test500 source")
-for arg in sys.argv[1:]:
+for arg in args:
     run, _, r500 = arg.partition(':')
     r500 = r500 or run
     row = [f'{run:10s}']
-    d, _ = load(f'output/{run}/{REL}')
+    d, _ = load(f'{PRED}/{run}/{REL}')
     if d is None:
         row += [f'{"—":>8s}'] * 3
     else:
         row += [f'{ap(t100, d):8.1f}',
                 f'{ap(t99, [x for x in d if x["image_id"] not in d99]):8.1f}',
                 f'{ap(t95, [x for x in d if x["image_id"] not in d95]):8.1f}']
-    d5, src = load(f'output_test500f/{r500}_final/{REL}')
+    d5, src = load(f'{PRED500}/{r500}_final/{REL}')
     if d5 is None:
-        d5, src = load(f'output_test500f/{r500}/{REL}')
+        d5, src = load(f'{PRED500}/{r500}/{REL}')
     if d5 is None:
         row += [f'{"—":>9s}'] * 2
         src = '-'
     else:
         row += [f'{ap(t500, d5):9.1f}', f'{ap(t499, [x for x in d5 if x["image_id"] not in d499]):9.1f}']
-        src = src.split('/')[1]
+        src = src[len(PRED500) + 1:].split('/')[0]
     print(' '.join(row), ' ', src)

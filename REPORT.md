@@ -47,7 +47,8 @@ the paper uses. Evaluation conditions are defined in §4.
   and visualisation tools, demos, SMIL port). The guide's `gpu_test.py`, `demo.py`, `streamlit_demo.py` and `fidip_simple.yml` exist in no public fork,
   so we wrote our own demos (§7).
 - **Training/eval:** Northeastern Explorer cluster, Slurm, V100-SXM2-32GB (B4: A100-80GB). Conda prefix env `envs/fidip`: Python 3.12.16,
-  PyTorch 2.3.1+cu121, built by `slurm/setup_env.sh`; package list in `fidip_env.yml`.
+  PyTorch 2.3.1+cu121, built by `slurm/setup_env.sh`. The same pins are in `reproduce/requirements.txt`, and `reproduce/00_env.sh` builds the same env on
+  any Linux GPU machine. (`fidip_env.yml` is upstream's file and is not what we used.)
 - **Server (analysis, demos, synthetic rendering):** 2× RTX 6000 Ada, `.venv-demo` (torch + yacs/streamlit/pycocotools), `.venv-smil` (pyrender EGL).
 - **Workflow:** code lives in git on the server and is pushed to GitHub. The cluster gets code by `rsync` (`slurm/sync.sh push|pull|env`) and never uses
   git. Secrets (`WANDB_API_KEY`) live in a git-ignored `.env`. Curves go to TensorBoard and W&B (project `fidip`).
@@ -109,10 +110,10 @@ behind the paper's 93.6. Dropping it never changes the ranking of runs.
 
 | Component | File | Role |
 |---|---|---|
-| Training + per-epoch Test100 eval | `tools/train_adaptive_model_hrnet.py`, `slurm/train.sh`, `slurm/submit_run.sh` | train, then chain two Test500f evals (best, final) with `afterok` |
-| Official evaluation | `tools/test_adaptive_model.py`, `slurm/eval.sh` | GT box, flip test, COCO keypoint eval |
-| Subset rescoring | `tools/eval_subsets.py` | rescores saved prediction JSONs on Test100 / Test99 / Test95 / Test500f / Test499f with pycocotools (no re-inference) |
-| Ensemble + TTA | `tools/eval_ensemble_tta.py`, `slurm/eval_ens.sh` | averages heatmaps over models and over scale/rotation views, warps them back, then applies the same DARK decoding and evaluation. Its identity setting reproduces the official eval (A0: 93.99 / 91.73 vs official 94.0 / 91.7) |
+| Training + per-epoch Test100 eval | `tools/train_adaptive_model_hrnet.py`; portable: `reproduce/06_train.sh`; cluster: `slurm/submit_run.sh` | train, then evaluate the final checkpoint on Test500f |
+| Official evaluation | `tools/test_adaptive_model.py`; `reproduce/04_eval.sh`; `slurm/eval.sh` | GT box, flip test, COCO keypoint eval |
+| Subset rescoring | `tools/eval_subsets.py`; `reproduce/03_score_saved.sh` | rescores saved prediction JSONs on Test100 / Test99 / Test95 / Test500f / Test499f with pycocotools (no re-inference) |
+| Ensemble + TTA | `tools/eval_ensemble_tta.py`; `reproduce/05_tta.sh`; `slurm/eval_ens.sh` | averages heatmaps over models and over scale/rotation views, warps them back, then applies the same DARK decoding and evaluation. Its identity setting reproduces the official eval (A0: 93.99 / 91.73 vs official 94.0 / 91.7) |
 | Single-image inference | `tools/fidip_infer.py` | shared by visualisation, demos, video; optional Faster R-CNN person detector |
 | Visualisation | `tools/visualize_preds.py`, `tools/plot_curves.py`, `tools/plot_compare.py`, `tools/plot_report_ablation.py` | GT vs prediction grids, per-joint OKS, training curves, Fig. 1 |
 
@@ -322,67 +323,60 @@ loss is a red flag for label noise, not just a side effect of augmentation.
 
 ## 8. Reproducibility
 
-All paths in this report are relative to the repository root. The cluster copy (`/home/hou.yuchen/courses/eece7373`) and the server copy have the same layout.
-MANIFEST §7–8 lists every checkpoint and log.
+Full instructions: [`REPRODUCE.md`](REPRODUCE.md). All paths in this report are relative to the repository root. The cluster copy
+(`/home/hou.yuchen/courses/eece7373`) has the same layout. MANIFEST §7–8 lists every checkpoint and log.
 
-### 8.1 What is in the repository
+### 8.1 One script per step
+
+| Step | Command | Time (1 GPU) | Reproduces |
+|---|---|---|---|
+| 0 | `bash reproduce/00_env.sh` | ~3 min | the env used for every run (Python 3.12, PyTorch 2.3.1 + CUDA 12.1), `lib/nms` built for the local GPU |
+| 1 | `bash reproduce/01_data.sh` | ~1 min + 1 GB download | SyRIP download (sha256-checked), and the corrected roots of §1.2 rebuilt byte-identically |
+| 2 | `bash reproduce/02_weights.sh` | ~20 s | the checkpoint bundle unpacked to `models/`, sha256-verified |
+| 3 | `bash reproduce/03_score_saved.sh` | ~3 min (no GPU) | **every AP in §4–6**, the bootstrap CIs (§5.1) and Fig. 1, from the tracked predictions |
+| 4 | `bash reproduce/04_eval.sh` | ~4 min | re-inference of E0, D1, F4, H1, S1, S2, M0, M2 on Test100 and Test500f |
+| 5 | `bash reproduce/05_tta.sh A0 A2` | ~1.5 min | the TTA system A2 (and the A0 sanity check); add `A1 A3` for the ensembles |
+| 6 | `bash reproduce/06_train.sh F4` | ≈ 1.2 h (100 ep) | retraining any run of §6 from the COCO init; IDs and the exact overrides in `reproduce/experiments.tsv` |
+
+**Tested from scratch (2026-11-04)** in a clean checkout on a different machine type from the cluster (RTX 6000 Ada, CUDA 13 driver):
+- Steps 0–5 ran unmodified.
+- The rebuilt data roots are byte-identical to the ones used for training.
+- Step 3 reprints every number in this report.
+- Step 4's re-inference matches the reported APs exactly for all 6 HRNet checkpoints on all 5 subsets, and to within 0.1 for MobileNet.
+- Step 5 matches A0 and A2 exactly.
+- Step 6 was smoke-tested for one epoch: it trained, evaluated and scored end to end, at a 12.7 GiB GPU peak.
+
+### 8.2 What is in the repository
 
 | Path | Contents |
 |---|---|
-| `tools/`, `slurm/`, `lib/`, `experiments/`, `syn_generation/` | all code: training, evaluation, TTA, rescoring, visualisation, demos, SMIL pipeline, Slurm scripts |
-| `logs/fidip-<run>-<jobid>.out` | Slurm stdout of every job (104 files), including the per-epoch AP tables |
+| `reproduce/` | the step scripts, `experiments.tsv` (all 24 training runs with their exact overrides, copied from each run's train log), `requirements.txt` |
+| `tools/`, `lib/`, `experiments/`, `syn_generation/` | all code: training, evaluation, TTA, rescoring, visualisation, demos, SMIL pipeline (index: `tools/README.md`) |
+| `slurm/` | the cluster versions of the same steps, which produced every reported number (`slurm/submit_run.sh <ID> <TIME> <overrides>`) |
+| `logs/fidip-<run>-<jobid>.out` | Slurm stdout of every job, including the per-epoch AP tables |
 | `log/<run>/` | TensorBoard events for every training run (input to `tools/plot_curves.py`, `tools/plot_compare.py`) |
 | `output/<run>/syrip/adaptive_pose_*/<cfg>/` | per-run train log and final Test100 predictions `results/keypoints_validate_infant_results_0.json` |
 | `output_test500f/<run>[_final]/...` | Test500f predictions and eval logs (`_final` = `final_state.pth`); `output_test500/` = the superseded constant-area evals |
+| `checkpoints/fidip_checkpoints.zip` | Git LFS, 1.7 GB: F4, H1, S1, S2, D1, M2 `final_state.pth`, the released `hrnet_fidip.pth` / `mobile_fidip.pth` and the COCO inits; contents in `checkpoints/README.md`, sha256 in `checkpoints/SHA256SUMS` |
 | `figures/` | every figure in this report (`figures/report/` = Fig. 1) plus all curves, prediction grids, demo outputs and video clips |
 | `temp_uploads/` | the 12 in-the-wild photos used in §7.3, with licences in `SOURCES.md` |
 | `data/syrip_syn_new/` | our 522 SMIL renders + COCO annotations, `render_meta.json`, `label_check.json` (§7.4) |
 
-**Not in the repository:**
-- **SyRIP** (images and annotations): download it from the AClab page; sha256 sums are in MANIFEST §3. Then rebuild the corrected symlink roots
-  (`data/syrip_fixed`, `data/syrip500_fixed`, …) with the scripts below.
-- **Checkpoints** are not stored as plain git files. They are bundled in `checkpoints/fidip_checkpoints.zip` (1.7 GB, Git LFS; contents and sha256 in
-  `checkpoints/README.md` and `checkpoints/SHA256SUMS`): F4, H1, S1, S2, D1, M2 `final_state.pth`, plus the third-party released and COCO-init weights.
-  The originals are on the cluster under `output/<run>/…/final_state.pth`.
-- **The licensed SMIL model.**
+**Not in the repository:** SyRIP itself (step 1 downloads it), `model_best.pth` / `checkpoint.pth` / `feature.npy` (not used for any reported number), and
+the licensed SMIL model.
 
-Every AP in this report can be recomputed without a GPU from the tracked prediction files once SyRIP is downloaded and the corrected roots are built:
-`python tools/eval_subsets.py D0_E0:E0 D1 F1 F4 H1 ENS_A2` and `python tools/report_stats_bootstrap.py 1000`.
+### 8.3 Provenance of the final numbers
 
-### 8.2 Commands
-
-```bash
-# 1. environment + data (once)
-sbatch slurm/setup_env.sh          # conda env, lib/nms build, model downloads, GPU check
-sbatch slurm/unpack_data.sh        # syrip_for_train.zip -> data/syrip
-bash tools/make_syrip_fixed.sh     # data/syrip_fixed: correct synthetic labels + correct test11 (symlinks)
-python tools/make_syrip500_fixed.py  # data/syrip500_fixed: Test500 with real areas
-
-# 2. released-model baseline (D0)
-sbatch slurm/eval.sh models/hrnet_fidip.pth DATASET.ROOT data/syrip_fixed/ OUTPUT_DIR output/D0_E0
-
-# 3. reproduction (D1-equivalent) and final model (F4); each also chains Test500f evals of best and final
-bash slurm/submit_run.sh F1 01:00:00
-bash slurm/submit_run.sh F4 02:45:00 TRAIN.END_EPOCH 100
-
-# 4. TTA system (A2)
-F4=output/F4/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/final_state.pth
-sbatch slurm/eval_ens.sh $F4 0.9,1.0,1.1 -30,0,30 output/ENS_A2 DATASET.ROOT data/syrip_fixed/                 # Test100
-sbatch slurm/eval_ens.sh $F4 0.9,1.0,1.1 -30,0,30 output_test500f/ENS_A2_final DATASET.ROOT data/syrip500_fixed/  # Test500f
-
-# 5. score every subset (server, after `bash slurm/sync.sh pull`)
-.venv-demo/bin/python tools/eval_subsets.py D0_E0:E0 D1 F1 F4 H1 ENS_A2
-```
-
-- **Config:** `experiments/coco/hrnet/w48_384x288_adam_lr1e-3_infant.yaml` (upstream, unchanged). Every deviation is a command-line override recorded
-  per run in the AGENT.md summary table, together with its Slurm job IDs.
-- **Final checkpoint:** `output/F4/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/final_state.pth` (Slurm 11603343; replicate H1 11607648).
-  In the repo it is `models/F4/final_state.pth` inside `checkpoints/fidip_checkpoints.zip` (Git LFS, sha256 `26a92b5b…`).
-- **Logs (in the repo):** F4's training is in `logs/fidip-F4-11603343.out` and `log/F4/`, its Test100 predictions in
-  `output/F4/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/results/`, and its Test500f predictions in `output_test500f/F4_final/`.
-  The same layout holds for every run. W&B project `fidip` mirrors the curves (runs are named by ID).
+- **Config:** `experiments/coco/hrnet/w48_384x288_adam_lr1e-3_infant.yaml` (upstream, unchanged). Every deviation is a command-line override, listed per
+  run in `reproduce/experiments.tsv` and, with its Slurm job IDs, in the AGENT.md summary table.
+- **Final checkpoint F4:** `models/F4/final_state.pth` in the bundle (sha256 `26a92b5b…`). It was trained by Slurm job 11603343 (replicate H1: 11607648).
+  On the cluster it is at `output/F4/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/final_state.pth`.
+- **Logs:** F4's training is in `logs/fidip-F4-11603343.out` and `log/F4/`. Its Test100 predictions are in
+  `output/F4/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/results/`, its Test500f predictions in `output_test500f/F4_final/`, and the A2 TTA
+  predictions in `output/ENS_A2/syrip/ens/x/results/` and `output_test500f/ENS_A2_final/`. The same layout holds for every run. W&B project `fidip` mirrors
+  the curves.
 - **Repeats:** D1/F1, F4/H1, G1/H3, S1/S2, B3a/b, B4a/b and SY1/SY2 are replicate pairs.
-- **Exact reproduction caveat:** cuDNN is non-deterministic, so expect ±0.2 AP between reruns. B4 ran on A100 (TF32 convolutions) rather than V100.
+- **Exact reproduction caveat:** cuDNN is non-deterministic, so expect ±0.2 AP between training reruns. B4 ran on an A100 (TF32 convolutions) instead of a V100.
 
 ---
 

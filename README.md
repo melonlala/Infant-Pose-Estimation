@@ -1,3 +1,7 @@
+> **EECE 7373 project (this fork):** the report is [`REPORT.md`](REPORT.md). To reproduce it, see [`REPRODUCE.md`](REPRODUCE.md): one script per step in
+> `reproduce/` (env → data → weights → score / re-evaluate / retrain). The lab notebook is [`AGENT.md`](AGENT.md), the artifact inventory
+> [`MANIFEST.md`](MANIFEST.md), and the cluster workflow [`SKILL.md`](SKILL.md). The upstream README follows.
+
 # Fine-tuned Domain-adapted Infant Pose (FiDIP)
 
 Codes and experiments for the following paper: 

@@ -71,6 +71,9 @@ lib/nms/gpu_nms.cpp
 .claude/worktrees/
 .claude/settings.local.json
 .venv*/
+# fresh outputs of reproduce/*.sh (OUT=repro by default)
+repro/
+repro_*/
 # Tracked results (since 2026-11-04, for submission): logs/ (Slurm stdout), log/ (TensorBoard events),
 # output*/ (text results pulled by `slurm/sync.sh pull`: *.json/*.log/*.txt; checkpoints and feature.npy stay out),
 # figures/, temp_uploads/, data/syrip_syn_new/. Re-allow the extensions the generic rules above ignore:

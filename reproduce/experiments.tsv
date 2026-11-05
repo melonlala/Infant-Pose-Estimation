@@ -1,0 +1,28 @@
+# Every training run in REPORT.md §6, as actually launched. Overrides are copied from each run's train-log Namespace line
+# (output/<ID>/.../*_train.log). Columns (tab-separated): ID  arch  data_root  overrides  description
+# arch: hrnet = tools/train_adaptive_model_hrnet.py, hrnet_x = tools/train_adaptive_model_hrnet_x.py (adds LOSS.USE_OHKM), mobile = tools/train_adaptive_model_mobile_wb.py
+# All runs use the upstream config (experiments/coco/.../*_infant.yaml) and init from the COCO weights in models/coco/.
+D1	hrnet	data/syrip_fixed/	-	reproduction: upstream config on corrected labels, 20 ep
+F1	hrnet	data/syrip_fixed/	-	D1 replicate
+F2	hrnet	data/syrip_fixed/	TRAIN.LAMBDA 0.0005 TRAIN.PRE_EPOCH 1	+ domain adaptation, paper lambda
+F3	hrnet	data/syrip_fixed/	TRAIN.LR 0.001	paper LR
+F4	hrnet	data/syrip_fixed/	TRAIN.END_EPOCH 100	FINAL MODEL: 100 epochs
+G1	hrnet	data/syrip_fixed/	TRAIN.BALANCED_SHUFFLE True	sampler reshuffles every epoch
+G2	hrnet	data/syrip_fixed_200R/	TRAIN.END_EPOCH 200 TRAIN.LR_STEP [400,500]	real-only 200R, matched iterations
+G3	hrnet	data/syrip_fixed/	TRAIN.LR 0.00005	LR 5e-5
+H1	hrnet	data/syrip_fixed/	TRAIN.END_EPOCH 100	F4 replicate
+H2	hrnet	data/syrip_fixed/	TRAIN.BALANCED_SHUFFLE True DATASET.ROT_FACTOR 60 DATASET.SCALE_FACTOR 0.45	shuffle + stronger augmentation
+H3	hrnet	data/syrip_fixed/	TRAIN.BALANCED_SHUFFLE True	G1 replicate
+L1	hrnet	data/syrip_fixed/	TRAIN.LAMBDA 0.0001 TRAIN.PRE_EPOCH 1	DA lambda 1e-4
+L2	hrnet	data/syrip_fixed/	TRAIN.LAMBDA 0.002 TRAIN.PRE_EPOCH 1	DA lambda 2e-3
+L3	hrnet	data/syrip_fixed/	TRAIN.LAMBDA 0.005 TRAIN.PRE_EPOCH 1	DA lambda 5e-3
+S1	hrnet	data/syrip_fixed/	TRAIN.END_EPOCH 100 TRAIN.BALANCED_SHUFFLE True	100 ep + shuffle
+S2	hrnet	data/syrip_fixed/	TRAIN.END_EPOCH 100 TRAIN.BALANCED_SHUFFLE True	S1 replicate
+B3a	hrnet_x	data/syrip_fixed/	TRAIN.END_EPOCH 100 LOSS.USE_OHKM True	100 ep + OHKM loss
+B3b	hrnet_x	data/syrip_fixed/	TRAIN.END_EPOCH 100 LOSS.USE_OHKM True	B3a replicate
+B4a	hrnet_x	data/syrip_fixed/	TRAIN.END_EPOCH 100 DATASET.ROT_FACTOR 60	100 ep + rotation 60 (ran on A100)
+B4b	hrnet_x	data/syrip_fixed/	TRAIN.END_EPOCH 100 DATASET.ROT_FACTOR 60	B4a replicate (A100)
+SY1	hrnet	data/syrip_fixed_plus522/	TRAIN.END_EPOCH 100	100 ep + 522 SMIL renders
+SY2	hrnet	data/syrip_fixed_plus522/	TRAIN.END_EPOCH 100	SY1 replicate
+M1	mobile	data/syrip_fixed/	-	MobileNetV2 224x224, 20 ep
+M2	mobile	data/syrip_fixed/	TRAIN.END_EPOCH 100	MobileNetV2, 100 ep

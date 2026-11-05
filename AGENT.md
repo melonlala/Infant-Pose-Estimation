@@ -737,6 +737,28 @@ accuracy than the paper's numbers (see `STUDENT_GUIDE.md`, Part 7).
   (sha256 checked against the release's `sha256sums.asc`; the GPG signature was not checked) and `git lfs install` was run. The zip is committed as an LFS pointer
   (oid = the zip's sha256), and the `.gitignore` guard was removed. **Not pushed:** check the GitHub account's LFS storage quota first (1.7 GB).
 
+### 2026-11-04: Portable reproduction scripts (user: "organize codes for simple reproduce", "update reproduce and ref path in report")
+- **Did:** added `REPRODUCE.md` and `reproduce/` with one script per step:
+  - `00_env.sh`: conda env with the cluster pins, in `reproduce/requirements.txt`.
+  - `01_data.sh`: download, sha256 check, unpack, build the corrected roots.
+  - `02_weights.sh`: LFS pull, unzip, `sha256sum -c`.
+  - `03_score_saved.sh`: all report APs, the bootstrap and Fig. 1 from tracked predictions.
+  - `04_eval.sh`, `05_tta.sh`: re-inference into `repro/`, which is git-ignored.
+  - `06_train.sh <ID>`: retrain any run. `reproduce/experiments.tsv` lists all 24 training runs, with overrides parsed from each run's train-log Namespace line.
+
+  Also added `tools/README.md` (index of every tool), `--pred/--pred500` options for `tools/eval_subsets.py`, and a README pointer. REPORT §1.1, §3 and §8 were
+  rewritten around these scripts. This also fixed §8's old TTA command, whose `--out` must end in `<run>/syrip/ens/x`.
+- **Portability bug fixed:** `lib/nms/setup_linux.py` hard-coded `-arch=sm_61`, which CUDA 13's nvcc rejects. The arch now comes from `NMS_CUDA_ARCH`; `00_env.sh`
+  sets it from the local GPU, and the default `sm_61` is unchanged for the cluster. `lib/nms/nms.py` now tolerates a missing `gpu_nms`; only `oks_nms` is used.
+- **Clean-checkout test** (this worktree, RTX 6000 Ada, CUDA 13 driver):
+  - 00 built the env in ~3 min (py 3.12.16, torch 2.3.1+cu121, gpu_nms for sm_89).
+  - 01 rebuilt every data root byte-identically (md5 vs the main checkout).
+  - 02: all 11 files OK.
+  - 03 reprinted every report number.
+  - 04 (3.6 min): E0/D1/F4/H1/S1/S2 identical on all 5 subsets, M0 within 0.1.
+  - 05 (1.5 min): A0/A2 identical.
+  - 06 smoke test: D1 for 1 epoch, 91.0 Test100, 12.65 GiB peak, eval and scoring OK (output deleted).
+
 ---
 
 ## Dead ends & lessons learned

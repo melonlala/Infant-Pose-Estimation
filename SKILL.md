@@ -107,6 +107,11 @@ Keep this table and the `AGENT.md` summary table in sync whenever you submit, fi
 - Train on **`DATASET.ROOT data/syrip_clean/`** (or the user's `data/syrip_fixed/`), never the raw `data/syrip/`: its synthetic labels are wrong.
 - GPU memory: V100 peak 12.6 GiB (no DA) / 17.2 GiB (DA). P100 16 GB OOMs. courses-gpu QoS allows 2 running jobs per user.
 
+## Portable reproduction (graders, any GPU machine)
+
+`REPRODUCE.md` + `reproduce/0*_*.sh` reproduce everything without Slurm (outputs to `repro/`). When a new reported run is added, add its row to
+`reproduce/experiments.tsv` (overrides from its train-log Namespace line) and, if its checkpoint is reported, to the bundle (`checkpoints/README.md`).
+
 ## Guardrails
 
 - **Confirm with the user before `scancel`**, before resubmitting a job that could overwrite an `output/` dir,

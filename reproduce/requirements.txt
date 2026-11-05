@@ -1,0 +1,20 @@
+# Same pins as the cluster env used for every reported run (slurm/setup_env.sh). torch/torchvision come from the cu121 index (00_env.sh).
+numpy==1.26.4
+opencv-python-headless==4.10.0.84
+pycocotools==2.0.8
+json-tricks==3.17.3
+yacs==0.1.8
+easydict==1.13
+cython==3.0.10
+scipy==1.14.0
+shapely==2.0.4
+tensorboardx==2.6.2.2
+tensorboard==2.21.0
+wandb==0.31.0
+matplotlib==3.9.1
+dsntnn==0.5.3
+pyyaml==6.0.1
+setuptools
+# demos (tools/demo.py, tools/streamlit_demo.py, tools/video_infer.py)
+streamlit
+pillow

@@ -11,7 +11,10 @@ from __future__ import print_function
 import numpy as np
 
 from .cpu_nms import cpu_nms
-from .gpu_nms import gpu_nms
+try:  # CUDA box NMS; not used by the keypoint pipeline (GT boxes + oks_nms), so a failed nvcc build is not fatal
+    from .gpu_nms import gpu_nms
+except ImportError:
+    gpu_nms = None
 
 
 def py_nms_wrapper(thresh):
