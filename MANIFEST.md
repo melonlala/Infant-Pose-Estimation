@@ -141,7 +141,9 @@ All annotations are COCO format, 17 keypoints.
 | `tools/video_infer.py` | 7.3 video file / folder batch / webcam inference with tracking | `<out>/<name>_pose.mp4`, `_keypoints.jsonl/.csv` |
 | `docs/part3_model_notes.md`, `docs/part7_synthetic_and_apps.md` | Part 3 notes; 7.1 status + 7.3 results | — |
 
-Server copies of weights (git-ignored): `models/hrnet_fidip.pth`, `models/E1b/model_best.pth`. Figures (`figures/`), Slurm logs (`logs/`), TensorBoard events (`log/`), text results in `output*/`, `temp_uploads/` and `data/syrip_syn_new/` are **tracked in git** since 2026-11-04; checkpoints and SyRIP itself are not.
+**Checkpoint bundle (2026-11-04):** `checkpoints/fidip_checkpoints.zip` (Git LFS, 1.7 GB) holds `models/{F4,H1,S1,S2,D1,M2}/final_state.pth`, the released
+`hrnet_fidip.pth` / `mobile_fidip.pth`, the COCO inits `models/coco/{w48_384x288,posemobile}.pth` and `figures/viz/synthetic_oks_check.npy`. sha256 in
+`checkpoints/SHA256SUMS`, contents in `checkpoints/README.md`. Server copies (git-ignored) sit at the same `models/` paths; `models/E1b/model_best.pth` is not bundled. Figures (`figures/`), Slurm logs (`logs/`), TensorBoard events (`log/`), text results in `output*/`, `temp_uploads/` and `data/syrip_syn_new/` are **tracked in git** since 2026-11-04; checkpoints and SyRIP itself are not.
 
 ## 8. Final reported result
 

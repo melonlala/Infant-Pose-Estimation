@@ -1,0 +1,2 @@
+# Large binaries go through Git LFS (checkpoints/README.md)
+checkpoints/*.zip filter=lfs diff=lfs merge=lfs -text

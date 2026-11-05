@@ -726,6 +726,15 @@ accuracy than the paper's numbers (see `STUDENT_GUIDE.md`, Part 7).
   cannot overwrite cluster results. `sync.sh pull` now updates tracked files: commit after each pull.
 - REPORT.md figure links point at `figures/...`; the duplicate `docs/report_figures/` copies were removed. B4 logs in the snapshot are partial (run in progress).
 
+### 2026-11-04: Merged into main; checkpoint bundle (user: "zip all necessary .pth checkpoints and .npy files to reproduce and sync with git")
+- **Merge:** `claude/fidip-grading-rubric-86bb65` (incl. the annotation-audit branch up to the B4 result) merged into `main` in the main checkout. The untracked result
+  dirs were moved aside, the merge was run, and the current files were rsynced back. The only differences were the completed B4 files, committed separately.
+- **Bundle:** copied H1/S1/S2/M2 `final_state.pth`, `mobile_fidip.pth` and the COCO inits from the cluster (xfer node) to `models/`, then zipped the 11 files a
+  reproduction needs into `checkpoints/fidip_checkpoints.zip` (1.70 GB, `unzip -t` OK; per-file sha256 in `checkpoints/SHA256SUMS`, table in `checkpoints/README.md`).
+  Left out: `model_best`/`checkpoint.pth`, `feature.npy`, and the licensed SMIL npz/pkl.
+- **Git:** every `.pth` is 255 MB, over GitHub's 100 MB file limit, so the zip must go through Git LFS (`.gitattributes` added). git-lfs is not installed on the server
+  and installing the release binary was blocked by the sandbox, so the zip is git-ignored until the user installs LFS and adds it with `git add -f`.
+
 ---
 
 ## Dead ends & lessons learned

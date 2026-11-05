@@ -341,7 +341,9 @@ MANIFEST §7–8 lists every checkpoint and log.
 **Not in the repository:**
 - **SyRIP** (images and annotations): download it from the AClab page; sha256 sums are in MANIFEST §3. Then rebuild the corrected symlink roots
   (`data/syrip_fixed`, `data/syrip500_fixed`, …) with the scripts below.
-- **Checkpoints** (`*.pth`, 0.25 GB each): on the cluster under `output/<run>/…/final_state.pth`.
+- **Checkpoints** are not stored as plain git files. They are bundled in `checkpoints/fidip_checkpoints.zip` (1.7 GB, Git LFS; contents and sha256 in
+  `checkpoints/README.md` and `checkpoints/SHA256SUMS`): F4, H1, S1, S2, D1, M2 `final_state.pth`, plus the third-party released and COCO-init weights.
+  The originals are on the cluster under `output/<run>/…/final_state.pth`.
 - **The licensed SMIL model.**
 
 Every AP in this report can be recomputed without a GPU from the tracked prediction files once SyRIP is downloaded and the corrected roots are built:
@@ -375,7 +377,7 @@ sbatch slurm/eval_ens.sh $F4 0.9,1.0,1.1 -30,0,30 output_test500f/ENS_A2_final D
 - **Config:** `experiments/coco/hrnet/w48_384x288_adam_lr1e-3_infant.yaml` (upstream, unchanged). Every deviation is a command-line override recorded
   per run in the AGENT.md summary table, together with its Slurm job IDs.
 - **Final checkpoint:** `output/F4/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/final_state.pth` (Slurm 11603343; replicate H1 11607648).
-  A copy is on the server at `models/F4/final_state.pth`. Checkpoints are not in git (size).
+  In the repo it is `models/F4/final_state.pth` inside `checkpoints/fidip_checkpoints.zip` (Git LFS, sha256 `26a92b5b…`).
 - **Logs (in the repo):** F4's training is in `logs/fidip-F4-11603343.out` and `log/F4/`, its Test100 predictions in
   `output/F4/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/results/`, and its Test500f predictions in `output_test500f/F4_final/`.
   The same layout holds for every run. W&B project `fidip` mirrors the curves (runs are named by ID).

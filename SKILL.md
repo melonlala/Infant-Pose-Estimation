@@ -34,6 +34,7 @@ The experiment log is in `AGENT.md`, and the inventory of artifacts is in `MANIF
   from the **server only**. `upstream` = ostadabbas. Commit code, scripts, docs **and** the text results on the server: since 2026-11-04 `logs/`, `log/` (TB),
   `output*/` (json/log/txt), `figures/`, `temp_uploads/`, `data/syrip_syn_new/` are tracked; commit them after each `sync.sh pull`.
   Never commit SyRIP data (`data/*` except `data/syrip_syn_new/`), `models/`, `envs/`, `*.pth`, `*.npy`, `wandb/`, `.env`, or the licensed SMIL files (see `.gitignore`).
+  Checkpoints go only into `checkpoints/fidip_checkpoints.zip` through **Git LFS** (`.gitattributes`); rebuild it and `checkpoints/SHA256SUMS` when a reported checkpoint changes.
 - **Server <-> cluster = plain copy** (`rsync` over ssh to `xfer.discovery.neu.edu`), via `slurm/sync.sh` run on the server. The cluster never uses GitHub.
   - `bash slurm/sync.sh push`: server code/scripts/docs -> cluster. **Run before every `sbatch`.** Excludes data, models,
     env, outputs, results, `.env`, the cluster's `.git`, and the `lib/nms` build products.
