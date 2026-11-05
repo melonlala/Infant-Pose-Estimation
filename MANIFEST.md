@@ -150,6 +150,8 @@ bar on each subset is the released checkpoint (= the paper's model, which reprod
 | **Best improved: F4** (D1 + `TRAIN.END_EPOCH 100`) | **94.0** | **93.0** | **93.2** | **91.7** | **91.4** |
 | F4 replicate H1 | 93.9 | 93.0 | 93.2 | 91.6 | 91.4 |
 | F4 + shuffle, S1 / S2 (not confirmed: pair mean 91.5 < 91.7) | 94.3 / 94.2 | 93.3 / 93.2 | 93.5 / 93.4 | 91.5 / 91.7 | 91.4 / 91.6 |
+| F4 + OHKM top-8, B3a / B3b (not confirmed: pair mean 91.2) | 94.0 / 94.1 | 93.0 / 93.1 | 93.2 / 93.3 | 91.5 / 91.2 | 91.4 / 91.1 |
+| F4 + `ROT_FACTOR 60`, B4a / B4b (not confirmed: pair mean 91.35; A100) | 93.8 / 94.0 | 92.8 / 93.0 | 93.0 / 93.1 | 91.4 / 91.6 | 91.3 / 91.4 |
 | Best MobileNet M2 (100 ep) vs released `mobile_fidip.pth` | 79.4 vs 79.2 | 78.6 vs 78.2 | 78.3 vs 77.9 | 73.2 vs 69.8 | 73.1 vs 69.7 |
 | F4 vs released | +0.4 | **+0.4** | +0.4 | +0.8 | **+0.7** |
 | **Final reported system: A3** = ensemble {F4, H1, S1, S2} + TTA (flip × scale 0.9/1/1.1 × rot ±30°/0; 72 passes) | **94.4** | **93.4** | **93.6** | **92.2** | **92.0** |

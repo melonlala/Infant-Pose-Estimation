@@ -638,6 +638,17 @@ accuracy than the paper's numbers (see `STUDENT_GUIDE.md`, Part 7).
   they were moved with `scontrol update jobid=… Partition=imanilab Account=m.imani TresPerNode=gres/gpu:a100:1` and started at once on **d3233 (A100 80GB PCIe)**.
   The 4 evals got `Partition=imanilab,gpu,courses-gpu Account=m.imani`. **Caveat:** F4/H1/B3 trained on V100-SXM2. On A100, PyTorch runs convolutions in TF32
   by default, so B4 differs from them in GPU type as well as ROT_FACTOR. That is expected to be small next to the ~0.2 run-to-run noise, but note it if B4 lands near the bar.
+- **B4 result** (all 6 jobs COMPLETED; train 61 min each on d3233, best val AP 0.9424 / 0.9417; scored with `tools/eval_subsets.py`, final_state):
+
+| run | Test100 | Test99 | Test95 | Test500f | **Test499f** |
+|---|---|---|---|---|---|
+| F4 / H1 | 93.99 / 93.93 | 92.99 / 93.03 | 93.20 / 93.16 | 91.73 / 91.60 | **91.43 / 91.39** |
+| B4a / B4b (ROT_FACTOR 60, A100) | 93.84 / 93.96 | 92.85 / 92.96 | 93.01 / 93.11 | 91.38 / 91.60 | **91.28 / 91.42** |
+
+  - **Rule applied:** the pair mean is 91.35, below 91.7, and B4a (91.28) is below 91.4 → **stronger rotation not confirmed**. It is flat to −0.1 on every subset.
+    The ±45° default already covers the infant poses, so widening it to ±60° adds no useful variety. Being this far from the bar, the TF32 caveat does not change the verdict.
+  - **A/B track closed.** A3 (ensemble + TTA) stays the final reported system and F4 the final single model. TTA (A2) was the only change that passed the bar; both training-side
+    changes (B3 OHKM, B4 rotation) did nothing. Stopping as pre-registered; nothing new without the user.
 
 ### 2026-11-04 — File transfers go through the xfer node
 - **Asked:** copy files between the server and the cluster through `xfer.discovery.neu.edu`, and add this to SKILL.md.
