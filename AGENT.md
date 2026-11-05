@@ -634,6 +634,10 @@ accuracy than the paper's numbers (see `STUDENT_GUIDE.md`, Part 7).
   `log/B4a`, `log/B4b`. /home usage 78.9 GB → **31.4 GB** (quota updates within a minute).
 - **B4 rerun** (same names, same overrides `TRAIN.END_EPOCH 100 DATASET.ROT_FACTOR 60`, partitions `gpu,courses-gpu`, same rule):
   B4a 11631221 → 11631227, 11631230. B4b 11631233 → 11631234, 11631235.
+  Both trains sat in PENDING (Priority) because `train_x.sh` pins `--gres=gpu:v100-sxm2:1`. On the user's request ("use hou.yuchen's gpu resource or imani group")
+  they were moved with `scontrol update jobid=… Partition=imanilab Account=m.imani TresPerNode=gres/gpu:a100:1` and started at once on **d3233 (A100 80GB PCIe)**.
+  The 4 evals got `Partition=imanilab,gpu,courses-gpu Account=m.imani`. **Caveat:** F4/H1/B3 trained on V100-SXM2. On A100, PyTorch runs convolutions in TF32
+  by default, so B4 differs from them in GPU type as well as ROT_FACTOR. That is expected to be small next to the ~0.2 run-to-run noise, but note it if B4 lands near the bar.
 
 ### 2026-11-04 — File transfers go through the xfer node
 - **Asked:** copy files between the server and the cluster through `xfer.discovery.neu.edu`, and add this to SKILL.md.
@@ -661,6 +665,8 @@ _(Record approaches that didn't work and why, so they aren't repeated.)_
 - **Cluster /home quota is 76 GB.** Every eval writes a ~0.57 GB `feature.npy` and every run leaves a ~0.75 GB `checkpoint.pth`; ~50 evals filled the quota and killed B4a/B4b.
   Keep bulky outputs on `/scratch/hou.yuchen`, or clean `feature.npy` after evals, and check `quota -s` before a batch.
   After deleting, the login node can show a removed dir as present for a few seconds (NFS cache): `submit_x.sh` refused once, then worked.
+- **Extra GPUs:** hou.yuchen is in group `ImaniLab` → partition `imanilab` (node d3233, 3× A100 80GB, 14-day limit, account `m.imani`) is usually idle.
+  A pending job can be moved there with `scontrol update jobid=<id> Partition=imanilab Account=m.imani TresPerNode=gres/gpu:a100:1` (needed when the script pins a GPU type).
 - **Copy files through `xfer.discovery.neu.edu`, not the login node** (user rule, 2026-11-04). `slurm/sync.sh` now does this; `pull` took 14.5 s vs minutes before.
 - **Don't trust `syrip_for_train.zip` labels blindly**: its synthetic keypoints are wrong and test11.jpg is swapped. Audit images vs annotations
   (size check, overlay a few, score a trusted model against each label set) before training.
