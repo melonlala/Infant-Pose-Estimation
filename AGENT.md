@@ -628,7 +628,12 @@ accuracy than the paper's numbers (see `STUDENT_GUIDE.md`, Part 7).
 - **B4a / B4b FAILED (19:04, both at once on different nodes):** `RuntimeError: File output/B4x/.../checkpoint.pth cannot be opened`. Cause: the cluster
   **/home quota is full** (78.9 GB used / 76 GB limit). The big items are 50 `feature.npy` files (28.3 GB; written by `test_adaptive_model.py` on every eval,
   never used) and 28 resume-only `checkpoint.pth` files (19.6 GB; contain optimizer state, not needed once a run is finished). `/scratch/hou.yuchen` (16 TB quota) is unused.
-  B4 got to epoch 3/1. Nothing was deleted or resubmitted: waiting for the user.
+  B4 got to epoch 3/1. Nothing was deleted or resubmitted until the user decided.
+- **Cleanup (user approved "删并重跑"):** deleted every `feature.npy` (53 files, 30.2 GB) and every `checkpoint.pth` (28 files, 19.6 GB) under `output*`
+  (queue was empty, so all were finished runs; `final_state.pth` / `model_best.pth` / results json untouched). Removed the broken `output/B4a`, `output/B4b`,
+  `log/B4a`, `log/B4b`. /home usage 78.9 GB → **31.4 GB** (quota updates within a minute).
+- **B4 rerun** (same names, same overrides `TRAIN.END_EPOCH 100 DATASET.ROT_FACTOR 60`, partitions `gpu,courses-gpu`, same rule):
+  B4a 11631221 → 11631227, 11631230. B4b 11631233 → 11631234, 11631235.
 
 ### 2026-11-04 — File transfers go through the xfer node
 - **Asked:** copy files between the server and the cluster through `xfer.discovery.neu.edu`, and add this to SKILL.md.
@@ -655,6 +660,7 @@ _(Record approaches that didn't work and why, so they aren't repeated.)_
 - **Negative numbers as CLI values:** `--rots -30,0,30` is parsed as an option by argparse. Always pass list arguments as `--rots=-30,0,30`.
 - **Cluster /home quota is 76 GB.** Every eval writes a ~0.57 GB `feature.npy` and every run leaves a ~0.75 GB `checkpoint.pth`; ~50 evals filled the quota and killed B4a/B4b.
   Keep bulky outputs on `/scratch/hou.yuchen`, or clean `feature.npy` after evals, and check `quota -s` before a batch.
+  After deleting, the login node can show a removed dir as present for a few seconds (NFS cache): `submit_x.sh` refused once, then worked.
 - **Copy files through `xfer.discovery.neu.edu`, not the login node** (user rule, 2026-11-04). `slurm/sync.sh` now does this; `pull` took 14.5 s vs minutes before.
 - **Don't trust `syrip_for_train.zip` labels blindly**: its synthetic keypoints are wrong and test11.jpg is swapped. Audit images vs annotations
   (size check, overlay a few, score a trusted model against each label set) before training.
