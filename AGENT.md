@@ -616,6 +616,19 @@ accuracy than the paper's numbers (see `STUDENT_GUIDE.md`, Part 7).
     scale/rotation views see the infant differently, which suits the arbitrary orientations of lying infants.
   - Caveat: the TTA grid was fixed in advance and not tuned, so it is not selected on the test set. Only the A1–A3 choice among 3 pre-listed configs touches
     the test set, and the winner clears the bar by 0.3.
+- **B3 (OHKM) result (final_state):**
+
+| run | Test100 | Test99 | Test95 | Test500f | **Test499f** |
+|---|---|---|---|---|---|
+| F4 / H1 | 93.99 / 93.93 | 92.99 / 93.03 | 93.20 / 93.16 | 91.73 / 91.60 | **91.43 / 91.39** |
+| B3a / B3b (OHKM top-8) | 94.00 / 94.14 | 93.01 / 93.14 | 93.20 / 93.25 | 91.51 / 91.17 | **91.40 / 91.06** |
+
+  - **Rule applied:** the pair mean is 91.23, below 91.7, and B3b (91.06) is below 91.4 → **OHKM not confirmed**. It is flat on Test99 (+0.07) and slightly worse on Test500f (−0.3).
+    Mining the 8 hardest joints does not help here: the remaining error sits on a few self-occluded images, not on a fixed set of joints.
+- **B4a / B4b FAILED (19:04, both at once on different nodes):** `RuntimeError: File output/B4x/.../checkpoint.pth cannot be opened`. Cause: the cluster
+  **/home quota is full** (78.9 GB used / 76 GB limit). The big items are 50 `feature.npy` files (28.3 GB; written by `test_adaptive_model.py` on every eval,
+  never used) and 28 resume-only `checkpoint.pth` files (19.6 GB; contain optimizer state, not needed once a run is finished). `/scratch/hou.yuchen` (16 TB quota) is unused.
+  B4 got to epoch 3/1. Nothing was deleted or resubmitted: waiting for the user.
 
 ### 2026-11-04 — File transfers go through the xfer node
 - **Asked:** copy files between the server and the cluster through `xfer.discovery.neu.edu`, and add this to SKILL.md.
@@ -640,6 +653,8 @@ _(Record approaches that didn't work and why, so they aren't repeated.)_
 - **One-off rsync of a *tracked* file to the cluster is not durable:** any `slurm/sync.sh push` from the main checkout reverts it, even in the middle of a submit
   loop (M1/M2 ran as HRNet). Put experimental cluster code in new files, or commit it to main first. sbatch snapshots the batch script, but not the Python it calls.
 - **Negative numbers as CLI values:** `--rots -30,0,30` is parsed as an option by argparse. Always pass list arguments as `--rots=-30,0,30`.
+- **Cluster /home quota is 76 GB.** Every eval writes a ~0.57 GB `feature.npy` and every run leaves a ~0.75 GB `checkpoint.pth`; ~50 evals filled the quota and killed B4a/B4b.
+  Keep bulky outputs on `/scratch/hou.yuchen`, or clean `feature.npy` after evals, and check `quota -s` before a batch.
 - **Copy files through `xfer.discovery.neu.edu`, not the login node** (user rule, 2026-11-04). `slurm/sync.sh` now does this; `pull` took 14.5 s vs minutes before.
 - **Don't trust `syrip_for_train.zip` labels blindly**: its synthetic keypoints are wrong and test11.jpg is swapped. Audit images vs annotations
   (size check, overlay a few, score a trusted model against each label set) before training.
