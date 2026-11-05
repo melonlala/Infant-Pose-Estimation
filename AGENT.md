@@ -58,6 +58,17 @@ accuracy than the paper's numbers (see `STUDENT_GUIDE.md`, Part 7).
 | H3 | 2026-11-04 | G1 replicate (D1 + shuffle); *extra confirmation run, not in the rule* | `submit_run.sh H3 ... TRAIN.BALANCED_SHUFFLE True` | 11607662 → 11607664, 11607666 | 94.2 | — | — | — | done (best @ 12, final 93.9); **Test500f 91.3 / 91.3** → shuffle pair mean 91.4 < 91.5, not confirmed |
 | SY1 | 2026-11-04 | F4 config (100 ep) + **522 new SMIL renders** (7.1) → train = 200R + 1000S + 522S | `ROOT=data/syrip_fixed_plus522/ submit_run.sh SY1 03:30:00 TRAIN.END_EPOCH 100` | 11618211 → 11618213, 11618215 | 93.8 | — | — | — | done (best @ Test100 93.8, final 93.2, Test96 92.6); **Test500f 91.4 / 91.7** (best / final) |
 | SY2 | 2026-11-04 | SY1 replicate | same, `SY2` | 11618217 → 11618218, 11618220 | 93.5 | — | — | — | done (best 93.5, final 93.1, Test96 92.5); **Test500f 90.9 / 91.5** → with SY1: no effect (rule) |
+| L1 | 2026-11-04 | D1 + DA λ 1e-4 (`PRE_EPOCH 1`) | `submit_run.sh L1 ... TRAIN.LAMBDA 0.0001 TRAIN.PRE_EPOCH 1` | 11617341 → 11617348, 11617351 | 93.7 | — | — | — | done (final); **Test99 92.8 / Test499f 91.1** |
+| L2 | 2026-11-04 | D1 + DA λ 2e-3 | same, `TRAIN.LAMBDA 0.002` | 11617353 → 11617376, 11617492 | 92.4 | — | — | — | done; Test99 91.4 / Test499f 89.6 |
+| L3 | 2026-11-04 | D1 + DA λ 5e-3 | same, `TRAIN.LAMBDA 0.005` | 11617418 → 11617494, 11617495 | 89.7 | — | — | — | done; Test99 88.8 / Test499f 87.2 → **DA never helps** |
+| S1 | 2026-11-04 | F4 (100 ep) + `BALANCED_SHUFFLE True` | `submit_run.sh S1 02:45:00 TRAIN.END_EPOCH 100 TRAIN.BALANCED_SHUFFLE True` | 11617384 → 11617393, 11617423 | 94.3 | — | — | — | done; Test99 93.3 / Test499f 91.4 |
+| S2 | 2026-11-04 | S1 replicate | same | 11617427 → 11617435, 11617437 | 94.2 | — | — | — | done; Test99 93.2 / Test499f 91.6 → pair mean 91.5 < 91.7, **not confirmed** |
+| M0 | 2026-11-04 | released `mobile_fidip.pth`, fixed data | `CFG=<mobile yaml> eval.sh` | 11617333, 11617336 | 79.2 | 99.0 | 89.4 | 84.1 | done; Test99 78.2 / Test499f 69.7 |
+| M1 | 2026-11-04 | MobileNet on fixed labels, own yaml, 20 ep | `submit_mobile.sh M1 01:00:00` | 11618020 → 11618092, 11618105 | 74.7 | — | — | — | done; Test99 74.0 / Test499f 69.0 (first attempt 11617422 ran as HRNet by mistake, cancelled) |
+| M2 | 2026-11-04 | M1 + 100 ep | `submit_mobile.sh M2 03:00:00 TRAIN.END_EPOCH 100` | 11618140 → 11618148, 11618151 | 79.4 | — | — | — | done; Test99 78.6 / Test499f 73.1 (+3.4 vs released MobileNet) |
+| T5f-E0 | 2026-11-03 | Released `hrnet_fidip.pth` on **Test500f** (Test500, `area` = bbox w*h) | `DATASET.ROOT data/syrip500_fixed/`, `OUTPUT_DIR output_test500f/E0` | 11602599 | 90.9 | 98.7 | 96.7 | 92.3 | done |
+| T5f-E1b | 2026-11-03 | E1b `model_best` on Test500f | same, `output_test500f/E1b` | 11602600 | 89.7 | 98.8 | 95.7 | 91.4 | done |
+| T5f-D1 | 2026-11-03 | D1 `model_best` on Test500f | same, `output_test500f/D1` | 11602601 (afterok 11602450) | 91.4 | 98.8 | 96.7 | 92.6 | done |
 
 ---
 
@@ -159,7 +170,7 @@ accuracy than the paper's numbers (see `STUDENT_GUIDE.md`, Part 7).
 - **Asked:** after creating the private repo, push only the server's code to it, and sync the cluster with the server by simple copy.
 - **Did:** removed `slurm/push_results.sh` and the plan for a cluster deploy key. Added `slurm/sync.sh push|pull|env` (rsync, no `--delete`).
   `push` copies code/scripts/docs to the cluster and excludes data/models/env/outputs/results/`.env`/nms build products. `pull` brings
-  back `logs/`, `log/` (TB), and `*.log|*.json|*.txt` from `output*/`. `env` copies only `WANDB_*` lines. `logs/` and `output_*/` are now git-ignored.
+  back `logs/`, `log/` (TB), and `*.log|*.json|*.txt` from `output*/`. `env` copies only `WANDB_*` lines. `logs/` and `output_*/` are now git-ignored. *(Reversed 2026-11-04: results are tracked for submission, see the last log entry.)*
   Pushed `main` to `origin` (private `melonlala/Infant-Pose-Estimation`).
 - **Why:** simpler. The cluster needs no GitHub credentials and git history stays code-only. The trade-off is that the cluster copy has no
   version info, so the commit used by a run must be noted in AGENT.md when submitting.
@@ -210,6 +221,9 @@ accuracy than the paper's numbers (see `STUDENT_GUIDE.md`, Part 7).
   and val does not, but val loss and AP do not degrade, so it is a plateau, not classic overfitting. Best-epoch selection on Test100 picks noise
   (best epochs 6, 18, 9 across E1b/E1c/E2). Report best and final. The plateau is partly explained by the label defect below: half of every batch
   carried wrong targets.
+- **Superseded (2026-11-04, see "Part 4.5 corrected" below):** this reading was made on broken data and is wrong in its cause. The
+  plateau after epoch 6 and the slowly falling, high train loss come from the **wrong synthetic labels** (half of every batch had unlearnable targets)
+  plus the swapped `test11.jpg` capping val AP. With correct labels (D1) train loss is 2.5× lower and val AP keeps rising to epoch ~17.
 
 ### 2026-11-03 — Part 4 visualisation + data audit: synthetic training labels in syrip_for_train are wrong
 - **Did:** `tools/fidip_infer.py` (shared inference = eval path), `tools/visualize_preds.py` (GT vs pred grids for worst/best OKS, per-keypoint
@@ -237,6 +251,62 @@ accuracy than the paper's numbers (see `STUDENT_GUIDE.md`, Part 7).
   confidence table; download button. Uploads are saved to `temp_uploads/` (6.3). Headless-tested with `streamlit.testing` (no exceptions, 17-row table).
 - Run on the server: `.venv-demo/bin/streamlit run tools/streamlit_demo.py` (venv = base python + yacs, streamlit, dsntnn, pycocotools).
 - 6.3 still needs the user's own infant images in `temp_uploads/`.
+
+### 2026-11-03 — Raw-data annotation audit (`tools/check_annotations.py`)
+- **Asked:** check the raw data for wrong or duplicate annotations.
+- **Did:** wrote `tools/check_annotations.py` (structure, keypoints, bbox/area, is_synthetic, identical labels, md5 + dHash
+  duplicates, and label agreement between copies), ran it on all 8 JSONs in `data/`, drew overlays of the flagged cases, and
+  re-scored the saved Test500 predictions with pycocotools.
+- **Result (confirmed by overlays):**
+  1. **Training labels for all 1000 synthetic images are wrong** in `data/syrip/annotations/person_keypoints_train_infant.json`
+     (the file FiDIP trains on). Its synthetic entries carry MINI-RGBD source poses (`image_source: MINI_dataset`,
+     `original_file_name: 01/syn_00000.png`, 13 kps, always 640x480), not labels for the SyRIP renders in `images/train_infant/`.
+     bbox IoU against `SyRIP/annotations/200R_1000S` is a median of 0.31, and 0% of images agree within 5% of bbox size. 46 entries also have the wrong size
+     (json 640x480, file 1920x1080). The images are byte-identical in both copies. `SyRIP/annotations/200R_1000S` matches them, and its 200 real labels are identical.
+  2. **Test500 `area` is the constant 2443298** for all 500 anns (`validate500` json). COCOeval uses gt area as the OKS scale, so
+     Test500 AP is inflated. With area = bbox w*h: E0 98.4 → **90.9**, E1b 98.5 → **89.7**, E1b final 98.3 → **90.0**. This explains
+     the "saturation" logged earlier. The train JSONs also use a constant area of 14233, which is harmless because the loader only checks `area > 0`.
+  3. **Test100 `test11.jpg` is the wrong image** in `data/syrip/images/validate_infant/`: it is byte-identical to `test24.jpg`. The labels
+     and the `SyRIP/` copy are correct. Scoring Test100 GT with predictions made on the correct images gives E0 92.1 → **92.7** and E1b 91.1 → **92.7**.
+     So E1b's "−1 AP vs E0" was an artifact, and the gap to the paper (93.6) is 0.9.
+  4. **Duplicates / leakage:** 4 images are in both train and Test100 (train00073=test20, train00272=test46, train00315=test42,
+     train00340=test50), each labelled twice with disagreements of 32–87 px. Three Test500 images appear twice (test56=test217, test7=test222,
+     test345=test349), also labelled inconsistently. Near-duplicates (dHash≤12), real images only: test162~test435, test328~test365,
+     test207~test47, test139~test166, train00044~train00464. There are no near-duplicates between train and test beyond the 4 exact ones.
+  5. **Copy-pasted label:** test149 has exactly test118's keypoints, on a different baby (Test500 only).
+  6. Test100 and Test500 disagree on test83 and test84 (two annotation passes; both look plausible).
+  7. Weak heuristic flags only. These need manual review and are mostly real twisted or side-view poses: 17 L/R shoulder–hip disagreements in Test500,
+     7 in 200R, and coincident joints such as train00133 with l_hip = r_hip.
+  8. `train_pre_infant`: keypoints are in original COCO coordinates on resized images, and the 2000+ SURREAL entries share one dummy pose.
+     This is **harmless**: that loader feeds only the domain classifier (`meta['synthetic']`).
+- **Decision / next:** train with `SyRIP/annotations/200R_1000S` labels, restore the correct `test11.jpg`, and evaluate Test500 with area = bbox area.
+  Then rerun E0 and E1. Report Test100 numbers from both before and after the fix.
+
+### 2026-11-03 — Part 7 track D: retrain on fixed labels
+- **Asked:** to beat the paper (Part 7), retrain with the corrected annotations.
+- **Did:** `tools/make_syrip_fixed.sh` builds `data/syrip_fixed/` on the server and the cluster. All files are symlinks, so `data/syrip` and `data/SyRIP` stay untouched:
+  - train json → `SyRIP/annotations/200R_1000S`
+  - `test11.jpg` → `SyRIP` copy
+  - everything else → `data/syrip`
+  Checks: ids ↔ file names match, json sizes match the files, and `is_synthetic` counts are 1000 synthetic / 200 real.
+  Submitted (cluster code as already pushed, no code change):
+  - D0 11602447 (released ckpt, fixed Test100)
+  - D0b 11602449 (E1b `model_best`, fixed Test100)
+  - D1 11602450 (E1b config + `DATASET.ROOT data/syrip_fixed/ OUTPUT_DIR output/D1 LOG_DIR log/D1`, W&B `D1-fixed-labels`, `--time 1:00`)
+- **Note:** a parallel sweep (E1c/E2/E3/E4/p100probe, submitted 20:12 from another session) still trains on `data/syrip/`,
+  i.e. with the broken synthetic labels. Its results are not comparable with track D. The QOS allows 2 running jobs per user, so D jobs queue behind it.
+- **Hypothesis:** about half of every batch had wrong pose targets. With correct targets, the synthetic half should help instead of hurting,
+  so D1 should beat E1b (92.6 on fixed Test100, D0b) and may reach or exceed the paper's 93.6. *(Result: D1 93.8 best / 93.6 final; see the next entries.)*
+- **Compare against:** D0 / D0b (same fixed Test100), not the old 92.1 / 91.1.
+
+### 2026-11-03 — Test500 with a valid `area` (third data fix)
+- **Did:** `tools/make_syrip500_fixed.py` builds `data/syrip500_fixed/` on the server and the cluster. It is the validate500 json with `area` = bbox w*h
+  (the original uses a constant 2443298). Images symlink to `SyRIP/images/validate_infant`. Copied the script and `tools/check_annotations.py` to the cluster
+  with a one-off rsync (not via `sync.sh`, which pushes from the main checkout). Submitted T5f-E0 11602599, T5f-E1b 11602600, and T5f-D1 11602601
+  (afterok on D1).
+- **Note:** the offline Test100 estimate (92.7) was too low. The real D0 eval on `data/syrip_fixed` gave **93.6 / 98.5 / 98.5 / AR 94.6**, which matches the paper.
+  The whole E0 gap (92.1 vs 93.6) was the wrong `test11.jpg`.
+- **Next:** Test500 (area fixed) is now usable as a second metric. It is not used for model selection, so it avoids the Test100 `model_best` bias.
 
 ### 2026-11-03 — Check of the user's data fix (`data/syrip_fixed`) and D-track results
 - **Asked:** check the updated fixed data and the model trained on it.
@@ -369,6 +439,226 @@ accuracy than the paper's numbers (see `STUDENT_GUIDE.md`, Part 7).
   - Finding: the box matters more than the model (whole image 0.77 → detected box 0.86 mean confidence). F4 is more confident than E0 on 11/12.
   - Failure modes: picking an adult as the "largest person", swaddling, foreshortening, side-view occlusion. Write-up: `docs/part6_demos.md`.
 
+### 2026-11-04 — test11 dropped from eval, Part 4.5 corrected, Part 7 target fixed at 93.6 on fixed data
+- **Asked:** test11's GT is wrong, drop it. 6.3 with images from the web. Correct the 4.5 analysis. Update AGENT.md and MANIFEST.md.
+  Part 7 must beat 93.6, compared on the fixed data.
+- **test11 check before dropping:** the GT (1536×2048, supine, 17 kps v=2) lines up with SyRIP's `test11.jpg` for head, arms and left leg;
+  left ear, both hips and the right knee/ankle are off by 50–90 px (`left_ear` is drawn on the face). Every fixed-data model scores it OKS ≈ 1 at all
+  thresholds, so it is an *easy* image under this loose GT. **Dropping it lowers every model's AP by ~1.0** (one perfect image out of 100).
+  Decision (user): drop it from all reported numbers.
+- **New eval subsets** (`tools/eval_subsets.py`, rescoring saved prediction JSONs with pycocotools, no re-inference):
+  Test99 = fixed Test100 − test11; Test95 = Test99 − 4 train-leaked images (test20/42/46/50); Test499f = Test500f − test11.
+  Test100-family predictions are each run's last training-loop validation (= `final_state`), Test500-family are `<run>_final` evals
+  (D1, E0, E1b: their only Test500f eval, `model_best` for D1/E1b).
+
+| run | what | Test100 | **Test99** | Test95 | Test500f | **Test499f** |
+|---|---|---|---|---|---|---|
+| E0 (D0) | released `hrnet_fidip.pth` = paper's model | 93.6 | **92.6** | 92.8 | 90.9 | **90.7** |
+| E1b (D0b) | our repro on broken labels | 92.6 | 91.6 | 91.8 | 89.7 | 89.6 |
+| D1 | repro on fixed labels, 20 ep | 93.6 | 92.7 | 92.9 | 91.4* | 91.2* |
+| F1 | D1 replicate | 93.5 | 92.5 | 92.7 | 91.2 | 91.1 |
+| F2 | + DA | 93.5 | 92.5 | 92.8 | 91.0 | 90.9 |
+| F3 | LR 1e-3 | 92.9 | 92.0 | 92.1 | 90.6 | 90.6 |
+| **F4** | 100 ep (final model) | **94.0** | **93.0** | **93.2** | **91.7** | **91.4** |
+| G1 | shuffle | 94.0 | 93.0 | 93.2 | 91.5 | 91.2 |
+| G2 | real-only 200R | 93.9 | 93.0 | 93.1 | 91.3 | 91.1 |
+| G3 | LR 5e-5 | 93.3 | 92.3 | 92.5 | 91.0 | 90.9 |
+| H1 | F4 replicate | 93.9 | 93.0 | 93.2 | 91.6 | 91.4 |
+| H2 | shuffle + strong aug | 93.9 | 92.9 | 93.0 | 91.6 | 91.5 |
+| H3 | G1 replicate | 93.9 | 92.9 | 93.1 | 91.3 | 91.3 |
+
+  \* D1 Test500f is `model_best` (no final-state Test500f eval).
+- **Part 7 target:** the paper's **93.6** is DarkPose+FiDIP on Test100. On the fixed Test100 the released checkpoint reproduces it exactly (93.6), so the
+  fixed data is the right place to compare. **F4 final = 94.0 > 93.6 (+0.4).** Once test11 is dropped, 93.6 is no longer the comparable number (it
+  includes test11). The equivalent bar is the released model on the same subset: **Test99 92.6 → F4 93.0 (+0.4)**, Test95 92.8 → 93.2 (+0.4),
+  Test499f 90.7 → 91.4 (+0.7). The F4/H1 replicate pair agrees to 0.0 on Test99 and Test499f, so the gain is not single-run noise (noise ≈ 0.2).
+  The ranking of all runs is unchanged by dropping test11 (every run loses 0.9–1.0 on Test100→Test99).
+- **Part 4.5 corrected** (`tools/plot_compare.py` → `figures/compare_4_5.png`; E1b vs D1 vs F3 vs F4 on one set of axes; write-up in
+  `docs/part4_results_and_fitting.md` §4.5.0):
+  - The original observation (E1b: "AP stalls after epoch 6, train loss stays flat") is real, but the earlier explanation (mild overfitting onset) was wrong.
+    E1b's train loss starts at 1.02e-3 and ends at 6.7e-4, 2.5× above D1 (4.2e-4 → 2.7e-4). E1b's val loss is *below* its train loss (ratio 0.59),
+    which is impossible for a healthy fit. Both are signatures of **label noise**: 1000 of the 1200 training targets were MINI-RGBD poses that do not match the
+    images, so half of every batch is unlearnable. Its val AP (on the swapped-test11 Test100) peaks at 0.911 @ ep 7 and then wanders.
+  - With correct labels (D1) val AP keeps rising to ep 17 (0.938) and val loss falls monotonically; val/train = 1.16, a normal small gap.
+  - Real fitting regimes, on fixed data: LR 1e-3 (F3) **overfits** (lowest train loss, val loss rises after ep 6, ratio 1.56, AP 0.929).
+    100 ep (F4) widens the gap to 1.58 but val loss keeps creeping *down* (3.02e-4), and AP holds at 0.94 → **benign plateau, not harmful overfitting**.
+    LR 5e-5 (G3) mildly underfits. Nothing at LR 1e-4 underfits.
+- **6.3:** already done earlier on 2026-11-04 (12 Wikimedia Commons infant photos, not in SyRIP, in `temp_uploads/` with licences in
+  `temp_uploads/SOURCES.md`; results in `docs/part6_demos.md`). Nothing re-run.
+
+### 2026-11-04 — L/M/S-track: λ sweep, MobileNet comparison, 100 ep + shuffle (rules pre-registered before results)
+- **Asked:** sweep λ, compare against MobileNet, and run long training with the reshuffled sampler. Monitor progress every 10 min.
+- **Code (new files only, see the incident below):** `slurm/submit_mobile.sh` → `slurm/train_mobile.sh` (`tools/train_adaptive_model_mobile_wb.py` =
+  upstream mobile script + W&B + per-epoch `val AP` line; 224×224 yaml; init `models/coco/posemobile.pth`) and `slurm/eval_mobile.sh`.
+  `tools/eval_subsets.py` now also finds `adaptive_pose_mobile` outputs. These were pushed to the cluster by one-off rsync from this worktree (branch
+  `claude/raw-data-annotation-check-23431c`).
+- **Runs** (all `data/syrip_fixed`, single factor vs the named base):
+  - **L1 / L2 / L3**: D1 + DA with `PRE_EPOCH 1`, λ = 1e-4 / 2e-3 / 5e-3, 20 ep. Together with F1 (λ = 0) and F2 (λ = 5e-4) this gives a 5-point sweep.
+  - **M0**: released `mobile_fidip.pth` on fixed Test100 and Test500f (eval only).
+  - **M1**: MobileNet on fixed labels, its own yaml (LR 1e-3, 20 ep, DA off). **M2**: M1 + 100 ep (LR drop at 90).
+  - **S1 / S2**: F4 (100 ep) + `TRAIN.BALANCED_SHUFFLE True`, two runs (pair), so the rule can be applied without another round.
+- **Metric:** final_state AP on **Test499f**, with Test99 as a secondary metric (`tools/eval_subsets.py`). Noise ≈ 0.2, so the significance bar is +0.3.
+- **Pre-registered rules:**
+  - **λ:** baseline F1 final Test499f 91.1. A λ is *promising* if it scores ≥ 91.4. Then it gets one replicate, and it is adopted only if the pair mean is ≥ 91.4
+    and both runs are ≥ 91.1. If no λ is promising, the conclusion is that **DA does not help on fixed labels at any λ in [1e-4, 5e-3]**. Separately, report
+    whether the domain-classifier accuracy falls toward 0.5 as λ grows (a sanity check that the adversarial term works).
+  - **Shuffle at 100 ep:** baseline F4/H1 pair mean 91.4 (91.4 / 91.4). *Confirmed* if the S1/S2 mean is ≥ 91.7 and both runs are ≥ 91.4. If confirmed, the final model
+    becomes the better of S1/S2. Otherwise F4 stays the final model.
+  - **MobileNet:** a comparison, not a candidate for the final model. Report M0 vs M1 (does the label fix help MobileNet as it did HRNet, +1.2?),
+    M1 vs M2 (does 100 ep help, ≥ +0.3?), and the gap between HRNet and MobileNet at matched settings (D1 vs M1, F4 vs M2).
+  - After these runs, stop and report. Nothing new is launched without the user.
+- **Job ids:** M0 t100 11617333, t500f 11617336. L1 11617341 → t5b 11617348, t5f 11617351. L2 11617353 → 11617376, 11617492.
+  L3 11617418 → 11617494, 11617495. S1 11617384 → 11617393, 11617423. S2 11617427 → 11617435, 11617437.
+  M1 11617422 and M2 11617442 (→ 11617447/49) were wrong (HRNet, see the incident): held, then cancelled with the user's OK and resubmitted with
+  `slurm/submit_mobile.sh`: **M1 11618020 → 11618092, 11618105; M2 11618140 → 11618148, 11618151** (arch=mobile).
+- **Incident (11:05):** in the middle of the submit loop, the cluster's `slurm/submit_run.sh`, `slurm/eval.sh` and `tools/train_adaptive_model_mobile.py` reverted to
+  main's versions, most likely because another session ran `slurm/sync.sh push` from the main checkout. So `ARCH=mobile` was ignored: **M1 and M2 were submitted as HRNet
+  runs (`slurm/train.sh`)**. Both were held (`scontrol hold`) before starting. Three sbatch calls also failed with "Unexpected message received"
+  (L2-t5f, L3-t5b/t5f); they were resubmitted by hand. L1–L3 and S1/S2 are HRNet by design, so they are unaffected. M0 is unaffected too, because sbatch snapshots the
+  batch script at submit time. Fix: the MobileNet path now lives only in new files that main does not have, so a push cannot revert them.
+- **M0 (released `mobile_fidip.pth`, fixed data):** Test100 **79.2** (AP50 99.0, AP75 89.4, AR 84.1). Test500f **69.8** (96.2 / 79.9 / AR 78.1).
+  That is 14–21 AP below HRNet (93.6 / 90.9).
+- **λ sweep result (done 2026-11-04 16:20; all final_state, 20 ep, `PRE_EPOCH 1` for λ > 0):**
+
+| run | λ | Test100 | Test99 | Test95 | Test500f | **Test499f** | DC acc (mean of last 5 ep) |
+|---|---|---|---|---|---|---|---|
+| F1 | 0 | 93.5 | 92.5 | 92.7 | 91.2 | **91.1** | 0.78 |
+| L1 | 1e-4 | 93.7 | 92.8 | 92.9 | 91.4 | **91.1** | 0.71 |
+| F2 | 5e-4 (paper) | 93.5 | 92.5 | 92.8 | 91.0 | **90.9** | 0.69 |
+| L2 | 2e-3 | 92.4 | 91.4 | 91.7 | 89.6 | **89.6** | 0.60 |
+| L3 | 5e-3 | 89.7 | 88.8 | 89.3 | 87.3 | **87.2** | 0.54 |
+
+  - **Rule applied:** no λ reaches 91.4 (the best is L1 at 91.1, equal to F1), so none is promising. **DA does not help on fixed labels at any λ in [1e-4, 5e-3].** Replicates are not needed.
+  - **Sanity check passes:** domain-classifier accuracy falls steadily toward chance (0.78 → 0.54) as λ grows, so the adversarial term does make the
+    features domain-invariant. Pose AP falls with it (−0.2 at the paper's λ, −1.5 at 2e-3, −3.9 at 5e-3). On correct labels, real-vs-synthetic invariance
+    costs keypoint accuracy instead of helping. The paper's Finetune→FiDIP +0.9 (Table IV) does not reproduce in this code at any λ.
+- **100 ep + shuffle result (S1/S2, final_state):**
+
+| run | Test100 | Test99 | Test95 | Test500f | **Test499f** |
+|---|---|---|---|---|---|
+| F4 / H1 (100 ep, no shuffle) | 94.0 / 93.9 | 93.0 / 93.0 | 93.2 / 93.2 | 91.7 / 91.6 | **91.4 / 91.4** |
+| S1 / S2 (100 ep + shuffle) | 94.3 / 94.2 | 93.3 / 93.2 | 93.5 / 93.4 | 91.5 / 91.7 | **91.4 / 91.6** |
+
+  - **Rule applied:** the pair mean is 91.5, below the 91.7 bar (both runs are ≥ 91.4) → **shuffle not confirmed**, **F4 stays the final model**. This is the same outcome as G1/H3 at 20 ep.
+    The shuffle pair is consistently a little higher (+0.25 Test99, +0.1 Test499f), but the gain is below the pre-registered significance bar.
+  - **Shuffle, pooled over both schedules (report wording):** *shuffle shows a consistent small positive trend (about +0.1–0.3) that does not reach the
+    significance bar.* The 4 shuffle runs vs their matched no-shuffle runs, final_state:
+
+    | schedule | no shuffle (Test99 / Test499f) | shuffle (Test99 / Test499f) | Δ Test99 | Δ Test499f |
+    |---|---|---|---|---|
+    | 20 ep (D1 base) | D1 92.7 / 91.2, F1 92.5 / 91.1 | G1 93.0 / 91.2, H3 92.9 / 91.3 | +0.35 | +0.1 |
+    | 100 ep (F4 base) | F4 93.0 / 91.4, H1 93.0 / 91.4 | S1 93.3 / 91.4, S2 93.2 / 91.6 | +0.25 | +0.1 |
+
+    All 4 shuffle runs are ≥ their no-shuffle counterparts on Test99, and none is lower on Test499f. The effect is too small to confirm with pairs
+    (noise ≈ 0.2, bar 0.3 on Test499f), so it is not adopted and the final model stays F4. Shuffle is a bug fix (the stock `BalancedBatchSampler` uses
+    the same batch order and the same real-image oversampling every epoch), so a small, non-negative effect is what one would expect.
+    *Decision (user, 2026-11-04): report it as a trend, no further replicates.*
+- **MobileNet result (final_state, `mobile_224x224` yaml: LR 1e-3, LR drop at ep 90, DA off):**
+
+| run | what | Test100 | Test99 | Test95 | Test500f | **Test499f** |
+|---|---|---|---|---|---|---|
+| M0 | released `mobile_fidip.pth` | 79.2 | 78.2 | 77.9 | 69.8 | **69.7** |
+| M1 | fixed labels, 20 ep | 74.7 | 74.0 | 73.9 | 69.2 | **69.0** |
+| M2 | fixed labels, 100 ep | 79.4 | 78.6 | 78.3 | 73.2 | **73.1** |
+
+  - **The label fix alone does not help MobileNet at 20 ep** (M1 vs M0: −4.2 Test99, −0.7 Test499f). For HRNet it was worth +1.2. A 224×224 MobileNet initialised from
+    COCO is still far from converged after 20 epochs (val AP is still rising at ep 19: best 76.4).
+  - **100 epochs is worth +4.6 Test99 / +4.1 Test499f** (M2 vs M1, ≫ 0.3), and M2 beats the released MobileNet by +0.4 Test99 and **+3.4 Test499f**. MobileNet needs the long schedule. HRNet needs it much less (F4 vs D1: +0.3 / +0.2).
+  - **HRNet vs MobileNet at matched settings:** D1 vs M1 = 92.7 vs 74.0 Test99 (−18.7), 91.2 vs 69.0 Test499f (−22.2). F4 vs M2 = 93.0 vs 78.6 (−14.4), 91.4 vs 73.1 (−18.3).
+    The gap is larger on Test500, where poses are more varied. AP50 stays high for MobileNet (≥ 96), so the loss comes from localisation precision
+    (224 input, 56×56 heatmaps vs 384×288 / 96×72), not from missed detections.
+- **Wrap-up (per the pre-registered stop rule):** no change to the final model (**F4 `final_state`**). Nothing new launched. The P100 test job 11619062 is still queued (it only checks that a P100 can run CUDA).
+
+### 2026-11-04 — A/B-track: ensemble, TTA, OHKM, stronger rotation (rules pre-registered before any result)
+- **Asked:** try A1 (model ensemble), A2 (test-time augmentation), B3 (OHKM) and B4 (stronger rotation augmentation).
+- **Code (new files only, so `sync.sh push` from main cannot revert them):**
+  - `tools/eval_ensemble_tta.py` + `slurm/eval_ens.sh`: official eval path.
+    - For each transform (scale, rotation), crop → each model + flip (as in `validate_adaptive`) → warp the heatmaps back to the reference frame → average
+      over transforms and models → the same DARK decoding (`get_final_preds`) → `dataset.evaluate`.
+    - With one model and the identity transform it equals the official eval. Sanity run **A0** must reproduce F4 (Test100 94.0 / Test500f 91.7).
+  - `tools/train_adaptive_model_hrnet_x.py` + `slurm/train_x.sh` + `slurm/submit_x.sh`: stock training script, plus `LOSS.USE_OHKM` used for the
+    *training* pose loss (`JointsOHKMMSELoss`, top-8 of 17 joints). Validation stays plain MSE. `submit_x.sh` uses partitions `gpu,courses-gpu` (V100-SXM2, same GPU type as F4).
+- **Runs** (all on fixed data, final_state, base = F4 = D1 + 100 ep):
+  - **A0** = F4 alone, flip only (sanity check).
+  - **A1** = ensemble {F4, H1, S1, S2}, flip only.
+  - **A2** = F4 alone + TTA: flip × scales {0.9, 1.0, 1.1} × rotations {−30°, 0°, +30°} (9 transforms).
+  - **A3** = A1 + A2 (4 models × 9 transforms).
+  - **B3a / B3b** = F4 + `LOSS.USE_OHKM True` (pair).
+  - **B4a / B4b** = F4 + `DATASET.ROT_FACTOR 60` (default 45; pair; scale aug unchanged, unlike H2).
+- **Metric:** Test499f (Test99 secondary), via `tools/eval_subsets.py`.
+- **Pre-registered rules:**
+  - **A (deterministic, no replicate):** a config is adopted if its Test499f ≥ **91.7** (F4 91.4 + 0.3). If several pass, the highest wins. The final *reported
+    system* then becomes "F4-based ensemble/TTA". Its inference cost (number of forward passes) is reported alongside. If A0 does not reproduce F4 within 0.1,
+    every A result is void until the tool is fixed.
+  - **B (training, pair):** confirmed if the pair mean Test499f is ≥ **91.7** and both runs are ≥ 91.4 (same bar as S1/S2). A confirmed B change replaces F4 as the final
+    *single* model (the better of its pair). It is not combined with A unless the user asks.
+  - Stop and report afterwards. Nothing new without the user.
+- **Job ids:** ENS_A0 t100 11625786 / t500 11625787, A1 11625790 / 11625795, A2 11625799 / 11625800, A3 11625802 / 11625804 (`slurm/eval_ens.sh`).
+  B3a 11625832 → 11625833, 11625835. B3b 11625837 → 11625839, 11625840. B4a 11625841 → 11625842, 11625844. B4b 11625846 → 11625847, 11625859
+  (`PART=courses-gpu slurm/submit_x.sh`: the gpu QOS caps *submitted* jobs at 8 per user and the 8 evals filled it).
+- **A0 sanity check passed:** Test100 93.99 (official F4 94.0), Test500f 91.73 (official 91.7). The tool matches the official eval, so A1–A3 are valid.
+- **Bug, fixed:** `slurm/eval_ens.sh` passed `--rots -30,0,30`, and argparse read `-30,...` as an option flag. A3-t500 (11625804) failed at argument parsing.
+  The other first-round A2/A3 jobs were left to fail on their own (no scancel). The fix is `--rots=...`/`--scales=...`, resubmitted on `gpu-short`:
+  A2 t100 11625924, t500 11625943; A3 t100 11625950, t500 11625953.
+- **Interim (17:50):** A1 (4-model ensemble) Test100 94.2 / Test99 93.2 / Test500f 91.8 / **Test499f 91.5** (F4 91.4) → +0.1, below the 91.7 bar.
+  A2 (F4 + 9-way TTA) Test100 94.4 / Test99 93.4; Test500f pending. B3a and B3b are training; B4a and B4b are queued.
+- **A result (all done 18:05; 3-decimal values from the same rescoring):**
+
+| config | models × transforms | forward passes / person | Test100 | Test99 | Test95 | Test500f | **Test499f** |
+|---|---|---|---|---|---|---|---|
+| F4 = A0 (flip only) | 1 × 1 | 2 | 93.99 | 92.99 | 93.20 | 91.73 | **91.43** |
+| A1 ensemble {F4,H1,S1,S2} | 4 × 1 | 8 | 94.23 | 93.22 | 93.39 | 91.79 | **91.49** |
+| A2 F4 + TTA (s 0.9/1/1.1 × r ±30°/0) | 1 × 9 | 18 | 94.42 | 93.42 | 93.62 | 92.16 | **91.96** |
+| A3 ensemble + TTA | 4 × 9 | 72 | 94.45 | 93.45 | 93.60 | 92.24 | **92.04** |
+
+  - **Rule applied:** A2 (91.96) and A3 (92.04) both pass the 91.7 bar. A1 (+0.06) does not. **Highest wins → A3 is adopted as the final reported
+    system**: Test99 **93.4** / Test499f **92.0**, vs F4 93.0 / 91.4 and vs the released checkpoint 92.6 / 90.7.
+  - **TTA does almost all the work.** On top of TTA, the 4-model ensemble adds only +0.08 Test499f at 4× the cost. A2 (single F4 model, 18 passes) is the practical choice
+    and is within 0.1 of A3. The ensemble members are near-copies (same data, same config family, plateaued), so their errors are correlated. TTA's
+    scale/rotation views see the infant differently, which suits the arbitrary orientations of lying infants.
+  - Caveat: the TTA grid was fixed in advance and not tuned, so it is not selected on the test set. Only the A1–A3 choice among 3 pre-listed configs touches
+    the test set, and the winner clears the bar by 0.3.
+- **B3 (OHKM) result (final_state):**
+
+| run | Test100 | Test99 | Test95 | Test500f | **Test499f** |
+|---|---|---|---|---|---|
+| F4 / H1 | 93.99 / 93.93 | 92.99 / 93.03 | 93.20 / 93.16 | 91.73 / 91.60 | **91.43 / 91.39** |
+| B3a / B3b (OHKM top-8) | 94.00 / 94.14 | 93.01 / 93.14 | 93.20 / 93.25 | 91.51 / 91.17 | **91.40 / 91.06** |
+
+  - **Rule applied:** the pair mean is 91.23, below 91.7, and B3b (91.06) is below 91.4 → **OHKM not confirmed**. It is flat on Test99 (+0.07) and slightly worse on Test500f (−0.3).
+    Mining the 8 hardest joints does not help here: the remaining error sits on a few self-occluded images, not on a fixed set of joints.
+- **B4a / B4b FAILED (19:04, both at once on different nodes):** `RuntimeError: File output/B4x/.../checkpoint.pth cannot be opened`. Cause: the cluster
+  **/home quota is full** (78.9 GB used / 76 GB limit). The big items are 50 `feature.npy` files (28.3 GB; written by `test_adaptive_model.py` on every eval,
+  never used) and 28 resume-only `checkpoint.pth` files (19.6 GB; contain optimizer state, not needed once a run is finished). `/scratch/hou.yuchen` (16 TB quota) is unused.
+  B4 got to epoch 3/1. Nothing was deleted or resubmitted until the user decided.
+- **Cleanup (user approved "删并重跑"):** deleted every `feature.npy` (53 files, 30.2 GB) and every `checkpoint.pth` (28 files, 19.6 GB) under `output*`
+  (queue was empty, so all were finished runs; `final_state.pth` / `model_best.pth` / results json untouched). Removed the broken `output/B4a`, `output/B4b`,
+  `log/B4a`, `log/B4b`. /home usage 78.9 GB → **31.4 GB** (quota updates within a minute).
+- **B4 rerun** (same names, same overrides `TRAIN.END_EPOCH 100 DATASET.ROT_FACTOR 60`, partitions `gpu,courses-gpu`, same rule):
+  B4a 11631221 → 11631227, 11631230. B4b 11631233 → 11631234, 11631235.
+  Both trains sat in PENDING (Priority) because `train_x.sh` pins `--gres=gpu:v100-sxm2:1`. On the user's request ("use hou.yuchen's gpu resource or imani group")
+  they were moved with `scontrol update jobid=… Partition=imanilab Account=m.imani TresPerNode=gres/gpu:a100:1` and started at once on **d3233 (A100 80GB PCIe)**.
+  The 4 evals got `Partition=imanilab,gpu,courses-gpu Account=m.imani`. **Caveat:** F4/H1/B3 trained on V100-SXM2. On A100, PyTorch runs convolutions in TF32
+  by default, so B4 differs from them in GPU type as well as ROT_FACTOR. That is expected to be small next to the ~0.2 run-to-run noise, but note it if B4 lands near the bar.
+- **B4 result** (all 6 jobs COMPLETED; train 61 min each on d3233, best val AP 0.9424 / 0.9417; scored with `tools/eval_subsets.py`, final_state):
+
+| run | Test100 | Test99 | Test95 | Test500f | **Test499f** |
+|---|---|---|---|---|---|
+| F4 / H1 | 93.99 / 93.93 | 92.99 / 93.03 | 93.20 / 93.16 | 91.73 / 91.60 | **91.43 / 91.39** |
+| B4a / B4b (ROT_FACTOR 60, A100) | 93.84 / 93.96 | 92.85 / 92.96 | 93.01 / 93.11 | 91.38 / 91.60 | **91.28 / 91.42** |
+
+  - **Rule applied:** the pair mean is 91.35, below 91.7, and B4a (91.28) is below 91.4 → **stronger rotation not confirmed**. It is flat to −0.1 on every subset.
+    The ±45° default already covers the infant poses, so widening it to ±60° adds no useful variety. Being this far from the bar, the TF32 caveat does not change the verdict.
+  - **A/B track closed.** A3 (ensemble + TTA) stays the final reported system and F4 the final single model. TTA (A2) was the only change that passed the bar; both training-side
+    changes (B3 OHKM, B4 rotation) did nothing. Stopping as pre-registered; nothing new without the user.
+
+### 2026-11-04 — File transfers go through the xfer node
+- **Asked:** copy files between the server and the cluster through `xfer.discovery.neu.edu`, and add this to SKILL.md.
+- **Did:** checked key login (`hou.yuchen@xfer.discovery.neu.edu`, host `xfer-00`, host key added with `accept-new`). It mounts the same `/discovery/home`, so
+  paths are identical. `slurm/sync.sh` now runs every rsync and its helper ssh calls (listing `output*`, writing `.env`) against the xfer node. Slurm commands still use
+  `ssh explorer`. Tested `sync.sh pull`: 14.5 s. Rule added to `SKILL.md` (Hosts table, Sync model, weights copy) and `.claude/skills/use_explorer_cluster/SKILL.md`.
+- **Note:** the main checkout's `slurm/sync.sh` is still the old login-node version until this branch is merged. Until then, run this branch's copy
+  (`bash .claude/worktrees/raw-data-annotation-check-23431c/slurm/sync.sh pull`; it `cd`s to the main checkout anyway).
 ### 2026-11-04: Part 7.1 synthetic generation with SMIL (user downloaded `syn_generation/models/smil.zip`)
 - Delegated to a subagent; I checked the result (figures, json bounds, git staging).
 - **Model conversion:** chumpy pickles → numpy npz through a restricted unpickler, so chumpy isn't needed. Fitting is in float64 with SMIL's own
@@ -417,6 +707,25 @@ accuracy than the paper's numbers (see `STUDENT_GUIDE.md`, Part 7).
   - Synthetic diversity is limited: 174 poses × 3 variants.
 - **Final model unchanged: F4 final_state.** No further runs without the user's go-ahead.
 
+### 2026-11-04: Grading-rubric pass and report draft (`REPORT.md`)
+- **Asked:** organise the existing results against the course rubric (50 pts + 5 bonus), list unfinished items, draft the report.
+- **Did:** rescored every run on Test100/99/95/500f/499f with the annotation branch's `tools/eval_subsets.py` (numbers match the logs). New on
+  this branch: SY1/SY2 on Test99 = 92.4 / 92.3 (F4/H1 93.0), Test499f 91.5 / 91.2. Paired image bootstrap vs the released model
+  (`tools/report_stats_bootstrap.py`, B = 1000): F4 Test99 +0.5 [−0.1, +1.2], Test499f +0.7 [+0.2, +1.3]; A2 (F4 + TTA) +1.0 [+0.2, +1.8] / +1.3 [+0.7, +1.9].
+  Fig. 1 `figures/report/ablation_overview.png` (`tools/plot_report_ablation.py`).
+- **Open:** B4a/B4b still training (A100).
+
+### 2026-11-04: Results and generated data now tracked in git (user: "sync all data with repo, update the path in report as in repo")
+- **Did:** merged `claude/raw-data-annotation-check-23431c` into this branch (`claude/fidip-grading-rubric-86bb65`; AGENT/MANIFEST conflicts resolved by keeping
+  both sides). Changed `.gitignore` so these are tracked, copied from the main checkout as of 2026-11-04 ~22:00:
+  `logs/` (104 Slurm stdout files), `log/` (TensorBoard events, 309 files), `output/`, `output_test500/`, `output_test500f/` (prediction JSONs + train/eval logs, no
+  checkpoints), `figures/` (92 files incl. 10 mp4), `temp_uploads/` (12 CC photos + `SOURCES.md`), `data/syrip_syn_new/` (522 SMIL renders + COCO json). ~227 MB total, largest file 7 MB.
+- **Still not in git (size/licence):** SyRIP images and annotations (`data/syrip`, `data/SyRIP`, raw zips; re-download per MANIFEST §3), the symlink roots built from them
+  (`data/syrip_fixed`, `data/syrip500_fixed`, ...; rebuilt by scripts), all `*.pth` checkpoints, `*.npy`, and the licensed SMIL model.
+- **Sync safety:** `slurm/sync.sh push` already excluded `output*/`, `log/`, `logs/`, `figures/`, `data/` explicitly; added `temp_uploads/` and `REPORT.md`, so a push still
+  cannot overwrite cluster results. `sync.sh pull` now updates tracked files: commit after each pull.
+- REPORT.md figure links point at `figures/...`; the duplicate `docs/report_figures/` copies were removed. B4 logs in the snapshot are partial (run in progress).
+
 ---
 
 ## Dead ends & lessons learned
@@ -428,6 +737,16 @@ _(Record approaches that didn't work and why, so they aren't repeated.)_
   because the login node kills `unzip` for exceeding resource limits.
 - `gdown` has no `--remaining-ok` flag (folder download failed in job 11509124).
 - **A nested `OUTPUT_DIR` must already exist** (`lib/utils/utils.py:27` uses `mkdir()` without parents). `mkdir -p` the parent before `sbatch`.
+- **Val loss below train loss for a whole run is a red flag for label noise**, not just augmentation (E1b: ratio 0.59 with broken labels vs 1.16 with fixed).
+- **One-off rsync of a *tracked* file to the cluster is not durable:** any `slurm/sync.sh push` from the main checkout reverts it, even in the middle of a submit
+  loop (M1/M2 ran as HRNet). Put experimental cluster code in new files, or commit it to main first. sbatch snapshots the batch script, but not the Python it calls.
+- **Negative numbers as CLI values:** `--rots -30,0,30` is parsed as an option by argparse. Always pass list arguments as `--rots=-30,0,30`.
+- **Cluster /home quota is 76 GB.** Every eval writes a ~0.57 GB `feature.npy` and every run leaves a ~0.75 GB `checkpoint.pth`; ~50 evals filled the quota and killed B4a/B4b.
+  Keep bulky outputs on `/scratch/hou.yuchen`, or clean `feature.npy` after evals, and check `quota -s` before a batch.
+  After deleting, the login node can show a removed dir as present for a few seconds (NFS cache): `submit_x.sh` refused once, then worked.
+- **Extra GPUs:** hou.yuchen is in group `ImaniLab` → partition `imanilab` (node d3233, 3× A100 80GB, 14-day limit, account `m.imani`) is usually idle.
+  A pending job can be moved there with `scontrol update jobid=<id> Partition=imanilab Account=m.imani TresPerNode=gres/gpu:a100:1` (needed when the script pins a GPU type).
+- **Copy files through `xfer.discovery.neu.edu`, not the login node** (user rule, 2026-11-04). `slurm/sync.sh` now does this; `pull` took 14.5 s vs minutes before.
 - **Don't trust `syrip_for_train.zip` labels blindly**: its synthetic keypoints are wrong and test11.jpg is swapped. Audit images vs annotations
   (size check, overlay a few, score a trusted model against each label set) before training.
 - **`wandb.util.generate_id` no longer exists** (wandb 0.31) → E3/E4 died at start. Run `tools/wandb_smoke.py` after any W&B code change.

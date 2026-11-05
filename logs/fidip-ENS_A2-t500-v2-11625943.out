@@ -1,0 +1,41 @@
+name, memory.total [MiB]
+Tesla V100-SXM2-32GB, 32768 MiB
+transforms (scale, rot): [(0.9, -30.0), (0.9, 0.0), (0.9, 30.0), (1.0, -30.0), (1.0, 0.0), (1.0, 30.0), (1.1, -30.0), (1.1, 0.0), (1.1, 30.0)]
+loaded output/F4/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/final_state.pth
+loading annotations into memory...
+Done (t=0.03s)
+creating index...
+index created!
+0/500
+50/500
+100/500
+150/500
+200/500
+250/500
+300/500
+350/500
+400/500
+450/500
+/home/hou.yuchen/courses/eece7373/envs/fidip/lib/python3.12/site-packages/json_tricks/encoders.py:419: UserWarning: json-tricks: numpy scalar serialization is experimental and may work differently in future versions
+  warnings.warn('json-tricks: numpy scalar serialization is experimental and may work differently in future versions')
+Loading and preparing results...
+DONE (t=0.02s)
+creating index...
+index created!
+Running per image evaluation...
+Evaluate annotation type *keypoints*
+DONE (t=0.21s).
+Accumulating evaluation results...
+DONE (t=0.01s).
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets= 20 ] = 0.922
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets= 20 ] = 0.988
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets= 20 ] = 0.967
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets= 20 ] = -1.000
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets= 20 ] = 0.922
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 20 ] = 0.935
+ Average Recall     (AR) @[ IoU=0.50      | area=   all | maxDets= 20 ] = 0.994
+ Average Recall     (AR) @[ IoU=0.75      | area=   all | maxDets= 20 ] = 0.976
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets= 20 ] = -1.000
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets= 20 ] = 0.935
+AP 0.9216444441181626
+OrderedDict({'AP': 0.9216444441181626, 'Ap .5': 0.9875592769697814, 'AP .75': 0.9669391626280418, 'AP (M)': -1.0, 'AP (L)': 0.9216444441181626, 'AR': 0.9345999999999999, 'AR .5': 0.994, 'AR .75': 0.976, 'AR (M)': -1.0, 'AR (L)': 0.9345999999999999})

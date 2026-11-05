@@ -1,0 +1,3 @@
+name, memory.total [MiB]
+Tesla P100-PCIE-12GB, 12288 MiB
+cuda ok Tesla P100-PCIE-12GB True

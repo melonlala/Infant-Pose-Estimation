@@ -1,0 +1,943 @@
+name, memory.total [MiB]
+Tesla V100-SXM2-32GB, 32768 MiB
+Namespace(cfg='experiments/coco/hrnet/w48_384x288_adam_lr1e-3_infant.yaml', opts=['TRAIN.CHECKPOINT', 'models/coco/w48_384x288.pth', 'WORKERS', '8', 'OUTPUT_DIR', 'output/E2', 'LOG_DIR', 'log/E2', 'TRAIN.LAMBDA', '0.0005', 'TRAIN.PRE_EPOCH', '1'], modelDir='', logDir='', dataDir='', prevModelDir='')
+AUTO_RESUME: True
+CUDNN:
+  BENCHMARK: True
+  DETERMINISTIC: False
+  ENABLED: True
+DATASET:
+  COLOR_RGB: True
+  DATASET: syrip
+  DATA_FORMAT: jpg
+  FLIP: True
+  HYBRID_JOINTS_TYPE: 
+  NUM_JOINTS_HALF_BODY: 8
+  PROB_HALF_BODY: 0.3
+  ROOT: data/syrip/
+  ROT_FACTOR: 45
+  SCALE_FACTOR: 0.35
+  SELECT_DATA: False
+  TEST_SET: validate_infant
+  TRAIN_PRE_SET: train_pre_infant
+  TRAIN_SET: train_infant
+DATA_DIR: 
+DEBUG:
+  DEBUG: True
+  SAVE_BATCH_IMAGES_GT: True
+  SAVE_BATCH_IMAGES_PRED: True
+  SAVE_HEATMAPS_GT: True
+  SAVE_HEATMAPS_PRED: True
+GPUS: (0,)
+LOG_DIR: log/E2
+LOSS:
+  TOPK: 8
+  USE_DIFFERENT_JOINTS_WEIGHT: False
+  USE_OHKM: False
+  USE_TARGET_WEIGHT: True
+MODEL:
+  EXTRA:
+    FINAL_CONV_KERNEL: 1
+    PRETRAINED_LAYERS: ['conv1', 'bn1', 'conv2', 'bn2', 'layer1', 'transition1', 'stage2', 'transition2', 'stage3', 'transition3', 'stage4']
+    STAGE2:
+      BLOCK: BASIC
+      FUSE_METHOD: SUM
+      NUM_BLOCKS: [4, 4]
+      NUM_BRANCHES: 2
+      NUM_CHANNELS: [48, 96]
+      NUM_MODULES: 1
+    STAGE3:
+      BLOCK: BASIC
+      FUSE_METHOD: SUM
+      NUM_BLOCKS: [4, 4, 4]
+      NUM_BRANCHES: 3
+      NUM_CHANNELS: [48, 96, 192]
+      NUM_MODULES: 4
+    STAGE4:
+      BLOCK: BASIC
+      FUSE_METHOD: SUM
+      NUM_BLOCKS: [4, 4, 4, 4]
+      NUM_BRANCHES: 4
+      NUM_CHANNELS: [48, 96, 192, 384]
+      NUM_MODULES: 3
+  HEATMAP_SIZE: [72, 96]
+  IMAGE_SIZE: [288, 384]
+  INIT_WEIGHTS: True
+  NAME: adaptive_pose_hrnet
+  NUM_JOINTS: 17
+  PRETRAINED: 
+  SIGMA: 3
+  TAG_PER_JOINT: True
+  TARGET_TYPE: gaussian
+OUTPUT_DIR: output/E2
+PIN_MEMORY: True
+PRINT_FREQ: 20
+RANK: 0
+TEST:
+  BATCH_SIZE_PER_GPU: 16
+  BBOX_THRE: 1.0
+  BLUR_KERNEL: 11
+  COCO_BBOX_FILE: data/coco/person_detection_results/COCO_val2017_detections_AP_H_56_person.json
+  FLIP_TEST: True
+  IMAGE_THRE: 0.0
+  IN_VIS_THRE: 0.2
+  MODEL_FILE: models/coco/w48_384×288.pth
+  NMS_THRE: 1.0
+  OKS_THRE: 0.9
+  POST_PROCESS: True
+  SOFT_NMS: False
+  USE_GT_BBOX: True
+TRAIN:
+  BATCH_SIZE_PER_GPU: 20
+  BEGIN_EPOCH: 0
+  CHECKPOINT: models/coco/w48_384x288.pth
+  END_EPOCH: 20
+  GAMMA1: 0.99
+  GAMMA2: 0.0
+  LAMBDA: 0.0005
+  LR: 0.0001
+  LR_FACTOR: 0.1
+  LR_STEP: [40, 200]
+  MOMENTUM: 0.9
+  NESTEROV: False
+  OPTIMIZER: adam
+  PRE_BATCH_SIZE_PER_GPU: 16
+  PRE_EPOCH: 1
+  RESUME: False
+  SHUFFLE: True
+  WD: 0.0001
+WORKERS: 8
+=> init weights from normal distribution
+=> loading model from models/coco/w48_384x288.pth
+
+Total Parameters: 63,595,745
+----------------------------------------------------------------------------------------------------------------------------------
+Total Multiply Adds (For Convolution and Linear Layers only): 32.881839752197266 GFLOPs
+----------------------------------------------------------------------------------------------------------------------------------
+Number of Layers
+Conv2d : 293 layers   BatchNorm2d : 292 layers   ReLU : 261 layers   Bottleneck : 4 layers   BasicBlock : 104 layers   Upsample : 28 layers   HighResolutionModule : 8 layers   
+=> classes: ['__background__', 'person']
+=> num_images: 4057
+=> load 3904 samples
+=> classes: ['__background__', 'person']
+=> num_images: 1200
+=> load 1200 samples
+=> classes: ['__background__', 'person']
+=> num_images: 100
+=> load 100 samples
+=> creating output/E2
+=> creating output/E2/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant
+=> creating log/E2/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant_2026-11-03-20-13
+loading annotations into memory...
+Done (t=0.06s)
+creating index...
+index created!
+loading annotations into memory...
+Done (t=0.02s)
+creating index...
+index created!
+loading annotations into memory...
+Done (t=0.00s)
+creating index...
+index created!
+Pretrained Stage:
+Start to train Domain Classifier-------
+Epoch: [0][0/244]	Accuracy_d: 0.5 (0.5)	Loss_d: 0.69303 (0.69303)
+Epoch: [0][20/244]	Accuracy_d: 1.0 (0.7976190476190477)	Loss_d: 0.31017 (0.50277)
+Epoch: [0][40/244]	Accuracy_d: 1.0 (0.8429878048780488)	Loss_d: 0.27584 (0.44099)
+Epoch: [0][60/244]	Accuracy_d: 0.875 (0.8534836065573771)	Loss_d: 0.36880 (0.41311)
+Epoch: [0][80/244]	Accuracy_d: 0.9375 (0.8672839506172839)	Loss_d: 0.28523 (0.38902)
+Epoch: [0][100/244]	Accuracy_d: 0.9375 (0.8725247524752475)	Loss_d: 0.24862 (0.37818)
+Epoch: [0][120/244]	Accuracy_d: 1.0 (0.8796487603305785)	Loss_d: 0.20732 (0.36401)
+Epoch: [0][140/244]	Accuracy_d: 0.9375 (0.8856382978723404)	Loss_d: 0.21957 (0.35399)
+Epoch: [0][160/244]	Accuracy_d: 0.9375 (0.8831521739130435)	Loss_d: 0.26642 (0.35028)
+Epoch: [0][180/244]	Accuracy_d: 1.0 (0.8836325966850829)	Loss_d: 0.20221 (0.34883)
+Epoch: [0][200/244]	Accuracy_d: 0.875 (0.884639303482587)	Loss_d: 0.27983 (0.34240)
+Epoch: [0][220/244]	Accuracy_d: 0.9375 (0.8846153846153846)	Loss_d: 0.27200 (0.34002)
+Epoch: [0][240/244]	Accuracy_d: 0.9375 (0.8848547717842323)	Loss_d: 0.32966 (0.33658)
+/home/hou.yuchen/courses/eece7373/envs/fidip/lib/python3.12/site-packages/torch/optim/lr_scheduler.py:143: UserWarning: Detected call of `lr_scheduler.step()` before `optimizer.step()`. In PyTorch 1.1.0 and later, you should call them in the opposite order: `optimizer.step()` before `lr_scheduler.step()`.  Failure to do this will result in PyTorch skipping the first value of the learning rate schedule. See more details at https://pytorch.org/docs/stable/optim.html#how-to-adjust-learning-rate
+  warnings.warn("Detected call of `lr_scheduler.step()` before `optimizer.step()`. "
+Training Stage (Step I and II):
+100
+Epoch: [0][0/100]	Accuracy_d 0.55 (0.8840468909276249)	Loss_d_2 0.8954267501831055	Time 2.661s (2.661s)	Data 0.797s (0.797s)	Loss_p 0.00082 (0.00082)	Loss_d 0.97726 (0.33822)	Accuracy_p 0.474 (0.474)
+Epoch: [0][20/100]	Accuracy_d 0.85 (0.8540703052728955)	Loss_d_2 0.4765414893627167	Time 0.395s (0.533s)	Data 0.000s (0.067s)	Loss_p 0.00084 (0.00069)	Loss_d 0.50211 (0.39033)	Accuracy_p 0.472 (0.512)
+Epoch: [0][40/100]	Accuracy_d 0.7 (0.8488569009314141)	Loss_d_2 0.5044147372245789	Time 0.395s (0.480s)	Data 0.000s (0.048s)	Loss_p 0.00080 (0.00077)	Loss_d 0.51358 (0.39734)	Accuracy_p 0.468 (0.510)
+Epoch: [0][60/100]	Accuracy_d 1.0 (0.8462138953942233)	Loss_d_2 0.23376043140888214	Time 0.397s (0.461s)	Data 0.000s (0.042s)	Loss_p 0.00092 (0.00080)	Loss_d 0.23553 (0.40031)	Accuracy_p 0.566 (0.518)
+Epoch: [0][80/100]	Accuracy_d 0.8 (0.8482983345401882)	Loss_d_2 0.3132696747779846	Time 0.395s (0.451s)	Data 0.000s (0.038s)	Loss_p 0.00083 (0.00081)	Loss_d 0.32263 (0.39525)	Accuracy_p 0.521 (0.517)
+Test: [0/7]	Time 0.847 (0.847)	Loss 0.0006 (0.0006)	Accuracy 0.857 (0.857)
+=> writing results json to output/E2/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/results/keypoints_validate_infant_results_0.json
+/home/hou.yuchen/courses/eece7373/envs/fidip/lib/python3.12/site-packages/json_tricks/encoders.py:419: UserWarning: json-tricks: numpy scalar serialization is experimental and may work differently in future versions
+  warnings.warn('json-tricks: numpy scalar serialization is experimental and may work differently in future versions')
+| Arch | AP | Ap .5 | AP .75 | AP (M) | AP (L) | AR | AR .5 | AR .75 | AR (M) | AR (L) |
+|---|---|---|---|---|---|---|---|---|---|---|
+| adaptive... | 0.883 | 0.969 | 0.969 | -1.000 | 0.883 | 0.903 | 0.980 | 0.980 | -1.000 | 0.903 |
+=> epoch 0 val AP 0.8829 (best 0.8829), peak GPU mem 17.21 GiB
+=> saving checkpoint to output/E2/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant
+batch
+batch
+batch
+batch
+batch
+batch
+batch
+Loading and preparing results...
+DONE (t=0.01s)
+creating index...
+index created!
+Running per image evaluation...
+Evaluate annotation type *keypoints*
+DONE (t=0.02s).
+Accumulating evaluation results...
+DONE (t=0.00s).
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets= 20 ] = 0.883
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets= 20 ] = 0.969
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets= 20 ] = 0.969
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets= 20 ] = -1.000
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets= 20 ] = 0.883
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 20 ] = 0.903
+ Average Recall     (AR) @[ IoU=0.50      | area=   all | maxDets= 20 ] = 0.980
+ Average Recall     (AR) @[ IoU=0.75      | area=   all | maxDets= 20 ] = 0.980
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets= 20 ] = -1.000
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets= 20 ] = 0.903
+100
+Epoch: [1][0/100]	Accuracy_d 1.0 (0.8863404689092762)	Loss_d_2 0.1923038810491562	Time 1.167s (1.167s)	Data 0.735s (0.735s)	Loss_p 0.00093 (0.00082)	Loss_d 0.19495 (0.38563)	Accuracy_p 0.515 (0.517)
+Epoch: [1][20/100]	Accuracy_d 0.9 (0.8857539315448658)	Loss_d_2 0.36013850569725037	Time 0.394s (0.460s)	Data 0.000s (0.064s)	Loss_p 0.00084 (0.00082)	Loss_d 0.37017 (0.38296)	Accuracy_p 0.473 (0.521)
+Epoch: [1][40/100]	Accuracy_d 0.95 (0.8837849280270956)	Loss_d_2 0.23232851922512054	Time 0.395s (0.442s)	Data 0.000s (0.047s)	Loss_p 0.00090 (0.00082)	Loss_d 0.23672 (0.38036)	Accuracy_p 0.554 (0.522)
+Epoch: [1][60/100]	Accuracy_d 0.95 (0.8791959406713505)	Loss_d_2 0.1886807233095169	Time 0.395s (0.436s)	Data 0.000s (0.040s)	Loss_p 0.00075 (0.00081)	Loss_d 0.18910 (0.38350)	Accuracy_p 0.537 (0.522)
+Epoch: [1][80/100]	Accuracy_d 1.0 (0.8812454742939899)	Loss_d_2 0.16448034346103668	Time 0.396s (0.433s)	Data 0.000s (0.037s)	Loss_p 0.00085 (0.00081)	Loss_d 0.16662 (0.37829)	Accuracy_p 0.549 (0.523)
+Test: [0/7]	Time 0.844 (0.844)	Loss 0.0005 (0.0005)	Accuracy 0.864 (0.864)
+=> writing results json to output/E2/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/results/keypoints_validate_infant_results_0.json
+| Arch | AP | Ap .5 | AP .75 | AP (M) | AP (L) | AR | AR .5 | AR .75 | AR (M) | AR (L) |
+|---|---|---|---|---|---|---|---|---|---|---|
+| adaptive... | 0.893 | 0.970 | 0.970 | -1.000 | 0.893 | 0.912 | 0.980 | 0.980 | -1.000 | 0.912 |
+=> epoch 1 val AP 0.8926 (best 0.8926), peak GPU mem 17.21 GiB
+=> saving checkpoint to output/E2/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant
+batch
+batch
+batch
+batch
+batch
+batch
+batch
+Loading and preparing results...
+DONE (t=0.00s)
+creating index...
+index created!
+Running per image evaluation...
+Evaluate annotation type *keypoints*
+DONE (t=0.02s).
+Accumulating evaluation results...
+DONE (t=0.00s).
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets= 20 ] = 0.893
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets= 20 ] = 0.970
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets= 20 ] = 0.970
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets= 20 ] = -1.000
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets= 20 ] = 0.893
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 20 ] = 0.912
+ Average Recall     (AR) @[ IoU=0.50      | area=   all | maxDets= 20 ] = 0.980
+ Average Recall     (AR) @[ IoU=0.75      | area=   all | maxDets= 20 ] = 0.980
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets= 20 ] = -1.000
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets= 20 ] = 0.912
+100
+Epoch: [2][0/100]	Accuracy_d 0.9 (0.8858307849133538)	Loss_d_2 0.2425374537706375	Time 1.107s (1.107s)	Data 0.679s (0.679s)	Loss_p 0.00082 (0.00081)	Loss_d 0.24558 (0.37099)	Accuracy_p 0.539 (0.524)
+Epoch: [2][20/100]	Accuracy_d 0.9 (0.8871415356151712)	Loss_d_2 0.2627788782119751	Time 0.394s (0.458s)	Data 0.000s (0.062s)	Loss_p 0.00073 (0.00081)	Loss_d 0.26847 (0.36704)	Accuracy_p 0.530 (0.527)
+Epoch: [2][40/100]	Accuracy_d 1.0 (0.88653683319221)	Loss_d_2 0.14703750610351562	Time 0.395s (0.441s)	Data 0.000s (0.046s)	Loss_p 0.00082 (0.00081)	Loss_d 0.14876 (0.36365)	Accuracy_p 0.560 (0.529)
+Epoch: [2][60/100]	Accuracy_d 0.9 (0.8844652615144418)	Loss_d_2 0.3114001154899597	Time 0.394s (0.435s)	Data 0.000s (0.040s)	Loss_p 0.00063 (0.00081)	Loss_d 0.31742 (0.36200)	Accuracy_p 0.622 (0.531)
+Epoch: [2][80/100]	Accuracy_d 1.0 (0.8874004344677769)	Loss_d_2 0.16020940244197845	Time 0.396s (0.432s)	Data 0.000s (0.037s)	Loss_p 0.00074 (0.00080)	Loss_d 0.16303 (0.35692)	Accuracy_p 0.585 (0.533)
+Test: [0/7]	Time 0.837 (0.837)	Loss 0.0005 (0.0005)	Accuracy 0.864 (0.864)
+=> writing results json to output/E2/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/results/keypoints_validate_infant_results_0.json
+| Arch | AP | Ap .5 | AP .75 | AP (M) | AP (L) | AR | AR .5 | AR .75 | AR (M) | AR (L) |
+|---|---|---|---|---|---|---|---|---|---|---|
+| adaptive... | 0.895 | 0.969 | 0.969 | -1.000 | 0.895 | 0.917 | 0.980 | 0.980 | -1.000 | 0.917 |
+=> epoch 2 val AP 0.8953 (best 0.8953), peak GPU mem 17.21 GiB
+=> saving checkpoint to output/E2/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant
+batch
+batch
+batch
+batch
+batch
+batch
+batch
+Loading and preparing results...
+DONE (t=0.00s)
+creating index...
+index created!
+Running per image evaluation...
+Evaluate annotation type *keypoints*
+DONE (t=0.02s).
+Accumulating evaluation results...
+DONE (t=0.00s).
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets= 20 ] = 0.895
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets= 20 ] = 0.969
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets= 20 ] = 0.969
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets= 20 ] = -1.000
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets= 20 ] = 0.895
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 20 ] = 0.917
+ Average Recall     (AR) @[ IoU=0.50      | area=   all | maxDets= 20 ] = 0.980
+ Average Recall     (AR) @[ IoU=0.75      | area=   all | maxDets= 20 ] = 0.980
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets= 20 ] = -1.000
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets= 20 ] = 0.917
+100
+Epoch: [3][0/100]	Accuracy_d 1.0 (0.8863404689092762)	Loss_d_2 0.17604321241378784	Time 1.123s (1.123s)	Data 0.691s (0.691s)	Loss_p 0.00085 (0.00080)	Loss_d 0.17984 (0.35105)	Accuracy_p 0.522 (0.534)
+Epoch: [3][20/100]	Accuracy_d 0.95 (0.8866790009250693)	Loss_d_2 0.20818638801574707	Time 0.399s (0.460s)	Data 0.001s (0.062s)	Loss_p 0.00074 (0.00080)	Loss_d 0.21092 (0.34859)	Accuracy_p 0.530 (0.536)
+Epoch: [3][40/100]	Accuracy_d 0.9 (0.8869602032176122)	Loss_d_2 0.22789494693279266	Time 0.395s (0.443s)	Data 0.000s (0.047s)	Loss_p 0.00077 (0.00080)	Loss_d 0.23266 (0.34625)	Accuracy_p 0.576 (0.537)
+Epoch: [3][60/100]	Accuracy_d 0.9 (0.8842701014832163)	Loss_d_2 0.2921244502067566	Time 0.394s (0.437s)	Data 0.000s (0.041s)	Loss_p 0.00079 (0.00080)	Loss_d 0.29676 (0.34618)	Accuracy_p 0.494 (0.538)
+Epoch: [3][80/100]	Accuracy_d 1.0 (0.8870383779869659)	Loss_d_2 0.15021443367004395	Time 0.395s (0.433s)	Data 0.000s (0.037s)	Loss_p 0.00068 (0.00080)	Loss_d 0.15314 (0.34256)	Accuracy_p 0.605 (0.540)
+Test: [0/7]	Time 0.840 (0.840)	Loss 0.0005 (0.0005)	Accuracy 0.864 (0.864)
+=> writing results json to output/E2/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/results/keypoints_validate_infant_results_0.json
+| Arch | AP | Ap .5 | AP .75 | AP (M) | AP (L) | AR | AR .5 | AR .75 | AR (M) | AR (L) |
+|---|---|---|---|---|---|---|---|---|---|---|
+| adaptive... | 0.897 | 0.968 | 0.968 | -1.000 | 0.897 | 0.919 | 0.980 | 0.980 | -1.000 | 0.919 |
+=> epoch 3 val AP 0.8968 (best 0.8968), peak GPU mem 17.21 GiB
+=> saving checkpoint to output/E2/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant
+batch
+batch
+batch
+batch
+batch
+batch
+batch
+Loading and preparing results...
+DONE (t=0.00s)
+creating index...
+index created!
+Running per image evaluation...
+Evaluate annotation type *keypoints*
+DONE (t=0.02s).
+Accumulating evaluation results...
+DONE (t=0.00s).
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets= 20 ] = 0.897
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets= 20 ] = 0.968
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets= 20 ] = 0.968
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets= 20 ] = -1.000
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets= 20 ] = 0.897
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 20 ] = 0.919
+ Average Recall     (AR) @[ IoU=0.50      | area=   all | maxDets= 20 ] = 0.980
+ Average Recall     (AR) @[ IoU=0.75      | area=   all | maxDets= 20 ] = 0.980
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets= 20 ] = -1.000
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets= 20 ] = 0.919
+100
+Epoch: [4][0/100]	Accuracy_d 0.9 (0.8858307849133538)	Loss_d_2 0.22064243257045746	Time 1.123s (1.123s)	Data 0.692s (0.692s)	Loss_p 0.00071 (0.00079)	Loss_d 0.22646 (0.33666)	Accuracy_p 0.574 (0.541)
+Epoch: [4][20/100]	Accuracy_d 0.85 (0.8876040703052729)	Loss_d_2 0.2729184627532959	Time 0.397s (0.460s)	Data 0.000s (0.062s)	Loss_p 0.00075 (0.00079)	Loss_d 0.27822 (0.33390)	Accuracy_p 0.563 (0.544)
+Epoch: [4][40/100]	Accuracy_d 1.0 (0.8875952582557155)	Loss_d_2 0.13831961154937744	Time 0.398s (0.445s)	Data 0.000s (0.047s)	Loss_p 0.00079 (0.00079)	Loss_d 0.14174 (0.33208)	Accuracy_p 0.587 (0.545)
+Epoch: [4][60/100]	Accuracy_d 0.85 (0.8871975019516003)	Loss_d_2 0.2368481457233429	Time 0.397s (0.440s)	Data 0.000s (0.042s)	Loss_p 0.00069 (0.00079)	Loss_d 0.24446 (0.33038)	Accuracy_p 0.579 (0.546)
+Epoch: [4][80/100]	Accuracy_d 1.0 (0.8906589427950761)	Loss_d_2 0.10237102955579758	Time 0.398s (0.436s)	Data 0.000s (0.038s)	Loss_p 0.00074 (0.00079)	Loss_d 0.10282 (0.32671)	Accuracy_p 0.590 (0.548)
+Test: [0/7]	Time 0.837 (0.837)	Loss 0.0005 (0.0005)	Accuracy 0.868 (0.868)
+=> writing results json to output/E2/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/results/keypoints_validate_infant_results_0.json
+| Arch | AP | Ap .5 | AP .75 | AP (M) | AP (L) | AR | AR .5 | AR .75 | AR (M) | AR (L) |
+|---|---|---|---|---|---|---|---|---|---|---|
+| adaptive... | 0.902 | 0.968 | 0.968 | -1.000 | 0.902 | 0.922 | 0.980 | 0.980 | -1.000 | 0.922 |
+=> epoch 4 val AP 0.9017 (best 0.9017), peak GPU mem 17.21 GiB
+=> saving checkpoint to output/E2/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant
+batch
+batch
+batch
+batch
+batch
+batch
+batch
+Loading and preparing results...
+DONE (t=0.00s)
+creating index...
+index created!
+Running per image evaluation...
+Evaluate annotation type *keypoints*
+DONE (t=0.02s).
+Accumulating evaluation results...
+DONE (t=0.00s).
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets= 20 ] = 0.902
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets= 20 ] = 0.968
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets= 20 ] = 0.968
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets= 20 ] = -1.000
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets= 20 ] = 0.902
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 20 ] = 0.922
+ Average Recall     (AR) @[ IoU=0.50      | area=   all | maxDets= 20 ] = 0.980
+ Average Recall     (AR) @[ IoU=0.75      | area=   all | maxDets= 20 ] = 0.980
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets= 20 ] = -1.000
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets= 20 ] = 0.922
+100
+Epoch: [5][0/100]	Accuracy_d 0.9 (0.8858307849133538)	Loss_d_2 0.2163667231798172	Time 1.092s (1.092s)	Data 0.670s (0.670s)	Loss_p 0.00070 (0.00079)	Loss_d 0.22256 (0.32244)	Accuracy_p 0.572 (0.549)
+Epoch: [5][20/100]	Accuracy_d 1.0 (0.8896854764107308)	Loss_d_2 0.15354123711585999	Time 0.394s (0.455s)	Data 0.000s (0.060s)	Loss_p 0.00081 (0.00078)	Loss_d 0.16037 (0.31971)	Accuracy_p 0.539 (0.550)
+Epoch: [5][40/100]	Accuracy_d 1.0 (0.8918289585097375)	Loss_d_2 0.1256905347108841	Time 0.397s (0.440s)	Data 0.000s (0.044s)	Loss_p 0.00077 (0.00078)	Loss_d 0.12982 (0.31686)	Accuracy_p 0.597 (0.552)
+Epoch: [5][60/100]	Accuracy_d 0.9 (0.8916861826697893)	Loss_d_2 0.17393361032009125	Time 0.395s (0.435s)	Data 0.000s (0.039s)	Loss_p 0.00064 (0.00078)	Loss_d 0.17743 (0.31613)	Accuracy_p 0.601 (0.553)
+Epoch: [5][80/100]	Accuracy_d 0.95 (0.8948225923244026)	Loss_d_2 0.14493131637573242	Time 0.395s (0.432s)	Data 0.000s (0.036s)	Loss_p 0.00071 (0.00078)	Loss_d 0.14854 (0.31305)	Accuracy_p 0.578 (0.554)
+Test: [0/7]	Time 0.851 (0.851)	Loss 0.0005 (0.0005)	Accuracy 0.864 (0.864)
+=> writing results json to output/E2/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/results/keypoints_validate_infant_results_0.json
+| Arch | AP | Ap .5 | AP .75 | AP (M) | AP (L) | AR | AR .5 | AR .75 | AR (M) | AR (L) |
+|---|---|---|---|---|---|---|---|---|---|---|
+| adaptive... | 0.908 | 0.968 | 0.968 | -1.000 | 0.908 | 0.928 | 0.980 | 0.980 | -1.000 | 0.928 |
+=> epoch 5 val AP 0.9083 (best 0.9083), peak GPU mem 17.21 GiB
+=> saving checkpoint to output/E2/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant
+batch
+batch
+batch
+batch
+batch
+batch
+batch
+Loading and preparing results...
+DONE (t=0.00s)
+creating index...
+index created!
+Running per image evaluation...
+Evaluate annotation type *keypoints*
+DONE (t=0.02s).
+Accumulating evaluation results...
+DONE (t=0.00s).
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets= 20 ] = 0.908
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets= 20 ] = 0.968
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets= 20 ] = 0.968
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets= 20 ] = -1.000
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets= 20 ] = 0.908
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 20 ] = 0.928
+ Average Recall     (AR) @[ IoU=0.50      | area=   all | maxDets= 20 ] = 0.980
+ Average Recall     (AR) @[ IoU=0.75      | area=   all | maxDets= 20 ] = 0.980
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets= 20 ] = -1.000
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets= 20 ] = 0.928
+100
+Epoch: [6][0/100]	Accuracy_d 1.0 (0.8863404689092762)	Loss_d_2 0.10838162899017334	Time 1.150s (1.150s)	Data 0.727s (0.727s)	Loss_p 0.00077 (0.00078)	Loss_d 0.10989 (0.31002)	Accuracy_p 0.622 (0.555)
+Epoch: [6][20/100]	Accuracy_d 0.9 (0.8892229417206291)	Loss_d_2 0.18144939839839935	Time 0.394s (0.460s)	Data 0.000s (0.064s)	Loss_p 0.00081 (0.00078)	Loss_d 0.18906 (0.30791)	Accuracy_p 0.551 (0.556)
+Epoch: [6][40/100]	Accuracy_d 1.0 (0.8916172734970365)	Loss_d_2 0.13440373539924622	Time 0.395s (0.443s)	Data 0.000s (0.048s)	Loss_p 0.00070 (0.00077)	Loss_d 0.13595 (0.30622)	Accuracy_p 0.642 (0.558)
+Epoch: [6][60/100]	Accuracy_d 0.9 (0.892271662763466)	Loss_d_2 0.1969572752714157	Time 0.394s (0.437s)	Data 0.000s (0.042s)	Loss_p 0.00065 (0.00077)	Loss_d 0.20347 (0.30529)	Accuracy_p 0.618 (0.558)
+Epoch: [6][80/100]	Accuracy_d 1.0 (0.8942795076031861)	Loss_d_2 0.09301163256168365	Time 0.397s (0.433s)	Data 0.000s (0.038s)	Loss_p 0.00078 (0.00077)	Loss_d 0.09538 (0.30337)	Accuracy_p 0.631 (0.559)
+Test: [0/7]	Time 0.850 (0.850)	Loss 0.0005 (0.0005)	Accuracy 0.871 (0.871)
+=> writing results json to output/E2/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/results/keypoints_validate_infant_results_0.json
+| Arch | AP | Ap .5 | AP .75 | AP (M) | AP (L) | AR | AR .5 | AR .75 | AR (M) | AR (L) |
+|---|---|---|---|---|---|---|---|---|---|---|
+| adaptive... | 0.908 | 0.968 | 0.968 | -1.000 | 0.908 | 0.928 | 0.980 | 0.980 | -1.000 | 0.928 |
+=> epoch 6 val AP 0.9080 (best 0.9083), peak GPU mem 17.21 GiB
+=> saving checkpoint to output/E2/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant
+batch
+batch
+batch
+batch
+batch
+batch
+batch
+Loading and preparing results...
+DONE (t=0.00s)
+creating index...
+index created!
+Running per image evaluation...
+Evaluate annotation type *keypoints*
+DONE (t=0.02s).
+Accumulating evaluation results...
+DONE (t=0.00s).
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets= 20 ] = 0.908
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets= 20 ] = 0.968
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets= 20 ] = 0.968
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets= 20 ] = -1.000
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets= 20 ] = 0.908
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 20 ] = 0.928
+ Average Recall     (AR) @[ IoU=0.50      | area=   all | maxDets= 20 ] = 0.980
+ Average Recall     (AR) @[ IoU=0.75      | area=   all | maxDets= 20 ] = 0.980
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets= 20 ] = -1.000
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets= 20 ] = 0.928
+100
+Epoch: [7][0/100]	Accuracy_d 0.95 (0.886085626911315)	Loss_d_2 0.10763338953256607	Time 1.099s (1.099s)	Data 0.664s (0.664s)	Loss_p 0.00077 (0.00077)	Loss_d 0.10955 (0.30063)	Accuracy_p 0.629 (0.561)
+Epoch: [7][20/100]	Accuracy_d 0.85 (0.8876040703052729)	Loss_d_2 0.2782524824142456	Time 0.394s (0.461s)	Data 0.000s (0.064s)	Loss_p 0.00070 (0.00077)	Loss_d 0.30553 (0.29946)	Accuracy_p 0.542 (0.562)
+Epoch: [7][40/100]	Accuracy_d 0.85 (0.8882303132938189)	Loss_d_2 0.281027227640152	Time 0.394s (0.441s)	Data 0.000s (0.046s)	Loss_p 0.00068 (0.00077)	Loss_d 0.29557 (0.29833)	Accuracy_p 0.620 (0.563)
+Epoch: [7][60/100]	Accuracy_d 0.85 (0.8875878220140515)	Loss_d_2 0.3556238114833832	Time 0.395s (0.435s)	Data 0.000s (0.039s)	Loss_p 0.00068 (0.00077)	Loss_d 0.36362 (0.29858)	Accuracy_p 0.608 (0.564)
+Epoch: [7][80/100]	Accuracy_d 0.95 (0.8893917451122375)	Loss_d_2 0.12993575632572174	Time 0.395s (0.432s)	Data 0.000s (0.037s)	Loss_p 0.00060 (0.00076)	Loss_d 0.13369 (0.29715)	Accuracy_p 0.671 (0.565)
+Test: [0/7]	Time 0.829 (0.829)	Loss 0.0005 (0.0005)	Accuracy 0.871 (0.871)
+=> writing results json to output/E2/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/results/keypoints_validate_infant_results_0.json
+| Arch | AP | Ap .5 | AP .75 | AP (M) | AP (L) | AR | AR .5 | AR .75 | AR (M) | AR (L) |
+|---|---|---|---|---|---|---|---|---|---|---|
+| adaptive... | 0.908 | 0.969 | 0.969 | -1.000 | 0.908 | 0.928 | 0.980 | 0.980 | -1.000 | 0.928 |
+=> epoch 7 val AP 0.9083 (best 0.9083), peak GPU mem 17.21 GiB
+=> saving checkpoint to output/E2/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant
+batch
+batch
+batch
+batch
+batch
+batch
+batch
+Loading and preparing results...
+DONE (t=0.01s)
+creating index...
+index created!
+Running per image evaluation...
+Evaluate annotation type *keypoints*
+DONE (t=0.02s).
+Accumulating evaluation results...
+DONE (t=0.00s).
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets= 20 ] = 0.908
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets= 20 ] = 0.969
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets= 20 ] = 0.969
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets= 20 ] = -1.000
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets= 20 ] = 0.908
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 20 ] = 0.928
+ Average Recall     (AR) @[ IoU=0.50      | area=   all | maxDets= 20 ] = 0.980
+ Average Recall     (AR) @[ IoU=0.75      | area=   all | maxDets= 20 ] = 0.980
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets= 20 ] = -1.000
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets= 20 ] = 0.928
+100
+Epoch: [8][0/100]	Accuracy_d 0.9 (0.8858307849133538)	Loss_d_2 0.2353144735097885	Time 1.184s (1.184s)	Data 0.756s (0.756s)	Loss_p 0.00076 (0.00076)	Loss_d 0.24214 (0.29554)	Accuracy_p 0.535 (0.566)
+Epoch: [8][20/100]	Accuracy_d 0.9 (0.8845975948196114)	Loss_d_2 0.20725004374980927	Time 0.395s (0.458s)	Data 0.000s (0.062s)	Loss_p 0.00073 (0.00076)	Loss_d 0.21623 (0.29593)	Accuracy_p 0.600 (0.567)
+Epoch: [8][40/100]	Accuracy_d 0.95 (0.884419983065199)	Loss_d_2 0.1929234266281128	Time 0.395s (0.440s)	Data 0.000s (0.045s)	Loss_p 0.00065 (0.00076)	Loss_d 0.19908 (0.29520)	Accuracy_p 0.647 (0.568)
+Epoch: [8][60/100]	Accuracy_d 0.85 (0.8807572209211554)	Loss_d_2 0.30857789516448975	Time 0.394s (0.434s)	Data 0.000s (0.039s)	Loss_p 0.00058 (0.00076)	Loss_d 0.33693 (0.29750)	Accuracy_p 0.687 (0.568)
+Epoch: [8][80/100]	Accuracy_d 1.0 (0.8834178131788559)	Loss_d_2 0.0972924456000328	Time 0.395s (0.431s)	Data 0.000s (0.036s)	Loss_p 0.00059 (0.00076)	Loss_d 0.09752 (0.29634)	Accuracy_p 0.686 (0.569)
+Test: [0/7]	Time 0.849 (0.849)	Loss 0.0005 (0.0005)	Accuracy 0.871 (0.871)
+=> writing results json to output/E2/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/results/keypoints_validate_infant_results_0.json
+| Arch | AP | Ap .5 | AP .75 | AP (M) | AP (L) | AR | AR .5 | AR .75 | AR (M) | AR (L) |
+|---|---|---|---|---|---|---|---|---|---|---|
+| adaptive... | 0.910 | 0.968 | 0.968 | -1.000 | 0.910 | 0.929 | 0.980 | 0.980 | -1.000 | 0.929 |
+=> epoch 8 val AP 0.9101 (best 0.9101), peak GPU mem 17.21 GiB
+=> saving checkpoint to output/E2/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant
+batch
+batch
+batch
+batch
+batch
+batch
+batch
+Loading and preparing results...
+DONE (t=0.00s)
+creating index...
+index created!
+Running per image evaluation...
+Evaluate annotation type *keypoints*
+DONE (t=0.02s).
+Accumulating evaluation results...
+DONE (t=0.00s).
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets= 20 ] = 0.910
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets= 20 ] = 0.968
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets= 20 ] = 0.968
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets= 20 ] = -1.000
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets= 20 ] = 0.910
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 20 ] = 0.929
+ Average Recall     (AR) @[ IoU=0.50      | area=   all | maxDets= 20 ] = 0.980
+ Average Recall     (AR) @[ IoU=0.75      | area=   all | maxDets= 20 ] = 0.980
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets= 20 ] = -1.000
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets= 20 ] = 0.929
+100
+Epoch: [9][0/100]	Accuracy_d 0.95 (0.886085626911315)	Loss_d_2 0.11398696899414062	Time 1.150s (1.150s)	Data 0.731s (0.731s)	Loss_p 0.00075 (0.00075)	Loss_d 0.11624 (0.29355)	Accuracy_p 0.614 (0.570)
+Epoch: [9][20/100]	Accuracy_d 0.9 (0.8878353376503237)	Loss_d_2 0.20355086028575897	Time 0.396s (0.458s)	Data 0.000s (0.062s)	Loss_p 0.00076 (0.00075)	Loss_d 0.21041 (0.29272)	Accuracy_p 0.599 (0.572)
+Epoch: [9][40/100]	Accuracy_d 0.9 (0.88653683319221)	Loss_d_2 0.29740357398986816	Time 0.395s (0.441s)	Data 0.000s (0.045s)	Loss_p 0.00072 (0.00075)	Loss_d 0.31179 (0.29312)	Accuracy_p 0.541 (0.572)
+Epoch: [9][60/100]	Accuracy_d 0.9 (0.884855581576893)	Loss_d_2 0.16575422883033752	Time 0.396s (0.435s)	Data 0.000s (0.040s)	Loss_p 0.00070 (0.00075)	Loss_d 0.18535 (0.29424)	Accuracy_p 0.604 (0.573)
+Epoch: [9][80/100]	Accuracy_d 0.95 (0.887762490948588)	Loss_d_2 0.14501482248306274	Time 0.395s (0.432s)	Data 0.000s (0.036s)	Loss_p 0.00059 (0.00075)	Loss_d 0.15028 (0.29303)	Accuracy_p 0.682 (0.574)
+Test: [0/7]	Time 0.841 (0.841)	Loss 0.0005 (0.0005)	Accuracy 0.875 (0.875)
+=> writing results json to output/E2/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/results/keypoints_validate_infant_results_0.json
+| Arch | AP | Ap .5 | AP .75 | AP (M) | AP (L) | AR | AR .5 | AR .75 | AR (M) | AR (L) |
+|---|---|---|---|---|---|---|---|---|---|---|
+| adaptive... | 0.911 | 0.968 | 0.968 | -1.000 | 0.911 | 0.928 | 0.980 | 0.980 | -1.000 | 0.928 |
+=> epoch 9 val AP 0.9107 (best 0.9107), peak GPU mem 17.21 GiB
+=> saving checkpoint to output/E2/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant
+batch
+batch
+batch
+batch
+batch
+batch
+batch
+Loading and preparing results...
+DONE (t=0.00s)
+creating index...
+index created!
+Running per image evaluation...
+Evaluate annotation type *keypoints*
+DONE (t=0.02s).
+Accumulating evaluation results...
+DONE (t=0.00s).
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets= 20 ] = 0.911
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets= 20 ] = 0.968
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets= 20 ] = 0.968
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets= 20 ] = -1.000
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets= 20 ] = 0.911
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 20 ] = 0.928
+ Average Recall     (AR) @[ IoU=0.50      | area=   all | maxDets= 20 ] = 0.980
+ Average Recall     (AR) @[ IoU=0.75      | area=   all | maxDets= 20 ] = 0.980
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets= 20 ] = -1.000
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets= 20 ] = 0.928
+100
+Epoch: [10][0/100]	Accuracy_d 0.9 (0.8858307849133538)	Loss_d_2 0.19398514926433563	Time 1.124s (1.124s)	Data 0.687s (0.687s)	Loss_p 0.00069 (0.00075)	Loss_d 0.20558 (0.29153)	Accuracy_p 0.594 (0.574)
+Epoch: [10][20/100]	Accuracy_d 0.95 (0.8859851988899168)	Loss_d_2 0.11906929314136505	Time 0.394s (0.455s)	Data 0.000s (0.059s)	Loss_p 0.00068 (0.00075)	Loss_d 0.12227 (0.29102)	Accuracy_p 0.619 (0.575)
+Epoch: [10][40/100]	Accuracy_d 1.0 (0.8878069432684166)	Loss_d_2 0.09482243657112122	Time 0.394s (0.438s)	Data 0.000s (0.043s)	Loss_p 0.00067 (0.00075)	Loss_d 0.09712 (0.29034)	Accuracy_p 0.656 (0.576)
+Epoch: [10][60/100]	Accuracy_d 0.95 (0.8866120218579235)	Loss_d_2 0.14460130035877228	Time 0.394s (0.434s)	Data 0.000s (0.039s)	Loss_p 0.00065 (0.00075)	Loss_d 0.14439 (0.29042)	Accuracy_p 0.676 (0.577)
+Epoch: [10][80/100]	Accuracy_d 0.95 (0.88848660391021)	Loss_d_2 0.24503827095031738	Time 0.398s (0.431s)	Data 0.000s (0.036s)	Loss_p 0.00055 (0.00074)	Loss_d 0.25636 (0.28985)	Accuracy_p 0.680 (0.578)
+Test: [0/7]	Time 0.841 (0.841)	Loss 0.0005 (0.0005)	Accuracy 0.875 (0.875)
+=> writing results json to output/E2/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/results/keypoints_validate_infant_results_0.json
+| Arch | AP | Ap .5 | AP .75 | AP (M) | AP (L) | AR | AR .5 | AR .75 | AR (M) | AR (L) |
+|---|---|---|---|---|---|---|---|---|---|---|
+| adaptive... | 0.902 | 0.967 | 0.958 | -1.000 | 0.902 | 0.924 | 0.980 | 0.970 | -1.000 | 0.924 |
+=> epoch 10 val AP 0.9023 (best 0.9107), peak GPU mem 17.21 GiB
+=> saving checkpoint to output/E2/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant
+batch
+batch
+batch
+batch
+batch
+batch
+batch
+Loading and preparing results...
+DONE (t=0.00s)
+creating index...
+index created!
+Running per image evaluation...
+Evaluate annotation type *keypoints*
+DONE (t=0.02s).
+Accumulating evaluation results...
+DONE (t=0.00s).
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets= 20 ] = 0.902
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets= 20 ] = 0.967
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets= 20 ] = 0.958
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets= 20 ] = -1.000
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets= 20 ] = 0.902
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 20 ] = 0.924
+ Average Recall     (AR) @[ IoU=0.50      | area=   all | maxDets= 20 ] = 0.980
+ Average Recall     (AR) @[ IoU=0.75      | area=   all | maxDets= 20 ] = 0.970
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets= 20 ] = -1.000
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets= 20 ] = 0.924
+100
+Epoch: [11][0/100]	Accuracy_d 1.0 (0.8863404689092762)	Loss_d_2 0.10299646854400635	Time 1.157s (1.157s)	Data 0.738s (0.738s)	Loss_p 0.00064 (0.00074)	Loss_d 0.10783 (0.28894)	Accuracy_p 0.691 (0.578)
+Epoch: [11][20/100]	Accuracy_d 0.95 (0.8876040703052729)	Loss_d_2 0.13305972516536713	Time 0.394s (0.457s)	Data 0.000s (0.062s)	Loss_p 0.00079 (0.00074)	Loss_d 0.13745 (0.28831)	Accuracy_p 0.563 (0.579)
+Epoch: [11][40/100]	Accuracy_d 1.0 (0.8873835732430144)	Loss_d_2 0.08707068860530853	Time 0.394s (0.439s)	Data 0.000s (0.045s)	Loss_p 0.00072 (0.00074)	Loss_d 0.08705 (0.28794)	Accuracy_p 0.666 (0.580)
+Epoch: [11][60/100]	Accuracy_d 0.85 (0.8866120218579235)	Loss_d_2 0.2994254231452942	Time 0.398s (0.435s)	Data 0.000s (0.039s)	Loss_p 0.00055 (0.00074)	Loss_d 0.30707 (0.28813)	Accuracy_p 0.622 (0.580)
+Epoch: [11][80/100]	Accuracy_d 0.9 (0.88848660391021)	Loss_d_2 0.25612398982048035	Time 0.397s (0.432s)	Data 0.000s (0.036s)	Loss_p 0.00059 (0.00074)	Loss_d 0.25880 (0.28714)	Accuracy_p 0.593 (0.581)
+Test: [0/7]	Time 0.847 (0.847)	Loss 0.0005 (0.0005)	Accuracy 0.879 (0.879)
+=> writing results json to output/E2/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/results/keypoints_validate_infant_results_0.json
+| Arch | AP | Ap .5 | AP .75 | AP (M) | AP (L) | AR | AR .5 | AR .75 | AR (M) | AR (L) |
+|---|---|---|---|---|---|---|---|---|---|---|
+| adaptive... | 0.907 | 0.967 | 0.967 | -1.000 | 0.907 | 0.927 | 0.980 | 0.980 | -1.000 | 0.927 |
+=> epoch 11 val AP 0.9068 (best 0.9107), peak GPU mem 17.21 GiB
+=> saving checkpoint to output/E2/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant
+batch
+batch
+batch
+batch
+batch
+batch
+batch
+Loading and preparing results...
+DONE (t=0.00s)
+creating index...
+index created!
+Running per image evaluation...
+Evaluate annotation type *keypoints*
+DONE (t=0.02s).
+Accumulating evaluation results...
+DONE (t=0.00s).
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets= 20 ] = 0.907
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets= 20 ] = 0.967
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets= 20 ] = 0.967
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets= 20 ] = -1.000
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets= 20 ] = 0.907
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 20 ] = 0.927
+ Average Recall     (AR) @[ IoU=0.50      | area=   all | maxDets= 20 ] = 0.980
+ Average Recall     (AR) @[ IoU=0.75      | area=   all | maxDets= 20 ] = 0.980
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets= 20 ] = -1.000
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets= 20 ] = 0.927
+100
+Epoch: [12][0/100]	Accuracy_d 0.95 (0.886085626911315)	Loss_d_2 0.21436583995819092	Time 1.097s (1.097s)	Data 0.672s (0.672s)	Loss_p 0.00069 (0.00074)	Loss_d 0.21986 (0.28635)	Accuracy_p 0.617 (0.581)
+Epoch: [12][20/100]	Accuracy_d 0.95 (0.8880666049953746)	Loss_d_2 0.11704609543085098	Time 0.395s (0.461s)	Data 0.000s (0.065s)	Loss_p 0.00078 (0.00074)	Loss_d 0.12155 (0.28578)	Accuracy_p 0.619 (0.582)
+Epoch: [12][40/100]	Accuracy_d 0.95 (0.8852667231160034)	Loss_d_2 0.21204066276550293	Time 0.395s (0.442s)	Data 0.000s (0.047s)	Loss_p 0.00066 (0.00073)	Loss_d 0.21788 (0.28669)	Accuracy_p 0.624 (0.583)
+Epoch: [12][60/100]	Accuracy_d 0.75 (0.8836846213895394)	Loss_d_2 0.4356420636177063	Time 0.394s (0.435s)	Data 0.000s (0.040s)	Loss_p 0.00063 (0.00073)	Loss_d 0.46430 (0.28759)	Accuracy_p 0.574 (0.583)
+Epoch: [12][80/100]	Accuracy_d 0.95 (0.8848660391020999)	Loss_d_2 0.1513015776872635	Time 0.397s (0.433s)	Data 0.000s (0.037s)	Loss_p 0.00063 (0.00073)	Loss_d 0.16451 (0.28721)	Accuracy_p 0.669 (0.584)
+Test: [0/7]	Time 0.845 (0.845)	Loss 0.0005 (0.0005)	Accuracy 0.879 (0.879)
+=> writing results json to output/E2/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/results/keypoints_validate_infant_results_0.json
+| Arch | AP | Ap .5 | AP .75 | AP (M) | AP (L) | AR | AR .5 | AR .75 | AR (M) | AR (L) |
+|---|---|---|---|---|---|---|---|---|---|---|
+| adaptive... | 0.908 | 0.968 | 0.958 | -1.000 | 0.908 | 0.927 | 0.980 | 0.970 | -1.000 | 0.927 |
+=> epoch 12 val AP 0.9079 (best 0.9107), peak GPU mem 17.21 GiB
+=> saving checkpoint to output/E2/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant
+batch
+batch
+batch
+batch
+batch
+batch
+batch
+Loading and preparing results...
+DONE (t=0.00s)
+creating index...
+index created!
+Running per image evaluation...
+Evaluate annotation type *keypoints*
+DONE (t=0.02s).
+Accumulating evaluation results...
+DONE (t=0.00s).
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets= 20 ] = 0.908
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets= 20 ] = 0.968
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets= 20 ] = 0.958
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets= 20 ] = -1.000
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets= 20 ] = 0.908
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 20 ] = 0.927
+ Average Recall     (AR) @[ IoU=0.50      | area=   all | maxDets= 20 ] = 0.980
+ Average Recall     (AR) @[ IoU=0.75      | area=   all | maxDets= 20 ] = 0.970
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets= 20 ] = -1.000
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets= 20 ] = 0.927
+100
+Epoch: [13][0/100]	Accuracy_d 0.9 (0.8858307849133538)	Loss_d_2 0.24234448373317719	Time 1.151s (1.151s)	Data 0.729s (0.729s)	Loss_p 0.00071 (0.00073)	Loss_d 0.25380 (0.28609)	Accuracy_p 0.616 (0.584)
+Epoch: [13][20/100]	Accuracy_d 0.85 (0.8869102682701202)	Loss_d_2 0.26459527015686035	Time 0.397s (0.466s)	Data 0.000s (0.068s)	Loss_p 0.00073 (0.00073)	Loss_d 0.27265 (0.28561)	Accuracy_p 0.562 (0.585)
+Epoch: [13][40/100]	Accuracy_d 0.8 (0.8867485182049111)	Loss_d_2 0.32991868257522583	Time 0.397s (0.450s)	Data 0.000s (0.052s)	Loss_p 0.00063 (0.00073)	Loss_d 0.34144 (0.28514)	Accuracy_p 0.631 (0.586)
+Epoch: [13][60/100]	Accuracy_d 1.0 (0.8879781420765027)	Loss_d_2 0.09584084898233414	Time 0.397s (0.442s)	Data 0.000s (0.044s)	Loss_p 0.00062 (0.00073)	Loss_d 0.09719 (0.28472)	Accuracy_p 0.698 (0.586)
+Epoch: [13][80/100]	Accuracy_d 0.95 (0.8906589427950761)	Loss_d_2 0.18565122783184052	Time 0.397s (0.438s)	Data 0.000s (0.040s)	Loss_p 0.00055 (0.00073)	Loss_d 0.18878 (0.28361)	Accuracy_p 0.657 (0.587)
+Test: [0/7]	Time 0.849 (0.849)	Loss 0.0005 (0.0005)	Accuracy 0.879 (0.879)
+=> writing results json to output/E2/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/results/keypoints_validate_infant_results_0.json
+| Arch | AP | Ap .5 | AP .75 | AP (M) | AP (L) | AR | AR .5 | AR .75 | AR (M) | AR (L) |
+|---|---|---|---|---|---|---|---|---|---|---|
+| adaptive... | 0.905 | 0.967 | 0.957 | -1.000 | 0.905 | 0.926 | 0.980 | 0.970 | -1.000 | 0.926 |
+=> epoch 13 val AP 0.9053 (best 0.9107), peak GPU mem 17.21 GiB
+=> saving checkpoint to output/E2/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant
+batch
+batch
+batch
+batch
+batch
+batch
+batch
+Loading and preparing results...
+DONE (t=0.00s)
+creating index...
+index created!
+Running per image evaluation...
+Evaluate annotation type *keypoints*
+DONE (t=0.02s).
+Accumulating evaluation results...
+DONE (t=0.00s).
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets= 20 ] = 0.905
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets= 20 ] = 0.967
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets= 20 ] = 0.957
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets= 20 ] = -1.000
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets= 20 ] = 0.905
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 20 ] = 0.926
+ Average Recall     (AR) @[ IoU=0.50      | area=   all | maxDets= 20 ] = 0.980
+ Average Recall     (AR) @[ IoU=0.75      | area=   all | maxDets= 20 ] = 0.970
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets= 20 ] = -1.000
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets= 20 ] = 0.926
+100
+Epoch: [14][0/100]	Accuracy_d 1.0 (0.8863404689092762)	Loss_d_2 0.0976986214518547	Time 1.130s (1.130s)	Data 0.701s (0.701s)	Loss_p 0.00071 (0.00073)	Loss_d 0.10467 (0.28243)	Accuracy_p 0.662 (0.587)
+Epoch: [14][20/100]	Accuracy_d 0.95 (0.8899167437557817)	Loss_d_2 0.15878735482692719	Time 0.394s (0.457s)	Data 0.000s (0.061s)	Loss_p 0.00069 (0.00073)	Loss_d 0.16152 (0.28156)	Accuracy_p 0.606 (0.588)
+Epoch: [14][40/100]	Accuracy_d 0.95 (0.8884419983065199)	Loss_d_2 0.16561071574687958	Time 0.395s (0.439s)	Data 0.000s (0.044s)	Loss_p 0.00066 (0.00073)	Loss_d 0.16918 (0.28163)	Accuracy_p 0.642 (0.589)
+Epoch: [14][60/100]	Accuracy_d 0.95 (0.8875878220140515)	Loss_d_2 0.2383788675069809	Time 0.394s (0.433s)	Data 0.000s (0.038s)	Loss_p 0.00062 (0.00072)	Loss_d 0.24578 (0.28186)	Accuracy_p 0.668 (0.589)
+Epoch: [14][80/100]	Accuracy_d 0.9 (0.8879435191889935)	Loss_d_2 0.19980740547180176	Time 0.395s (0.430s)	Data 0.000s (0.035s)	Loss_p 0.00065 (0.00072)	Loss_d 0.20523 (0.28176)	Accuracy_p 0.643 (0.590)
+Test: [0/7]	Time 0.837 (0.837)	Loss 0.0005 (0.0005)	Accuracy 0.879 (0.879)
+=> writing results json to output/E2/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/results/keypoints_validate_infant_results_0.json
+| Arch | AP | Ap .5 | AP .75 | AP (M) | AP (L) | AR | AR .5 | AR .75 | AR (M) | AR (L) |
+|---|---|---|---|---|---|---|---|---|---|---|
+| adaptive... | 0.904 | 0.967 | 0.958 | -1.000 | 0.904 | 0.923 | 0.980 | 0.970 | -1.000 | 0.923 |
+=> epoch 14 val AP 0.9041 (best 0.9107), peak GPU mem 17.21 GiB
+=> saving checkpoint to output/E2/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant
+batch
+batch
+batch
+batch
+batch
+batch
+batch
+Loading and preparing results...
+DONE (t=0.00s)
+creating index...
+index created!
+Running per image evaluation...
+Evaluate annotation type *keypoints*
+DONE (t=0.02s).
+Accumulating evaluation results...
+DONE (t=0.00s).
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets= 20 ] = 0.904
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets= 20 ] = 0.967
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets= 20 ] = 0.958
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets= 20 ] = -1.000
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets= 20 ] = 0.904
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 20 ] = 0.923
+ Average Recall     (AR) @[ IoU=0.50      | area=   all | maxDets= 20 ] = 0.980
+ Average Recall     (AR) @[ IoU=0.75      | area=   all | maxDets= 20 ] = 0.970
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets= 20 ] = -1.000
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets= 20 ] = 0.923
+100
+Epoch: [15][0/100]	Accuracy_d 0.9 (0.8858307849133538)	Loss_d_2 0.28093406558036804	Time 1.110s (1.110s)	Data 0.688s (0.688s)	Loss_p 0.00063 (0.00072)	Loss_d 0.28359 (0.28134)	Accuracy_p 0.619 (0.590)
+Epoch: [15][20/100]	Accuracy_d 0.9 (0.887372802960222)	Loss_d_2 0.2618667781352997	Time 0.394s (0.458s)	Data 0.000s (0.063s)	Loss_p 0.00072 (0.00072)	Loss_d 0.27508 (0.28122)	Accuracy_p 0.563 (0.591)
+Epoch: [15][40/100]	Accuracy_d 0.9 (0.8871718882303133)	Loss_d_2 0.20344248414039612	Time 0.397s (0.443s)	Data 0.000s (0.048s)	Loss_p 0.00067 (0.00072)	Loss_d 0.20693 (0.28128)	Accuracy_p 0.627 (0.591)
+Epoch: [15][60/100]	Accuracy_d 0.95 (0.8879781420765027)	Loss_d_2 0.16563701629638672	Time 0.396s (0.437s)	Data 0.000s (0.041s)	Loss_p 0.00057 (0.00072)	Loss_d 0.16719 (0.28123)	Accuracy_p 0.675 (0.592)
+Epoch: [15][80/100]	Accuracy_d 0.9 (0.8893917451122375)	Loss_d_2 0.28348881006240845	Time 0.397s (0.434s)	Data 0.000s (0.037s)	Loss_p 0.00070 (0.00072)	Loss_d 0.29218 (0.28082)	Accuracy_p 0.557 (0.592)
+Test: [0/7]	Time 0.834 (0.834)	Loss 0.0005 (0.0005)	Accuracy 0.875 (0.875)
+=> writing results json to output/E2/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/results/keypoints_validate_infant_results_0.json
+| Arch | AP | Ap .5 | AP .75 | AP (M) | AP (L) | AR | AR .5 | AR .75 | AR (M) | AR (L) |
+|---|---|---|---|---|---|---|---|---|---|---|
+| adaptive... | 0.905 | 0.968 | 0.958 | -1.000 | 0.905 | 0.925 | 0.980 | 0.970 | -1.000 | 0.925 |
+=> epoch 15 val AP 0.9052 (best 0.9107), peak GPU mem 17.21 GiB
+=> saving checkpoint to output/E2/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant
+batch
+batch
+batch
+batch
+batch
+batch
+batch
+Loading and preparing results...
+DONE (t=0.01s)
+creating index...
+index created!
+Running per image evaluation...
+Evaluate annotation type *keypoints*
+DONE (t=0.02s).
+Accumulating evaluation results...
+DONE (t=0.00s).
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets= 20 ] = 0.905
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets= 20 ] = 0.968
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets= 20 ] = 0.958
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets= 20 ] = -1.000
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets= 20 ] = 0.905
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 20 ] = 0.925
+ Average Recall     (AR) @[ IoU=0.50      | area=   all | maxDets= 20 ] = 0.980
+ Average Recall     (AR) @[ IoU=0.75      | area=   all | maxDets= 20 ] = 0.970
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets= 20 ] = -1.000
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets= 20 ] = 0.925
+100
+Epoch: [16][0/100]	Accuracy_d 0.95 (0.886085626911315)	Loss_d_2 0.1675773411989212	Time 1.095s (1.095s)	Data 0.663s (0.663s)	Loss_p 0.00056 (0.00072)	Loss_d 0.16933 (0.28002)	Accuracy_p 0.668 (0.593)
+Epoch: [16][20/100]	Accuracy_d 0.95 (0.8878353376503237)	Loss_d_2 0.11867089569568634	Time 0.394s (0.457s)	Data 0.000s (0.062s)	Loss_p 0.00080 (0.00072)	Loss_d 0.12512 (0.27959)	Accuracy_p 0.647 (0.593)
+Epoch: [16][40/100]	Accuracy_d 0.95 (0.8899237933954276)	Loss_d_2 0.16502974927425385	Time 0.395s (0.440s)	Data 0.000s (0.045s)	Loss_p 0.00068 (0.00072)	Loss_d 0.17517 (0.27906)	Accuracy_p 0.630 (0.594)
+Epoch: [16][60/100]	Accuracy_d 0.85 (0.8889539422326308)	Loss_d_2 0.2577120363712311	Time 0.394s (0.433s)	Data 0.000s (0.038s)	Loss_p 0.00054 (0.00072)	Loss_d 0.27519 (0.27922)	Accuracy_p 0.688 (0.594)
+Epoch: [16][80/100]	Accuracy_d 0.9 (0.8902968863142651)	Loss_d_2 0.23217478394508362	Time 0.396s (0.430s)	Data 0.000s (0.036s)	Loss_p 0.00061 (0.00072)	Loss_d 0.24190 (0.27839)	Accuracy_p 0.636 (0.595)
+Test: [0/7]	Time 0.835 (0.835)	Loss 0.0005 (0.0005)	Accuracy 0.864 (0.864)
+=> writing results json to output/E2/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/results/keypoints_validate_infant_results_0.json
+| Arch | AP | Ap .5 | AP .75 | AP (M) | AP (L) | AR | AR .5 | AR .75 | AR (M) | AR (L) |
+|---|---|---|---|---|---|---|---|---|---|---|
+| adaptive... | 0.901 | 0.968 | 0.958 | -1.000 | 0.901 | 0.923 | 0.980 | 0.970 | -1.000 | 0.923 |
+=> epoch 16 val AP 0.9009 (best 0.9107), peak GPU mem 17.21 GiB
+=> saving checkpoint to output/E2/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant
+batch
+batch
+batch
+batch
+batch
+batch
+batch
+Loading and preparing results...
+DONE (t=0.00s)
+creating index...
+index created!
+Running per image evaluation...
+Evaluate annotation type *keypoints*
+DONE (t=0.02s).
+Accumulating evaluation results...
+DONE (t=0.00s).
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets= 20 ] = 0.901
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets= 20 ] = 0.968
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets= 20 ] = 0.958
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets= 20 ] = -1.000
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets= 20 ] = 0.901
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 20 ] = 0.923
+ Average Recall     (AR) @[ IoU=0.50      | area=   all | maxDets= 20 ] = 0.980
+ Average Recall     (AR) @[ IoU=0.75      | area=   all | maxDets= 20 ] = 0.970
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets= 20 ] = -1.000
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets= 20 ] = 0.923
+100
+Epoch: [17][0/100]	Accuracy_d 0.95 (0.886085626911315)	Loss_d_2 0.16143377125263214	Time 1.139s (1.139s)	Data 0.713s (0.713s)	Loss_p 0.00062 (0.00071)	Loss_d 0.17881 (0.27810)	Accuracy_p 0.654 (0.595)
+Epoch: [17][20/100]	Accuracy_d 0.9 (0.8843663274745606)	Loss_d_2 0.2733333706855774	Time 0.394s (0.459s)	Data 0.000s (0.063s)	Loss_p 0.00071 (0.00071)	Loss_d 0.28723 (0.27830)	Accuracy_p 0.602 (0.596)
+Epoch: [17][40/100]	Accuracy_d 0.95 (0.8846316680779001)	Loss_d_2 0.1892043799161911	Time 0.395s (0.442s)	Data 0.000s (0.047s)	Loss_p 0.00059 (0.00071)	Loss_d 0.19495 (0.27820)	Accuracy_p 0.694 (0.596)
+Epoch: [17][60/100]	Accuracy_d 0.9 (0.8825136612021858)	Loss_d_2 0.1945274919271469	Time 0.394s (0.435s)	Data 0.000s (0.041s)	Loss_p 0.00056 (0.00071)	Loss_d 0.20221 (0.27881)	Accuracy_p 0.694 (0.596)
+Epoch: [17][80/100]	Accuracy_d 1.0 (0.8848660391020999)	Loss_d_2 0.13252879679203033	Time 0.395s (0.432s)	Data 0.000s (0.037s)	Loss_p 0.00060 (0.00071)	Loss_d 0.13973 (0.27811)	Accuracy_p 0.678 (0.597)
+Test: [0/7]	Time 0.839 (0.839)	Loss 0.0005 (0.0005)	Accuracy 0.875 (0.875)
+=> writing results json to output/E2/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/results/keypoints_validate_infant_results_0.json
+| Arch | AP | Ap .5 | AP .75 | AP (M) | AP (L) | AR | AR .5 | AR .75 | AR (M) | AR (L) |
+|---|---|---|---|---|---|---|---|---|---|---|
+| adaptive... | 0.906 | 0.968 | 0.958 | -1.000 | 0.906 | 0.924 | 0.980 | 0.970 | -1.000 | 0.924 |
+=> epoch 17 val AP 0.9056 (best 0.9107), peak GPU mem 17.21 GiB
+=> saving checkpoint to output/E2/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant
+batch
+batch
+batch
+batch
+batch
+batch
+batch
+Loading and preparing results...
+DONE (t=0.00s)
+creating index...
+index created!
+Running per image evaluation...
+Evaluate annotation type *keypoints*
+DONE (t=0.02s).
+Accumulating evaluation results...
+DONE (t=0.00s).
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets= 20 ] = 0.906
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets= 20 ] = 0.968
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets= 20 ] = 0.958
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets= 20 ] = -1.000
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets= 20 ] = 0.906
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 20 ] = 0.924
+ Average Recall     (AR) @[ IoU=0.50      | area=   all | maxDets= 20 ] = 0.980
+ Average Recall     (AR) @[ IoU=0.75      | area=   all | maxDets= 20 ] = 0.970
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets= 20 ] = -1.000
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets= 20 ] = 0.924
+100
+Epoch: [18][0/100]	Accuracy_d 1.0 (0.8863404689092762)	Loss_d_2 0.0866498127579689	Time 1.130s (1.130s)	Data 0.704s (0.704s)	Loss_p 0.00071 (0.00071)	Loss_d 0.08833 (0.27745)	Accuracy_p 0.676 (0.597)
+Epoch: [18][20/100]	Accuracy_d 0.9 (0.8869102682701202)	Loss_d_2 0.3083464205265045	Time 0.395s (0.458s)	Data 0.000s (0.062s)	Loss_p 0.00067 (0.00071)	Loss_d 0.31968 (0.27734)	Accuracy_p 0.552 (0.598)
+Epoch: [18][40/100]	Accuracy_d 0.95 (0.8903471634208298)	Loss_d_2 0.12197990715503693	Time 0.395s (0.442s)	Data 0.000s (0.046s)	Loss_p 0.00063 (0.00071)	Loss_d 0.12834 (0.27646)	Accuracy_p 0.683 (0.599)
+Epoch: [18][60/100]	Accuracy_d 0.85 (0.892271662763466)	Loss_d_2 0.30289724469184875	Time 0.394s (0.435s)	Data 0.000s (0.040s)	Loss_p 0.00053 (0.00071)	Loss_d 0.31166 (0.27604)	Accuracy_p 0.651 (0.599)
+Epoch: [18][80/100]	Accuracy_d 0.9 (0.8930123099203475)	Loss_d_2 0.19768591225147247	Time 0.394s (0.431s)	Data 0.000s (0.036s)	Loss_p 0.00061 (0.00071)	Loss_d 0.20415 (0.27549)	Accuracy_p 0.658 (0.599)
+Test: [0/7]	Time 0.843 (0.843)	Loss 0.0005 (0.0005)	Accuracy 0.875 (0.875)
+=> writing results json to output/E2/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/results/keypoints_validate_infant_results_0.json
+| Arch | AP | Ap .5 | AP .75 | AP (M) | AP (L) | AR | AR .5 | AR .75 | AR (M) | AR (L) |
+|---|---|---|---|---|---|---|---|---|---|---|
+| adaptive... | 0.905 | 0.968 | 0.958 | -1.000 | 0.905 | 0.924 | 0.980 | 0.970 | -1.000 | 0.924 |
+=> epoch 18 val AP 0.9048 (best 0.9107), peak GPU mem 17.21 GiB
+=> saving checkpoint to output/E2/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant
+batch
+batch
+batch
+batch
+batch
+batch
+batch
+Loading and preparing results...
+DONE (t=0.00s)
+creating index...
+index created!
+Running per image evaluation...
+Evaluate annotation type *keypoints*
+DONE (t=0.02s).
+Accumulating evaluation results...
+DONE (t=0.00s).
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets= 20 ] = 0.905
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets= 20 ] = 0.968
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets= 20 ] = 0.958
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets= 20 ] = -1.000
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets= 20 ] = 0.905
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 20 ] = 0.924
+ Average Recall     (AR) @[ IoU=0.50      | area=   all | maxDets= 20 ] = 0.980
+ Average Recall     (AR) @[ IoU=0.75      | area=   all | maxDets= 20 ] = 0.970
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets= 20 ] = -1.000
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets= 20 ] = 0.924
+100
+Epoch: [19][0/100]	Accuracy_d 0.95 (0.886085626911315)	Loss_d_2 0.15553875267505646	Time 1.133s (1.133s)	Data 0.720s (0.720s)	Loss_p 0.00072 (0.00071)	Loss_d 0.16212 (0.27480)	Accuracy_p 0.603 (0.600)
+Epoch: [19][20/100]	Accuracy_d 0.9 (0.8880666049953746)	Loss_d_2 0.2001231163740158	Time 0.394s (0.458s)	Data 0.000s (0.064s)	Loss_p 0.00076 (0.00071)	Loss_d 0.20655 (0.27445)	Accuracy_p 0.573 (0.600)
+Epoch: [19][40/100]	Accuracy_d 1.0 (0.890770533446232)	Loss_d_2 0.08983535319566727	Time 0.394s (0.440s)	Data 0.000s (0.045s)	Loss_p 0.00063 (0.00071)	Loss_d 0.09186 (0.27392)	Accuracy_p 0.666 (0.601)
+Epoch: [19][60/100]	Accuracy_d 0.95 (0.8914910226385636)	Loss_d_2 0.19012172520160675	Time 0.395s (0.435s)	Data 0.000s (0.040s)	Loss_p 0.00064 (0.00071)	Loss_d 0.19606 (0.27389)	Accuracy_p 0.645 (0.601)
+Epoch: [19][80/100]	Accuracy_d 1.0 (0.8928312816799421)	Loss_d_2 0.09021421521902084	Time 0.395s (0.431s)	Data 0.000s (0.037s)	Loss_p 0.00061 (0.00070)	Loss_d 0.09499 (0.27346)	Accuracy_p 0.689 (0.601)
+Test: [0/7]	Time 0.836 (0.836)	Loss 0.0005 (0.0005)	Accuracy 0.871 (0.871)
+=> writing results json to output/E2/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/results/keypoints_validate_infant_results_0.json
+| Arch | AP | Ap .5 | AP .75 | AP (M) | AP (L) | AR | AR .5 | AR .75 | AR (M) | AR (L) |
+|---|---|---|---|---|---|---|---|---|---|---|
+| adaptive... | 0.901 | 0.968 | 0.948 | -1.000 | 0.901 | 0.920 | 0.980 | 0.960 | -1.000 | 0.920 |
+=> epoch 19 val AP 0.9012 (best 0.9107), peak GPU mem 17.21 GiB
+=> saving checkpoint to output/E2/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant
+saving final model state to output/E2/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/final_state.pth
+batch
+batch
+batch
+batch
+batch
+batch
+batch
+Loading and preparing results...
+DONE (t=0.01s)
+creating index...
+index created!
+Running per image evaluation...
+Evaluate annotation type *keypoints*
+DONE (t=0.02s).
+Accumulating evaluation results...
+DONE (t=0.00s).
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets= 20 ] = 0.901
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets= 20 ] = 0.968
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets= 20 ] = 0.948
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets= 20 ] = -1.000
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets= 20 ] = 0.901
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 20 ] = 0.920
+ Average Recall     (AR) @[ IoU=0.50      | area=   all | maxDets= 20 ] = 0.980
+ Average Recall     (AR) @[ IoU=0.75      | area=   all | maxDets= 20 ] = 0.960
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets= 20 ] = -1.000
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets= 20 ] = 0.920

@@ -1,0 +1,26 @@
+[
+ {
+  "source": "figures/video/input/test0_pan.mp4",
+  "frames": 120,
+  "model_fps": 22.5,
+  "end_to_end_fps": 20.2,
+  "tracked_frac": 1.0,
+  "out": "figures/video/track/test0_pan_pose.mp4"
+ },
+ {
+  "source": "figures/video/input/test33_pan.mp4",
+  "frames": 120,
+  "model_fps": 23.7,
+  "end_to_end_fps": 21.4,
+  "tracked_frac": 1.0,
+  "out": "figures/video/track/test33_pan_pose.mp4"
+ },
+ {
+  "source": "figures/video/input/test41_pan.mp4",
+  "frames": 120,
+  "model_fps": 23.7,
+  "end_to_end_fps": 20.5,
+  "tracked_frac": 1.0,
+  "out": "figures/video/track/test41_pan_pose.mp4"
+ }
+]

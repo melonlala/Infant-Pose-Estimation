@@ -1,0 +1,41 @@
+name, memory.total [MiB]
+Tesla P100-PCIE-12GB, 12288 MiB
+transforms (scale, rot): [(1.0, 0.0)]
+loaded output/F4/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/final_state.pth
+loading annotations into memory...
+Done (t=0.02s)
+creating index...
+index created!
+0/500
+50/500
+100/500
+150/500
+200/500
+250/500
+300/500
+350/500
+400/500
+450/500
+/home/hou.yuchen/courses/eece7373/envs/fidip/lib/python3.12/site-packages/json_tricks/encoders.py:419: UserWarning: json-tricks: numpy scalar serialization is experimental and may work differently in future versions
+  warnings.warn('json-tricks: numpy scalar serialization is experimental and may work differently in future versions')
+Loading and preparing results...
+DONE (t=0.02s)
+creating index...
+index created!
+Running per image evaluation...
+Evaluate annotation type *keypoints*
+DONE (t=0.21s).
+Accumulating evaluation results...
+DONE (t=0.01s).
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets= 20 ] = 0.917
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets= 20 ] = 0.988
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets= 20 ] = 0.967
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets= 20 ] = -1.000
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets= 20 ] = 0.917
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 20 ] = 0.929
+ Average Recall     (AR) @[ IoU=0.50      | area=   all | maxDets= 20 ] = 0.994
+ Average Recall     (AR) @[ IoU=0.75      | area=   all | maxDets= 20 ] = 0.974
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets= 20 ] = -1.000
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets= 20 ] = 0.929
+AP 0.9172816069049539
+OrderedDict({'AP': 0.9172816069049539, 'Ap .5': 0.9876783269509318, 'AP .75': 0.9669477482305724, 'AP (M)': -1.0, 'AP (L)': 0.9172816069049539, 'AR': 0.9287999999999998, 'AR .5': 0.994, 'AR .75': 0.974, 'AR (M)': -1.0, 'AR (L)': 0.9287999999999998})
