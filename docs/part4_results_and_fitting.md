@@ -1,6 +1,8 @@
 # Part 4: prediction visualisation and over/underfitting analysis (final model)
 
 All numbers come from the fixed data: `data/syrip_fixed` (Test100 with the corrected test11) and `data/syrip500_fixed` (Test500 with real areas).
+Training-loop curves validate on Test100 *including* test11. Reported final numbers drop test11 (Test99 / Test499f, `tools/eval_subsets.py`,
+see `MANIFEST.md` §8). Dropping it lowers every run by 0.9–1.0 AP and does not change the ranking, so the curves and conclusions below still hold.
 The scripts run on the server with `.venv-demo/bin/python`.
 
 ## 4. Prediction visualisation: released (E0) vs reproduced (D1) vs final (F4)
@@ -44,6 +46,30 @@ train-loop eval, and are 0.936 / 0.936 / 0.940; the small differences come from 
 - **AP50 = AP75 = 0.98 for every model.** All the remaining error is fine localisation on a few hard images, not gross failures.
 
 ## 4.5 Over/underfitting: curves and diagnosis for every run
+
+### 4.5.0 Correction of the first analysis (E1b plateau)
+
+The first 4.5 write-up (AGENT.md, 2026-11-03) looked at E1b: val AP stops at epoch ~6 and the train loss stays flat and high. It read this as
+"mild overfitting onset". **That reading was wrong.** E1b trained on `syrip_for_train`, where all 1000 synthetic labels are MINI-RGBD poses that do
+not match the images, and its val set had the swapped `test11.jpg`.
+
+![E1b vs D1 vs F3 vs F4](../figures/compare_4_5.png)
+
+`tools/plot_compare.py E1b=<tb> D1=<tb> F3=<tb> F4=<tb>` → `figures/compare_4_5.png` (log-scaled epoch axis):
+
+| run | data | train loss ep1 → last | val loss ep1 → min → last | val/train | best val AP @ ep | final val AP |
+|---|---|---|---|---|---|---|
+| E1b | broken labels + swapped test11 | 1.02e-3 → 6.71e-4 | 4.35e-4 → 3.88e-4 → 3.98e-4 | **0.59** | 0.911 @ 7 | 0.903 |
+| D1 | fixed, LR 1e-4, 20 ep | 4.15e-4 → 2.69e-4 | 3.60e-4 → 3.12e-4 → 3.12e-4 | 1.16 | 0.938 @ 17 | 0.936 |
+| F3 | fixed, LR 1e-3 | 4.10e-4 → 2.12e-4 | 3.50e-4 → 3.27e-4 → 3.31e-4 | 1.56 | 0.933 @ 14 | 0.929 |
+| F4 | fixed, 100 ep | 3.99e-4 → 1.91e-4 | 3.59e-4 → 3.02e-4 → 3.02e-4 | 1.58 | 0.941 @ 21 | 0.940 |
+
+- **E1b is label noise, not overfitting.** Its train loss sits 2.5× above D1 for the whole run, because half of every batch has targets the network
+  cannot fit. Its val loss is *below* train loss (ratio 0.59), which a healthy fit never shows: val targets are correct, train targets are not.
+  Val AP flattens at epoch ~6 because more fitting of contradictory targets does not help.
+- **With correct labels the same config keeps learning.** D1's val AP rises until epoch ~17 and val loss falls monotonically. The ~0.03 AP jump
+  from E1b to D1 is the label fix (+1.2 AP on the same fixed Test100: 92.6 → 93.8 best). The rest is the test11 image fix.
+- **The real fitting regimes only show up on fixed data** (table below): LR 1e-3 overfits, 100 epochs is a benign plateau, and LR 5e-5 slightly underfits.
 
 Make the curves with `tools/plot_curves.py log/<run>/syrip/adaptive_pose_hrnet/<timestamp>/ --name <run>`. They are written to
 `figures/<run>_curves.png` and have four panels: pose loss, heatmap accuracy, AP/AR, and the domain classifier.

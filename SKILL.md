@@ -13,12 +13,17 @@ The experiment log is in `AGENT.md`, and the inventory of artifacts is in `MANIF
 
 | | Server (where the agent runs) | Cluster |
 |--|--|--|
-| Host | local workstation, user `yuchen` | `ssh explorer` -> `login.explorer.northeastern.edu`, user `hou.yuchen` |
+| Host | local workstation, user `yuchen` | `ssh explorer` -> `login.explorer.northeastern.edu`, user `hou.yuchen` (Slurm commands) |
+| File transfer | — | **`hou.yuchen@xfer.discovery.neu.edu`** (data-transfer node, same `/home` as the login node) |
 | Project root | `/home/yuchen/courses/EECE7373/hands_on_project` | `/home/hou.yuchen/courses/eece7373` |
 | Data / models | `data/` (raw zips + extracted, local copy) | `data/`, `models/` (authoritative) |
 | Env | none (no GPU work here) | conda prefix env `envs/fidip` (py 3.12, torch 2.3.1+cu121) |
 
-- Always run through `ssh explorer '<cmd>'`. If `module`/`conda` are not found, use
+- **Copy files to/from the cluster through the transfer node `xfer.discovery.neu.edu`, never through the login node.** Use
+  `rsync -e ssh <src> hou.yuchen@xfer.discovery.neu.edu:/home/hou.yuchen/courses/eece7373/<dst>` (or `scp`), and `slurm/sync.sh`, which already does this.
+  This applies to one-off copies too (scripts, checkpoints, figures). The login node drops big rsyncs (`Broken pipe`) and is slow when busy.
+  The xfer node shares `/home` with the login node, so paths are identical. Key login works (host key accepted 2026-11-04).
+- Always run Slurm/shell commands through `ssh explorer '<cmd>'`. If `module`/`conda` are not found, use
   `ssh explorer 'bash -lc "<cmd>"'`. SSH is key-only (`BatchMode yes`, `ControlPersist 4h`); never type passwords.
 - Code: fork of `ostadabbas/Infant-Pose-Estimation` @ `a76b4f4` (remote `upstream`).
   The guide's `gpu_test.py`, `demo.py`, `streamlit_demo.py`, `fidip_simple.yml` do not exist in any public fork.
@@ -28,7 +33,7 @@ The experiment log is in `AGENT.md`, and the inventory of artifacts is in `MANIF
 - **GitHub = code only**: `origin` = `git@github.com:melonlala/Infant-Pose-Estimation.git` (private, `main`), pushed
   from the **server only**. `upstream` = ostadabbas. Commit code, scripts, and docs on the server. Never commit `data/`, `models/`,
   `envs/`, `output*/`, `log/`, `logs/`, `*.pth`, `*.npy`, `wandb/`, `.env` (see `.gitignore`).
-- **Server <-> cluster = plain copy** (`rsync` over `ssh explorer`), via `slurm/sync.sh` run on the server. The cluster never uses GitHub.
+- **Server <-> cluster = plain copy** (`rsync` over ssh to `xfer.discovery.neu.edu`), via `slurm/sync.sh` run on the server. The cluster never uses GitHub.
   - `bash slurm/sync.sh push`: server code/scripts/docs -> cluster. **Run before every `sbatch`.** Excludes data, models,
     env, outputs, results, `.env`, the cluster's `.git`, and the `lib/nms` build products.
   - `bash slurm/sync.sh pull`: cluster -> server for `logs/` (Slurm stdout), `log/` (TensorBoard events), and only the
@@ -86,7 +91,7 @@ Keep this table and the `AGENT.md` summary table in sync whenever you submit, fi
 ## Server-side demos and analysis (no cluster needed)
 
 - The server has 2× RTX 6000 Ada. Use `.venv-demo/bin/python` (base python 3.13 + torch, plus yacs/streamlit/dsntnn/pycocotools).
-- Weights: `rsync explorer:/home/hou.yuchen/courses/eece7373/<ckpt> models/...` (git-ignored).
+- Weights: `rsync hou.yuchen@xfer.discovery.neu.edu:/home/hou.yuchen/courses/eece7373/<ckpt> models/...` (git-ignored).
 - `tools/demo.py --image temp_uploads/own05.jpg --model models/F4/final_state.pth --output figures/demo/x.jpg` (person detector by default; `--person K`, `--box-mode full`, `--bbox`)
 - `.venv-demo/bin/streamlit run tools/streamlit_demo.py --server.headless true` -> http://localhost:8501 (deep link `?src=temp_uploads/&img=own05.jpg`); stop it afterwards, it holds GPU memory
 - `.venv-demo/bin/python tools/video_infer.py --source <video|folder|0> --out figures/video/ [--no-flip] [--show]` (7.3; no webcam on the server)

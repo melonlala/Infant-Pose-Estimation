@@ -3,6 +3,7 @@
 
 ### Access
 - login node login.explorer.northeastern.edu, user hou.yuchen.
+- file transfer: use the data-transfer node xfer.discovery.neu.edu (same /home), e.g. `rsync -e ssh <src> hou.yuchen@xfer.discovery.neu.edu:<path>`. Do not copy files through the login node.
 - all operations on the explorer cluster are executed through `ssh explorer '<command>'`, SSH is configured for non-interactive and connection reuse, do not attempt to enter a password.
 - if a command cannot be found (such as module, conda), use `ssh explorer 'bash -lc "<command>"'` instead.
 
