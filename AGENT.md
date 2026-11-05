@@ -733,7 +733,9 @@ accuracy than the paper's numbers (see `STUDENT_GUIDE.md`, Part 7).
   reproduction needs into `checkpoints/fidip_checkpoints.zip` (1.70 GB, `unzip -t` OK; per-file sha256 in `checkpoints/SHA256SUMS`, table in `checkpoints/README.md`).
   Left out: `model_best`/`checkpoint.pth`, `feature.npy`, and the licensed SMIL npz/pkl.
 - **Git:** every `.pth` is 255 MB, over GitHub's 100 MB file limit, so the zip must go through Git LFS (`.gitattributes` added). git-lfs is not installed on the server
-  and installing the release binary was blocked by the sandbox, so the zip is git-ignored until the user installs LFS and adds it with `git add -f`.
+  and installing the release binary was first blocked by the sandbox. After the user allowed it ("Allow you to install"), git-lfs 3.5.1 was installed to `~/.local/bin`
+  (sha256 checked against the release's `sha256sums.asc`; the GPG signature was not checked) and `git lfs install` was run. The zip is committed as an LFS pointer
+  (oid = the zip's sha256), and the `.gitignore` guard was removed. **Not pushed:** check the GitHub account's LFS storage quota first (1.7 GB).
 
 ---
 

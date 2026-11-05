@@ -77,6 +77,4 @@ lib/nms/gpu_nms.cpp
 !/output/**/*.log
 !/output_*/**/*.log
 !/figures/**/*.mp4
-# Checkpoint bundle: tracked through Git LFS only (.gitattributes). Ignored here so it can never be added as a plain 1.7 GB blob;
-# add it with `git lfs install && git add -f checkpoints/fidip_checkpoints.zip` (checkpoints/README.md).
-checkpoints/*.zip
+# Checkpoint bundle checkpoints/*.zip is tracked through Git LFS (.gitattributes); run `git lfs install` once per machine before `git add`.
