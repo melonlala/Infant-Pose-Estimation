@@ -1,0 +1,33 @@
+name, memory.total [MiB]
+Tesla V100-SXM2-32GB, 32768 MiB
+transforms (scale, rot): [(0.9, -30.0), (0.9, 0.0), (0.9, 30.0), (1.0, -30.0), (1.0, 0.0), (1.0, 30.0), (1.1, -30.0), (1.1, 0.0), (1.1, 30.0)]
+loaded output/F4/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/final_state.pth
+loading annotations into memory...
+Done (t=0.01s)
+creating index...
+index created!
+0/100
+50/100
+/home/hou.yuchen/courses/eece7373/envs/fidip/lib/python3.12/site-packages/json_tricks/encoders.py:419: UserWarning: json-tricks: numpy scalar serialization is experimental and may work differently in future versions
+  warnings.warn('json-tricks: numpy scalar serialization is experimental and may work differently in future versions')
+Loading and preparing results...
+DONE (t=0.00s)
+creating index...
+index created!
+Running per image evaluation...
+Evaluate annotation type *keypoints*
+DONE (t=0.02s).
+Accumulating evaluation results...
+DONE (t=0.00s).
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets= 20 ] = 0.944
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets= 20 ] = 0.984
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets= 20 ] = 0.984
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets= 20 ] = -1.000
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets= 20 ] = 0.944
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 20 ] = 0.955
+ Average Recall     (AR) @[ IoU=0.50      | area=   all | maxDets= 20 ] = 0.990
+ Average Recall     (AR) @[ IoU=0.75      | area=   all | maxDets= 20 ] = 0.990
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets= 20 ] = -1.000
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets= 20 ] = 0.955
+AP 0.9441552895551796
+OrderedDict({'AP': 0.9441552895551796, 'Ap .5': 0.9836633663366336, 'AP .75': 0.9836633663366336, 'AP (M)': -1.0, 'AP (L)': 0.9441552895551796, 'AR': 0.9549999999999998, 'AR .5': 0.99, 'AR .75': 0.99, 'AR (M)': -1.0, 'AR (L)': 0.9549999999999998})

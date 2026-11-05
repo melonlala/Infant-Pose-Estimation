@@ -1,8 +1,8 @@
 <!--
 DRAFT, 2026-11-04. Open items before submission:
   [ ] B4a/B4b (100 ep + ROT_FACTOR 60) are still training (jobs 11631221/11631233, A100). Fill §6.2 row "B4" and re-check the final-model decision.
-  [ ] Merge branch claude/raw-data-annotation-check-23431c into main (λ sweep, MobileNet, A/B tracks, eval_subsets.py, eval_ensemble_tta.py), so every
-      tool and number cited here is in the submitted repo.
+  [x] Annotation-audit branch merged into this branch; results, logs, figures and generated data tracked in git (2026-11-04).
+  [ ] Merge this branch (claude/fidip-grading-rubric-86bb65) into main before submission.
   [ ] Fill in the name/ID line and the repo URL / commit hash below.
 -->
 
@@ -114,7 +114,7 @@ behind the paper's 93.6. Dropping it never changes the ranking of runs.
 | Subset rescoring | `tools/eval_subsets.py` | rescores saved prediction JSONs on Test100 / Test99 / Test95 / Test500f / Test499f with pycocotools (no re-inference) |
 | Ensemble + TTA | `tools/eval_ensemble_tta.py`, `slurm/eval_ens.sh` | averages heatmaps over models and over scale/rotation views, warps them back, then applies the same DARK decoding and evaluation. Its identity setting reproduces the official eval (A0: 93.99 / 91.73 vs official 94.0 / 91.7) |
 | Single-image inference | `tools/fidip_infer.py` | shared by visualisation, demos, video; optional Faster R-CNN person detector |
-| Visualisation | `tools/visualize_preds.py`, `tools/plot_curves.py`, `plot_compare.py`, `tools/plot_report_ablation.py` | GT vs prediction grids, per-joint OKS, training curves, Fig. 1 |
+| Visualisation | `tools/visualize_preds.py`, `tools/plot_curves.py`, `tools/plot_compare.py`, `tools/plot_report_ablation.py` | GT vs prediction grids, per-joint OKS, training curves, Fig. 1 |
 
 **Evaluation conditions (identical for every row in this report):** SyRIP real test images; GT person boxes (`TEST.USE_GT_BBOX True`), as in the paper; flip test;
 COCO OKS AP averaged over thresholds 0.50:0.95 with the standard COCO sigmas; the same code path for the released model and ours.
@@ -202,7 +202,7 @@ lucky run, but this is not a clean held-out evaluation. A cleaner protocol would
 
 ## 6. All improvement attempts (rubric: quantitative evaluation)
 
-![Every ablation vs the released checkpoint](docs/report_figures/ablation_overview.png)
+![Every ablation vs the released checkpoint](figures/report/ablation_overview.png)
 
 *Figure 1. One dot per training run, final checkpoint. Replicate pairs are joined. Dashed line: the released checkpoint. Shaded band: the +0.3 significance
 bar. Orange: adopted. `tools/plot_report_ablation.py`.*
@@ -255,7 +255,7 @@ bar. Orange: adopted. `tools/plot_report_ablation.py`.*
 
 ### 7.1 Training curves: diagnosing fit (Part 4.5, `docs/part4_results_and_fitting.md`)
 
-![E1b vs D1 vs F3 vs F4](docs/report_figures/compare_4_5.png)
+![E1b vs D1 vs F3 vs F4](figures/compare_4_5.png)
 
 *Figure 2. Train loss, val loss and val AP for E1b (broken labels), D1, F3 (LR 1e-3) and F4 (100 ep).*
 
@@ -271,11 +271,11 @@ loss is a red flag for label noise, not just a side effect of augmentation.
 
 ### 7.2 Per-joint accuracy and worst cases
 
-![per-keypoint OKS](docs/report_figures/per_keypoint.png)
+![per-keypoint OKS](figures/viz_final/per_keypoint.png)
 
 *Figure 3. Mean per-joint OKS similarity on Test100 for the released model (E0), D1 and F4.*
 
-![F4 worst images](docs/report_figures/F4_worst.jpg)
+![F4 worst images](figures/viz_final/F4_worst.png)
 
 *Figure 4. F4's 8 worst Test100 images, GT (left) next to the prediction.*
 
@@ -287,7 +287,7 @@ loss is a red flag for label noise, not just a side effect of augmentation.
 
 ### 7.3 Demos and in-the-wild images (Part 6, `docs/part6_demos.md`)
 
-![own images](docs/report_figures/own_grid.jpg)
+![own images](figures/demo/own_grid.jpg)
 
 *Figure 5. F4 on 12 Wikimedia Commons infant photos that are not in SyRIP (`temp_uploads/SOURCES.md`), with the person-detector box.*
 
@@ -297,7 +297,7 @@ loss is a red flag for label noise, not just a side effect of augmentation.
   We added a Faster R-CNN person detector for this reason. F4 is more confident than the released model on 11 of 12 images.
 - **Failure modes:** the detector picks an adult as the "largest person" (fixed with a picker), swaddled infants, strong foreshortening, and side-view occlusion.
 
-![Streamlit](docs/report_figures/2_pick_infant_among_people.png)
+![Streamlit](figures/demo/streamlit/2_pick_infant_among_people.png)
 
 *Figure 6. Streamlit demo: 5 people detected, the infant selected, 17/17 keypoints.*
 
@@ -305,7 +305,7 @@ loss is a red flag for label noise, not just a side effect of augmentation.
 
 - **7.3 Video / webcam** (`tools/video_infer.py`): file, folder batch, or webcam. It tracks the box from the previous frame's keypoint hull and writes an
   annotated mp4 plus jsonl/csv. On 3 synthetic pan/zoom clips with known GT, tracking beats the whole-frame box by +0.010 to +0.024 mean OKS. Speed is
-  ~20 fps with flip and 32 fps without (RTX 6000 Ada). See `docs/part7_synthetic_and_apps.md` and `docs/report_figures/track_frames.jpg`.
+  ~20 fps with flip and 32 fps without (RTX 6000 Ada). See `docs/part7_synthetic_and_apps.md` and `figures/video/track_frames.jpg`.
 - **7.1 Synthetic generation with SMIL** (`syn_generation/tools/`, `docs/part7_synthetic_and_apps.md`):
   - We converted the licensed SMIL model from chumpy to numpy and ported the OpenDR renderer (not installable on Python ≥ 3.10) to pyrender EGL.
   - We fitted SMIL to all 200 real training images (median reprojection error 2.1 % of the box diagonal) and kept 174 fits. Rendering 3 variants each
@@ -314,7 +314,7 @@ loss is a red flag for label noise, not just a side effect of augmentation.
     The original 1000S set has narrow hips too, which may be one reason it helps little.
   - Training on these renders (SY1/SY2) had no measurable effect (§6).
 
-![SMIL pipeline](docs/report_figures/pipeline_examples.jpg)
+![SMIL pipeline](figures/syn/pipeline_examples.jpg)
 
 *Figure 7. Real image → SMIL fit → new synthetic renders with labels.*
 
@@ -322,7 +322,32 @@ loss is a red flag for label noise, not just a side effect of augmentation.
 
 ## 8. Reproducibility
 
-All paths are relative to the cluster project root `/home/hou.yuchen/courses/eece7373`. MANIFEST §7–8 lists every checkpoint and log.
+All paths in this report are relative to the repository root. The cluster copy (`/home/hou.yuchen/courses/eece7373`) and the server copy have the same layout.
+MANIFEST §7–8 lists every checkpoint and log.
+
+### 8.1 What is in the repository
+
+| Path | Contents |
+|---|---|
+| `tools/`, `slurm/`, `lib/`, `experiments/`, `syn_generation/` | all code: training, evaluation, TTA, rescoring, visualisation, demos, SMIL pipeline, Slurm scripts |
+| `logs/fidip-<run>-<jobid>.out` | Slurm stdout of every job (104 files), including the per-epoch AP tables |
+| `log/<run>/` | TensorBoard events for every training run (input to `tools/plot_curves.py`, `tools/plot_compare.py`) |
+| `output/<run>/syrip/adaptive_pose_*/<cfg>/` | per-run train log and final Test100 predictions `results/keypoints_validate_infant_results_0.json` |
+| `output_test500f/<run>[_final]/...` | Test500f predictions and eval logs (`_final` = `final_state.pth`); `output_test500/` = the superseded constant-area evals |
+| `figures/` | every figure in this report (`figures/report/` = Fig. 1) plus all curves, prediction grids, demo outputs and video clips |
+| `temp_uploads/` | the 12 in-the-wild photos used in §7.3, with licences in `SOURCES.md` |
+| `data/syrip_syn_new/` | our 522 SMIL renders + COCO annotations, `render_meta.json`, `label_check.json` (§7.4) |
+
+**Not in the repository:**
+- **SyRIP** (images and annotations): download it from the AClab page; sha256 sums are in MANIFEST §3. Then rebuild the corrected symlink roots
+  (`data/syrip_fixed`, `data/syrip500_fixed`, …) with the scripts below.
+- **Checkpoints** (`*.pth`, 0.25 GB each): on the cluster under `output/<run>/…/final_state.pth`.
+- **The licensed SMIL model.**
+
+Every AP in this report can be recomputed without a GPU from the tracked prediction files once SyRIP is downloaded and the corrected roots are built:
+`python tools/eval_subsets.py D0_E0:E0 D1 F1 F4 H1 ENS_A2` and `python tools/report_stats_bootstrap.py 1000`.
+
+### 8.2 Commands
 
 ```bash
 # 1. environment + data (once)
@@ -350,9 +375,10 @@ sbatch slurm/eval_ens.sh $F4 0.9,1.0,1.1 -30,0,30 output_test500f/ENS_A2_final D
 - **Config:** `experiments/coco/hrnet/w48_384x288_adam_lr1e-3_infant.yaml` (upstream, unchanged). Every deviation is a command-line override recorded
   per run in the AGENT.md summary table, together with its Slurm job IDs.
 - **Final checkpoint:** `output/F4/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/final_state.pth` (Slurm 11603343; replicate H1 11607648).
-  A copy is on the server at `models/F4/final_state.pth`. Checkpoints are not in git (size and licence).
-- **Logs:** Slurm stdout `logs/fidip-<run>-<jobid>.out`, TensorBoard `log/<run>/`, W&B project `fidip` (runs named by ID), and prediction JSONs in
-  `output*/<run>/.../results/`.
+  A copy is on the server at `models/F4/final_state.pth`. Checkpoints are not in git (size).
+- **Logs (in the repo):** F4's training is in `logs/fidip-F4-11603343.out` and `log/F4/`, its Test100 predictions in
+  `output/F4/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/results/`, and its Test500f predictions in `output_test500f/F4_final/`.
+  The same layout holds for every run. W&B project `fidip` mirrors the curves (runs are named by ID).
 - **Repeats:** D1/F1, F4/H1, G1/H3, S1/S2, B3a/b, B4a/b and SY1/SY2 are replicate pairs.
 - **Exact reproduction caveat:** cuDNN is non-deterministic, so expect ±0.2 AP between reruns. B4 ran on A100 (TF32 convolutions) rather than V100.
 

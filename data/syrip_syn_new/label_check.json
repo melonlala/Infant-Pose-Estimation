@@ -1,0 +1,58 @@
+{
+ "structure": {
+  "n_images": 522,
+  "n_anns": 522,
+  "image_keys_match": true,
+  "ann_keys_match": true,
+  "unique_ids": true,
+  "names_follow_id": true,
+  "all_synthetic": true,
+  "categories_match": true
+ },
+ "per_label": {
+  "n_bad": 0,
+  "examples": [],
+  "visibility_counts": {
+   "v0": 0,
+   "v1": 973,
+   "v2": 7901
+  }
+ },
+ "left_right": {
+  "n_checked": 445,
+  "consistent": 445,
+  "inconsistent_ids": [],
+  "nose_vis_vs_head_facing_n": 372,
+  "nose_vis_vs_head_facing_ok": 367,
+  "nose_mismatch_ids": [
+   20019,
+   20246,
+   20428,
+   20431,
+   20432
+  ]
+ },
+ "real_mapping": {
+  "n": 200,
+  "median_rel_err": {
+   "nose": 0.0098,
+   "left_eye": 0.014,
+   "right_eye": 0.0148,
+   "left_ear": 0.0187,
+   "right_ear": 0.0157,
+   "left_shoulder": 0.021,
+   "right_shoulder": 0.0204,
+   "left_elbow": 0.0149,
+   "right_elbow": 0.0145,
+   "left_wrist": 0.0049,
+   "right_wrist": 0.0042,
+   "left_hip": 0.0395,
+   "right_hip": 0.0378,
+   "left_knee": 0.0156,
+   "right_knee": 0.0188,
+   "left_ankle": 0.0015,
+   "right_ankle": 0.0013
+  },
+  "lr_swap_better": 0
+ }
+}

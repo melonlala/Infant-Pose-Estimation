@@ -1,4 +1,4 @@
-"""Report Fig. 1 (docs/report_figures/ablation_overview.png). Values = tools/eval_subsets.py output, final_state. Run from project root."""
+"""Report Fig. 1 (figures/report/ablation_overview.png). Values = tools/eval_subsets.py output, final_state. Run from project root."""
 import matplotlib; matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 # (label, [(Test99, Test499f) per run], highlight)
@@ -43,4 +43,4 @@ axes[0].set_xlim(88.4, 93.8); axes[1].set_xlim(86.8, 92.4)
 axes[0].set_yticks(y); axes[0].set_yticklabels([r[0] for r in rows], fontsize=9, color=INK)
 fig.suptitle('Every ablation vs the released FiDIP checkpoint (dot = one training run, pairs joined; dashed = released model, shaded = +0.3 bar)', fontsize=11.5, color=INK, x=0.01, ha='left')
 fig.tight_layout(rect=(0, 0, 1, 0.96))
-fig.savefig('docs/report_figures/ablation_overview.png', dpi=150, facecolor='white')
+fig.savefig('figures/report/ablation_overview.png', dpi=150, facecolor='white')

@@ -1,0 +1,14 @@
+name, memory.total [MiB]
+Tesla V100-SXM2-32GB, 32768 MiB
+=> creating output_test500/E1b
+Traceback (most recent call last):
+  File "/home/hou.yuchen/courses/eece7373/tools/test_adaptive_model.py", line 137, in <module>
+    main()
+  File "/home/hou.yuchen/courses/eece7373/tools/test_adaptive_model.py", line 77, in main
+    logger, final_output_dir, tb_log_dir = create_logger(
+                                           ^^^^^^^^^^^^^^
+  File "/home/hou.yuchen/courses/eece7373/tools/../lib/utils/utils.py", line 27, in create_logger
+    root_output_dir.mkdir()
+  File "/home/hou.yuchen/courses/eece7373/envs/fidip/lib/python3.12/pathlib.py", line 1311, in mkdir
+    os.mkdir(self, mode)
+FileNotFoundError: [Errno 2] No such file or directory: 'output_test500/E1b'

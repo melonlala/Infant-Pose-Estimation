@@ -1,0 +1,380 @@
+2026-11-04 12:28:19,109 Namespace(cfg='experiments/coco/hrnet/w48_384x288_adam_lr1e-3_infant.yaml', opts=['TRAIN.CHECKPOINT', 'models/coco/w48_384x288.pth', 'WORKERS', '8', 'OUTPUT_DIR', 'output/L3', 'LOG_DIR', 'log/L3', 'DATASET.ROOT', 'data/syrip_fixed/', 'TRAIN.LAMBDA', '0.005', 'TRAIN.PRE_EPOCH', '1'], modelDir='', logDir='', dataDir='', prevModelDir='')
+2026-11-04 12:28:19,109 AUTO_RESUME: True
+CUDNN:
+  BENCHMARK: True
+  DETERMINISTIC: False
+  ENABLED: True
+DATASET:
+  COLOR_RGB: True
+  DATASET: syrip
+  DATA_FORMAT: jpg
+  FLIP: True
+  HYBRID_JOINTS_TYPE: 
+  NUM_JOINTS_HALF_BODY: 8
+  PROB_HALF_BODY: 0.3
+  ROOT: data/syrip_fixed/
+  ROT_FACTOR: 45
+  SCALE_FACTOR: 0.35
+  SELECT_DATA: False
+  TEST_SET: validate_infant
+  TRAIN_PRE_SET: train_pre_infant
+  TRAIN_SET: train_infant
+DATA_DIR: 
+DEBUG:
+  DEBUG: True
+  SAVE_BATCH_IMAGES_GT: True
+  SAVE_BATCH_IMAGES_PRED: True
+  SAVE_HEATMAPS_GT: True
+  SAVE_HEATMAPS_PRED: True
+GPUS: (0,)
+LOG_DIR: log/L3
+LOSS:
+  TOPK: 8
+  USE_DIFFERENT_JOINTS_WEIGHT: False
+  USE_OHKM: False
+  USE_TARGET_WEIGHT: True
+MODEL:
+  EXTRA:
+    FINAL_CONV_KERNEL: 1
+    PRETRAINED_LAYERS: ['conv1', 'bn1', 'conv2', 'bn2', 'layer1', 'transition1', 'stage2', 'transition2', 'stage3', 'transition3', 'stage4']
+    STAGE2:
+      BLOCK: BASIC
+      FUSE_METHOD: SUM
+      NUM_BLOCKS: [4, 4]
+      NUM_BRANCHES: 2
+      NUM_CHANNELS: [48, 96]
+      NUM_MODULES: 1
+    STAGE3:
+      BLOCK: BASIC
+      FUSE_METHOD: SUM
+      NUM_BLOCKS: [4, 4, 4]
+      NUM_BRANCHES: 3
+      NUM_CHANNELS: [48, 96, 192]
+      NUM_MODULES: 4
+    STAGE4:
+      BLOCK: BASIC
+      FUSE_METHOD: SUM
+      NUM_BLOCKS: [4, 4, 4, 4]
+      NUM_BRANCHES: 4
+      NUM_CHANNELS: [48, 96, 192, 384]
+      NUM_MODULES: 3
+  HEATMAP_SIZE: [72, 96]
+  IMAGE_SIZE: [288, 384]
+  INIT_WEIGHTS: True
+  NAME: adaptive_pose_hrnet
+  NUM_JOINTS: 17
+  PRETRAINED: 
+  SIGMA: 3
+  TAG_PER_JOINT: True
+  TARGET_TYPE: gaussian
+OUTPUT_DIR: output/L3
+PIN_MEMORY: True
+PRINT_FREQ: 20
+RANK: 0
+TEST:
+  BATCH_SIZE_PER_GPU: 16
+  BBOX_THRE: 1.0
+  BLUR_KERNEL: 11
+  COCO_BBOX_FILE: data/coco/person_detection_results/COCO_val2017_detections_AP_H_56_person.json
+  FLIP_TEST: True
+  IMAGE_THRE: 0.0
+  IN_VIS_THRE: 0.2
+  MODEL_FILE: models/coco/w48_384×288.pth
+  NMS_THRE: 1.0
+  OKS_THRE: 0.9
+  POST_PROCESS: True
+  SOFT_NMS: False
+  USE_GT_BBOX: True
+TRAIN:
+  BALANCED_SHUFFLE: False
+  BATCH_SIZE_PER_GPU: 20
+  BEGIN_EPOCH: 0
+  CHECKPOINT: models/coco/w48_384x288.pth
+  END_EPOCH: 20
+  GAMMA1: 0.99
+  GAMMA2: 0.0
+  LAMBDA: 0.005
+  LR: 0.0001
+  LR_FACTOR: 0.1
+  LR_STEP: [40, 200]
+  MOMENTUM: 0.9
+  NESTEROV: False
+  OPTIMIZER: adam
+  PRE_BATCH_SIZE_PER_GPU: 16
+  PRE_EPOCH: 1
+  RESUME: False
+  SHUFFLE: True
+  WD: 0.0001
+WORKERS: 8
+2026-11-04 12:28:19,687 => init weights from normal distribution
+2026-11-04 12:28:20,166 => loading model from models/coco/w48_384x288.pth
+2026-11-04 12:28:34,159 
+Total Parameters: 63,595,745
+----------------------------------------------------------------------------------------------------------------------------------
+Total Multiply Adds (For Convolution and Linear Layers only): 32.881839752197266 GFLOPs
+----------------------------------------------------------------------------------------------------------------------------------
+Number of Layers
+Conv2d : 293 layers   BatchNorm2d : 292 layers   ReLU : 261 layers   Bottleneck : 4 layers   BasicBlock : 104 layers   Upsample : 28 layers   HighResolutionModule : 8 layers   
+2026-11-04 12:28:34,382 => classes: ['__background__', 'person']
+2026-11-04 12:28:34,383 => num_images: 4057
+2026-11-04 12:28:34,699 => load 3904 samples
+2026-11-04 12:28:34,744 => classes: ['__background__', 'person']
+2026-11-04 12:28:34,744 => num_images: 1200
+2026-11-04 12:28:34,842 => load 1200 samples
+2026-11-04 12:28:34,847 => classes: ['__background__', 'person']
+2026-11-04 12:28:34,848 => num_images: 100
+2026-11-04 12:28:34,856 => load 100 samples
+2026-11-04 12:28:39,097 Epoch: [0][0/244]	Accuracy_d: 0.5625 (0.5625)	Loss_d: 0.70701 (0.70701)
+2026-11-04 12:28:41,339 Epoch: [0][20/244]	Accuracy_d: 1.0 (0.8065476190476191)	Loss_d: 0.29358 (0.48186)
+2026-11-04 12:28:43,579 Epoch: [0][40/244]	Accuracy_d: 0.875 (0.8292682926829268)	Loss_d: 0.36146 (0.43204)
+2026-11-04 12:28:45,819 Epoch: [0][60/244]	Accuracy_d: 0.875 (0.8463114754098361)	Loss_d: 0.31330 (0.40260)
+2026-11-04 12:28:48,060 Epoch: [0][80/244]	Accuracy_d: 1.0 (0.8541666666666666)	Loss_d: 0.21577 (0.38747)
+2026-11-04 12:28:50,306 Epoch: [0][100/244]	Accuracy_d: 0.75 (0.8638613861386139)	Loss_d: 0.44302 (0.36981)
+2026-11-04 12:28:52,548 Epoch: [0][120/244]	Accuracy_d: 1.0 (0.8708677685950413)	Loss_d: 0.19262 (0.35809)
+2026-11-04 12:28:54,791 Epoch: [0][140/244]	Accuracy_d: 1.0 (0.8798758865248227)	Loss_d: 0.16733 (0.34301)
+2026-11-04 12:28:57,033 Epoch: [0][160/244]	Accuracy_d: 0.9375 (0.8823757763975155)	Loss_d: 0.20217 (0.33362)
+2026-11-04 12:28:59,275 Epoch: [0][180/244]	Accuracy_d: 0.9375 (0.8867403314917127)	Loss_d: 0.24005 (0.32362)
+2026-11-04 12:29:01,515 Epoch: [0][200/244]	Accuracy_d: 0.9375 (0.888681592039801)	Loss_d: 0.18765 (0.31725)
+2026-11-04 12:29:03,756 Epoch: [0][220/244]	Accuracy_d: 1.0 (0.8914027149321267)	Loss_d: 0.13224 (0.31130)
+2026-11-04 12:29:05,999 Epoch: [0][240/244]	Accuracy_d: 0.9375 (0.8944502074688797)	Loss_d: 0.21598 (0.30452)
+2026-11-04 12:29:09,215 Epoch: [0][0/100]	Accuracy_d 0.55 (0.8929663608562691)	Loss_d_2 0.7773013710975647	Time 2.799s (2.799s)	Data 0.868s (0.868s)	Loss_p -0.00338 (-0.00338)	Loss_d 0.83346 (0.30611)	Accuracy_p 0.834 (0.834)
+2026-11-04 12:29:17,783 Epoch: [0][20/100]	Accuracy_d 0.35 (0.8559204440333025)	Loss_d_2 0.9400060772895813	Time 0.400s (0.541s)	Data 0.000s (0.068s)	Loss_p -0.00407 (-0.00403)	Loss_d 1.05690 (0.37225)	Accuracy_p 0.726 (0.797)
+2026-11-04 12:29:26,304 Epoch: [0][40/100]	Accuracy_d 0.7 (0.8281117696867062)	Loss_d_2 0.6039277911186218	Time 0.400s (0.485s)	Data 0.000s (0.048s)	Loss_p -0.00257 (-0.00349)	Loss_d 0.65977 (0.40455)	Accuracy_p 0.845 (0.804)
+2026-11-04 12:29:34,958 Epoch: [0][60/100]	Accuracy_d 0.6 (0.8038641686182669)	Loss_d_2 0.6369608044624329	Time 0.400s (0.468s)	Data 0.000s (0.042s)	Loss_p -0.00269 (-0.00335)	Loss_d 0.66684 (0.43158)	Accuracy_p 0.809 (0.813)
+2026-11-04 12:29:43,680 Epoch: [0][80/100]	Accuracy_d 0.55 (0.7901882693700217)	Loss_d_2 0.6587702631950378	Time 0.402s (0.460s)	Data 0.000s (0.039s)	Loss_p -0.00283 (-0.00318)	Loss_d 0.68648 (0.44749)	Accuracy_p 0.832 (0.824)
+2026-11-04 12:29:52,885 Test: [0/7]	Time 0.918 (0.918)	Loss 0.0004 (0.0004)	Accuracy 0.897 (0.897)
+2026-11-04 12:29:55,359 => writing results json to output/L3/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/results/keypoints_validate_infant_results_0.json
+2026-11-04 12:29:55,474 | Arch | AP | Ap .5 | AP .75 | AP (M) | AP (L) | AR | AR .5 | AR .75 | AR (M) | AR (L) |
+2026-11-04 12:29:55,475 |---|---|---|---|---|---|---|---|---|---|---|
+2026-11-04 12:29:55,475 | adaptive... | 0.884 | 0.986 | 0.976 | -1.000 | 0.884 | 0.898 | 0.990 | 0.980 | -1.000 | 0.898 |
+2026-11-04 12:29:55,582 => epoch 0 val AP 0.8844 (best 0.8844), peak GPU mem 17.22 GiB
+2026-11-04 12:29:55,729 => saving checkpoint to output/L3/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant
+2026-11-04 12:29:59,230 Epoch: [1][0/100]	Accuracy_d 0.65 (0.8934760448521917)	Loss_d_2 0.6678163409233093	Time 1.172s (1.172s)	Data 0.738s (0.738s)	Loss_p -0.00290 (-0.00311)	Loss_d 0.69557 (0.46364)	Accuracy_p 0.838 (0.824)
+2026-11-04 12:30:07,874 Epoch: [1][20/100]	Accuracy_d 0.75 (0.8656336725254394)	Loss_d_2 0.5743811726570129	Time 0.400s (0.467s)	Data 0.000s (0.066s)	Loss_p -0.00232 (-0.00305)	Loss_d 0.59229 (0.47696)	Accuracy_p 0.794 (0.824)
+2026-11-04 12:30:16,422 Epoch: [1][40/100]	Accuracy_d 0.75 (0.844623200677392)	Loss_d_2 0.6046122908592224	Time 0.400s (0.448s)	Data 0.000s (0.047s)	Loss_p -0.00255 (-0.00300)	Loss_d 0.61950 (0.48707)	Accuracy_p 0.823 (0.825)
+2026-11-04 12:30:24,992 Epoch: [1][60/100]	Accuracy_d 0.75 (0.8253317720530835)	Loss_d_2 0.5820102095603943	Time 0.401s (0.442s)	Data 0.000s (0.040s)	Loss_p -0.00238 (-0.00298)	Loss_d 0.59709 (0.49763)	Accuracy_p 0.813 (0.827)
+2026-11-04 12:30:33,570 Epoch: [1][80/100]	Accuracy_d 0.55 (0.8106444605358436)	Loss_d_2 0.6667912602424622	Time 0.402s (0.438s)	Data 0.000s (0.037s)	Loss_p -0.00294 (-0.00295)	Loss_d 0.68987 (0.50572)	Accuracy_p 0.865 (0.831)
+2026-11-04 12:30:42,945 Test: [0/7]	Time 0.928 (0.928)	Loss 0.0004 (0.0004)	Accuracy 0.901 (0.901)
+2026-11-04 12:30:45,096 => writing results json to output/L3/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/results/keypoints_validate_infant_results_0.json
+2026-11-04 12:30:45,212 | Arch | AP | Ap .5 | AP .75 | AP (M) | AP (L) | AR | AR .5 | AR .75 | AR (M) | AR (L) |
+2026-11-04 12:30:45,213 |---|---|---|---|---|---|---|---|---|---|---|
+2026-11-04 12:30:45,213 | adaptive... | 0.896 | 0.986 | 0.976 | -1.000 | 0.896 | 0.909 | 0.990 | 0.980 | -1.000 | 0.909 |
+2026-11-04 12:30:45,215 => epoch 1 val AP 0.8963 (best 0.8963), peak GPU mem 17.22 GiB
+2026-11-04 12:30:45,216 => saving checkpoint to output/L3/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant
+2026-11-04 12:30:48,900 Epoch: [2][0/100]	Accuracy_d 0.45 (0.8924566768603466)	Loss_d_2 0.6233620643615723	Time 1.156s (1.156s)	Data 0.713s (0.713s)	Loss_p -0.00262 (-0.00294)	Loss_d 0.63873 (0.51482)	Accuracy_p 0.822 (0.830)
+2026-11-04 12:30:57,519 Epoch: [2][20/100]	Accuracy_d 0.6 (0.8635522664199815)	Loss_d_2 0.6246399283409119	Time 0.400s (0.465s)	Data 0.000s (0.064s)	Loss_p -0.00261 (-0.00294)	Loss_d 0.64427 (0.52261)	Accuracy_p 0.840 (0.833)
+2026-11-04 12:31:06,213 Epoch: [2][40/100]	Accuracy_d 0.5 (0.8433530906011855)	Loss_d_2 0.681114673614502	Time 0.399s (0.450s)	Data 0.000s (0.050s)	Loss_p -0.00296 (-0.00292)	Loss_d 0.70329 (0.52891)	Accuracy_p 0.803 (0.833)
+2026-11-04 12:31:14,764 Epoch: [2][60/100]	Accuracy_d 0.6 (0.8263075722092116)	Loss_d_2 0.6342102289199829	Time 0.401s (0.443s)	Data 0.000s (0.042s)	Loss_p -0.00270 (-0.00291)	Loss_d 0.65094 (0.53401)	Accuracy_p 0.814 (0.835)
+2026-11-04 12:31:23,343 Epoch: [2][80/100]	Accuracy_d 0.7 (0.8139029688631426)	Loss_d_2 0.5270163416862488	Time 0.400s (0.439s)	Data 0.000s (0.039s)	Loss_p -0.00230 (-0.00289)	Loss_d 0.54087 (0.53738)	Accuracy_p 0.910 (0.838)
+2026-11-04 12:31:32,591 Test: [0/7]	Time 0.905 (0.905)	Loss 0.0004 (0.0004)	Accuracy 0.912 (0.912)
+2026-11-04 12:31:34,790 => writing results json to output/L3/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/results/keypoints_validate_infant_results_0.json
+2026-11-04 12:31:34,933 | Arch | AP | Ap .5 | AP .75 | AP (M) | AP (L) | AR | AR .5 | AR .75 | AR (M) | AR (L) |
+2026-11-04 12:31:34,933 |---|---|---|---|---|---|---|---|---|---|---|
+2026-11-04 12:31:34,933 | adaptive... | 0.897 | 0.987 | 0.977 | -1.000 | 0.897 | 0.909 | 0.990 | 0.980 | -1.000 | 0.909 |
+2026-11-04 12:31:34,935 => epoch 2 val AP 0.8973 (best 0.8973), peak GPU mem 17.22 GiB
+2026-11-04 12:31:34,937 => saving checkpoint to output/L3/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant
+2026-11-04 12:31:38,907 Epoch: [3][0/100]	Accuracy_d 0.75 (0.8939857288481141)	Loss_d_2 0.6050734519958496	Time 1.203s (1.203s)	Data 0.778s (0.778s)	Loss_p -0.00264 (-0.00288)	Loss_d 0.62521 (0.54242)	Accuracy_p 0.864 (0.838)
+2026-11-04 12:31:47,546 Epoch: [3][20/100]	Accuracy_d 0.5 (0.8658649398704903)	Loss_d_2 0.6474153399467468	Time 0.399s (0.469s)	Data 0.000s (0.066s)	Loss_p -0.00274 (-0.00287)	Loss_d 0.66691 (0.54711)	Accuracy_p 0.832 (0.839)
+2026-11-04 12:31:56,057 Epoch: [3][40/100]	Accuracy_d 0.5 (0.8418712955122777)	Loss_d_2 0.66231769323349	Time 0.399s (0.448s)	Data 0.000s (0.046s)	Loss_p -0.00290 (-0.00287)	Loss_d 0.67700 (0.55188)	Accuracy_p 0.840 (0.840)
+2026-11-04 12:32:04,703 Epoch: [3][60/100]	Accuracy_d 0.85 (0.8245511319281811)	Loss_d_2 0.5433449745178223	Time 0.400s (0.443s)	Data 0.000s (0.042s)	Loss_p -0.00222 (-0.00286)	Loss_d 0.55794 (0.55490)	Accuracy_p 0.780 (0.840)
+2026-11-04 12:32:13,288 Epoch: [3][80/100]	Accuracy_d 0.6 (0.8137219406227372)	Loss_d_2 0.6377467513084412	Time 0.402s (0.439s)	Data 0.000s (0.039s)	Loss_p -0.00277 (-0.00285)	Loss_d 0.65560 (0.55726)	Accuracy_p 0.860 (0.842)
+2026-11-04 12:32:22,502 Test: [0/7]	Time 0.922 (0.922)	Loss 0.0004 (0.0004)	Accuracy 0.915 (0.915)
+2026-11-04 12:32:24,559 => writing results json to output/L3/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/results/keypoints_validate_infant_results_0.json
+2026-11-04 12:32:24,674 | Arch | AP | Ap .5 | AP .75 | AP (M) | AP (L) | AR | AR .5 | AR .75 | AR (M) | AR (L) |
+2026-11-04 12:32:24,675 |---|---|---|---|---|---|---|---|---|---|---|
+2026-11-04 12:32:24,675 | adaptive... | 0.899 | 0.986 | 0.986 | -1.000 | 0.899 | 0.912 | 0.990 | 0.990 | -1.000 | 0.912 |
+2026-11-04 12:32:24,677 => epoch 3 val AP 0.8987 (best 0.8987), peak GPU mem 17.22 GiB
+2026-11-04 12:32:24,678 => saving checkpoint to output/L3/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant
+2026-11-04 12:32:28,366 Epoch: [4][0/100]	Accuracy_d 0.4 (0.8922018348623854)	Loss_d_2 0.7224254012107849	Time 1.188s (1.188s)	Data 0.758s (0.758s)	Loss_p -0.00319 (-0.00285)	Loss_d 0.74378 (0.56087)	Accuracy_p 0.860 (0.842)
+2026-11-04 12:32:36,981 Epoch: [4][20/100]	Accuracy_d 0.5 (0.8679463459759482)	Loss_d_2 0.6747144460678101	Time 0.398s (0.467s)	Data 0.000s (0.066s)	Loss_p -0.00284 (-0.00284)	Loss_d 0.69441 (0.56372)	Accuracy_p 0.804 (0.842)
+2026-11-04 12:32:45,516 Epoch: [4][40/100]	Accuracy_d 0.6 (0.8473751058425063)	Loss_d_2 0.6090030670166016	Time 0.398s (0.447s)	Data 0.000s (0.047s)	Loss_p -0.00263 (-0.00284)	Loss_d 0.62721 (0.56649)	Accuracy_p 0.844 (0.842)
+2026-11-04 12:32:54,258 Epoch: [4][60/100]	Accuracy_d 0.7 (0.828064012490242)	Loss_d_2 0.6386817097663879	Time 0.400s (0.444s)	Data 0.000s (0.044s)	Loss_p -0.00281 (-0.00283)	Loss_d 0.66026 (0.56943)	Accuracy_p 0.875 (0.843)
+2026-11-04 12:33:02,854 Epoch: [4][80/100]	Accuracy_d 0.8 (0.8144460535843592)	Loss_d_2 0.5581479072570801	Time 0.401s (0.440s)	Data 0.000s (0.040s)	Loss_p -0.00238 (-0.00282)	Loss_d 0.57332 (0.57087)	Accuracy_p 0.845 (0.845)
+2026-11-04 12:33:12,163 Test: [0/7]	Time 0.915 (0.915)	Loss 0.0004 (0.0004)	Accuracy 0.893 (0.893)
+2026-11-04 12:33:14,319 => writing results json to output/L3/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/results/keypoints_validate_infant_results_0.json
+2026-11-04 12:33:14,432 | Arch | AP | Ap .5 | AP .75 | AP (M) | AP (L) | AR | AR .5 | AR .75 | AR (M) | AR (L) |
+2026-11-04 12:33:14,433 |---|---|---|---|---|---|---|---|---|---|---|
+2026-11-04 12:33:14,433 | adaptive... | 0.897 | 0.987 | 0.972 | -1.000 | 0.897 | 0.912 | 0.990 | 0.980 | -1.000 | 0.912 |
+2026-11-04 12:33:14,435 => epoch 4 val AP 0.8972 (best 0.8987), peak GPU mem 17.22 GiB
+2026-11-04 12:33:14,436 => saving checkpoint to output/L3/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant
+2026-11-04 12:33:17,454 Epoch: [5][0/100]	Accuracy_d 0.45 (0.8924566768603466)	Loss_d_2 0.7385535836219788	Time 1.178s (1.178s)	Data 0.755s (0.755s)	Loss_p -0.00327 (-0.00282)	Loss_d 0.75902 (0.57383)	Accuracy_p 0.895 (0.845)
+2026-11-04 12:33:26,092 Epoch: [5][20/100]	Accuracy_d 0.6 (0.8677150786308974)	Loss_d_2 0.584514319896698	Time 0.399s (0.467s)	Data 0.000s (0.068s)	Loss_p -0.00234 (-0.00282)	Loss_d 0.59717 (0.57593)	Accuracy_p 0.781 (0.845)
+2026-11-04 12:33:34,606 Epoch: [5][40/100]	Accuracy_d 0.55 (0.84229466553768)	Loss_d_2 0.7000064253807068	Time 0.398s (0.447s)	Data 0.000s (0.048s)	Loss_p -0.00310 (-0.00282)	Loss_d 0.71714 (0.57890)	Accuracy_p 0.870 (0.845)
+2026-11-04 12:33:43,142 Epoch: [5][60/100]	Accuracy_d 0.7 (0.8231850117096019)	Loss_d_2 0.5687884092330933	Time 0.400s (0.440s)	Data 0.000s (0.041s)	Loss_p -0.00231 (-0.00282)	Loss_d 0.58496 (0.58087)	Accuracy_p 0.835 (0.846)
+2026-11-04 12:33:51,643 Epoch: [5][80/100]	Accuracy_d 0.65 (0.808653149891383)	Loss_d_2 0.5988370776176453	Time 0.400s (0.437s)	Data 0.000s (0.037s)	Loss_p -0.00258 (-0.00282)	Loss_d 0.61768 (0.58245)	Accuracy_p 0.858 (0.847)
+2026-11-04 12:34:00,935 Test: [0/7]	Time 0.902 (0.902)	Loss 0.0004 (0.0004)	Accuracy 0.879 (0.879)
+2026-11-04 12:34:03,112 => writing results json to output/L3/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/results/keypoints_validate_infant_results_0.json
+2026-11-04 12:34:03,253 | Arch | AP | Ap .5 | AP .75 | AP (M) | AP (L) | AR | AR .5 | AR .75 | AR (M) | AR (L) |
+2026-11-04 12:34:03,253 |---|---|---|---|---|---|---|---|---|---|---|
+2026-11-04 12:34:03,254 | adaptive... | 0.901 | 0.987 | 0.973 | -1.000 | 0.901 | 0.913 | 0.990 | 0.980 | -1.000 | 0.913 |
+2026-11-04 12:34:03,256 => epoch 5 val AP 0.9006 (best 0.9006), peak GPU mem 17.22 GiB
+2026-11-04 12:34:03,257 => saving checkpoint to output/L3/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant
+2026-11-04 12:34:07,104 Epoch: [6][0/100]	Accuracy_d 0.35 (0.891946992864424)	Loss_d_2 0.7601015567779541	Time 1.197s (1.197s)	Data 0.770s (0.770s)	Loss_p -0.00338 (-0.00282)	Loss_d 0.78722 (0.58465)	Accuracy_p 0.849 (0.847)
+2026-11-04 12:34:15,711 Epoch: [6][20/100]	Accuracy_d 0.75 (0.866327474560592)	Loss_d_2 0.6123543977737427	Time 0.399s (0.467s)	Data 0.000s (0.066s)	Loss_p -0.00249 (-0.00281)	Loss_d 0.62898 (0.58626)	Accuracy_p 0.824 (0.847)
+2026-11-04 12:34:24,200 Epoch: [6][40/100]	Accuracy_d 0.6 (0.8420829805249789)	Loss_d_2 0.5879722833633423	Time 0.399s (0.446s)	Data 0.000s (0.046s)	Loss_p -0.00250 (-0.00281)	Loss_d 0.60360 (0.58814)	Accuracy_p 0.847 (0.847)
+2026-11-04 12:34:32,720 Epoch: [6][60/100]	Accuracy_d 0.65 (0.8188914910226386)	Loss_d_2 0.5797097086906433	Time 0.398s (0.440s)	Data 0.000s (0.040s)	Loss_p -0.00238 (-0.00281)	Loss_d 0.59576 (0.59038)	Accuracy_p 0.792 (0.848)
+2026-11-04 12:34:41,291 Epoch: [6][80/100]	Accuracy_d 0.7 (0.806842867487328)	Loss_d_2 0.5816395878791809	Time 0.401s (0.437s)	Data 0.000s (0.037s)	Loss_p -0.00246 (-0.00281)	Loss_d 0.60010 (0.59123)	Accuracy_p 0.855 (0.848)
+2026-11-04 12:34:50,529 Test: [0/7]	Time 0.919 (0.919)	Loss 0.0004 (0.0004)	Accuracy 0.890 (0.890)
+2026-11-04 12:34:52,670 => writing results json to output/L3/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/results/keypoints_validate_infant_results_0.json
+2026-11-04 12:34:52,782 | Arch | AP | Ap .5 | AP .75 | AP (M) | AP (L) | AR | AR .5 | AR .75 | AR (M) | AR (L) |
+2026-11-04 12:34:52,783 |---|---|---|---|---|---|---|---|---|---|---|
+2026-11-04 12:34:52,783 | adaptive... | 0.904 | 0.985 | 0.985 | -1.000 | 0.904 | 0.917 | 0.990 | 0.990 | -1.000 | 0.917 |
+2026-11-04 12:34:52,785 => epoch 6 val AP 0.9041 (best 0.9041), peak GPU mem 17.22 GiB
+2026-11-04 12:34:52,786 => saving checkpoint to output/L3/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant
+2026-11-04 12:34:56,346 Epoch: [7][0/100]	Accuracy_d 0.65 (0.8934760448521917)	Loss_d_2 0.6130531430244446	Time 1.176s (1.176s)	Data 0.742s (0.742s)	Loss_p -0.00262 (-0.00281)	Loss_d 0.63086 (0.59275)	Accuracy_p 0.870 (0.848)
+2026-11-04 12:35:04,938 Epoch: [7][20/100]	Accuracy_d 0.6 (0.8658649398704903)	Loss_d_2 0.6487141251564026	Time 0.399s (0.465s)	Data 0.000s (0.064s)	Loss_p -0.00266 (-0.00281)	Loss_d 0.66756 (0.59437)	Accuracy_p 0.818 (0.848)
+2026-11-04 12:35:13,470 Epoch: [7][40/100]	Accuracy_d 0.4 (0.8441998306519899)	Loss_d_2 0.7126855254173279	Time 0.400s (0.446s)	Data 0.000s (0.046s)	Loss_p -0.00319 (-0.00281)	Loss_d 0.73574 (0.59579)	Accuracy_p 0.892 (0.849)
+2026-11-04 12:35:21,993 Epoch: [7][60/100]	Accuracy_d 0.65 (0.8257220921155347)	Loss_d_2 0.5969867706298828	Time 0.399s (0.440s)	Data 0.000s (0.040s)	Loss_p -0.00246 (-0.00280)	Loss_d 0.61318 (0.59700)	Accuracy_p 0.809 (0.849)
+2026-11-04 12:35:30,563 Epoch: [7][80/100]	Accuracy_d 0.4 (0.8113685734974656)	Loss_d_2 0.714272677898407	Time 0.400s (0.437s)	Data 0.000s (0.037s)	Loss_p -0.00314 (-0.00280)	Loss_d 0.73253 (0.59800)	Accuracy_p 0.862 (0.850)
+2026-11-04 12:35:39,753 Test: [0/7]	Time 0.901 (0.901)	Loss 0.0004 (0.0004)	Accuracy 0.886 (0.886)
+2026-11-04 12:35:41,858 => writing results json to output/L3/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/results/keypoints_validate_infant_results_0.json
+2026-11-04 12:35:41,969 | Arch | AP | Ap .5 | AP .75 | AP (M) | AP (L) | AR | AR .5 | AR .75 | AR (M) | AR (L) |
+2026-11-04 12:35:41,970 |---|---|---|---|---|---|---|---|---|---|---|
+2026-11-04 12:35:41,970 | adaptive... | 0.901 | 0.985 | 0.985 | -1.000 | 0.901 | 0.912 | 0.990 | 0.990 | -1.000 | 0.912 |
+2026-11-04 12:35:41,972 => epoch 7 val AP 0.9009 (best 0.9041), peak GPU mem 17.22 GiB
+2026-11-04 12:35:41,973 => saving checkpoint to output/L3/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant
+2026-11-04 12:35:45,133 Epoch: [8][0/100]	Accuracy_d 0.4 (0.8922018348623854)	Loss_d_2 0.7038707733154297	Time 1.220s (1.220s)	Data 0.782s (0.782s)	Loss_p -0.00303 (-0.00280)	Loss_d 0.72648 (0.59944)	Accuracy_p 0.831 (0.849)
+2026-11-04 12:35:53,662 Epoch: [8][20/100]	Accuracy_d 0.65 (0.8623959296947271)	Loss_d_2 0.6222676038742065	Time 0.398s (0.464s)	Data 0.000s (0.064s)	Loss_p -0.00249 (-0.00280)	Loss_d 0.63584 (0.60085)	Accuracy_p 0.757 (0.849)
+2026-11-04 12:36:02,177 Epoch: [8][40/100]	Accuracy_d 0.55 (0.836155800169348)	Loss_d_2 0.6606350541114807	Time 0.401s (0.445s)	Data 0.000s (0.045s)	Loss_p -0.00289 (-0.00280)	Loss_d 0.67580 (0.60246)	Accuracy_p 0.869 (0.849)
+2026-11-04 12:36:10,722 Epoch: [8][60/100]	Accuracy_d 0.75 (0.8181108508977362)	Loss_d_2 0.6241633296012878	Time 0.399s (0.439s)	Data 0.000s (0.040s)	Loss_p -0.00259 (-0.00280)	Loss_d 0.64116 (0.60352)	Accuracy_p 0.855 (0.850)
+2026-11-04 12:36:19,332 Epoch: [8][80/100]	Accuracy_d 0.45 (0.8041274438812455)	Loss_d_2 0.6732324957847595	Time 0.400s (0.437s)	Data 0.000s (0.037s)	Loss_p -0.00293 (-0.00280)	Loss_d 0.69292 (0.60434)	Accuracy_p 0.875 (0.850)
+2026-11-04 12:36:28,632 Test: [0/7]	Time 0.917 (0.917)	Loss 0.0004 (0.0004)	Accuracy 0.886 (0.886)
+2026-11-04 12:36:30,748 => writing results json to output/L3/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/results/keypoints_validate_infant_results_0.json
+2026-11-04 12:36:30,861 | Arch | AP | Ap .5 | AP .75 | AP (M) | AP (L) | AR | AR .5 | AR .75 | AR (M) | AR (L) |
+2026-11-04 12:36:30,862 |---|---|---|---|---|---|---|---|---|---|---|
+2026-11-04 12:36:30,862 | adaptive... | 0.897 | 0.986 | 0.986 | -1.000 | 0.897 | 0.909 | 0.990 | 0.990 | -1.000 | 0.909 |
+2026-11-04 12:36:30,864 => epoch 8 val AP 0.8965 (best 0.9041), peak GPU mem 17.22 GiB
+2026-11-04 12:36:30,865 => saving checkpoint to output/L3/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant
+2026-11-04 12:36:33,896 Epoch: [9][0/100]	Accuracy_d 0.55 (0.8929663608562691)	Loss_d_2 0.6501741409301758	Time 1.188s (1.188s)	Data 0.759s (0.759s)	Loss_p -0.00281 (-0.00280)	Loss_d 0.66551 (0.60556)	Accuracy_p 0.884 (0.850)
+2026-11-04 12:36:42,554 Epoch: [9][20/100]	Accuracy_d 0.6 (0.8667900092506938)	Loss_d_2 0.6678840517997742	Time 0.399s (0.469s)	Data 0.000s (0.066s)	Loss_p -0.00271 (-0.00280)	Loss_d 0.68678 (0.60653)	Accuracy_p 0.808 (0.850)
+2026-11-04 12:36:51,174 Epoch: [9][40/100]	Accuracy_d 0.35 (0.84229466553768)	Loss_d_2 0.7212428450584412	Time 0.403s (0.450s)	Data 0.000s (0.048s)	Loss_p -0.00315 (-0.00280)	Loss_d 0.74237 (0.60762)	Accuracy_p 0.849 (0.850)
+2026-11-04 12:36:59,723 Epoch: [9][60/100]	Accuracy_d 0.6 (0.8200624512099922)	Loss_d_2 0.6153162121772766	Time 0.400s (0.443s)	Data 0.000s (0.041s)	Loss_p -0.00258 (-0.00280)	Loss_d 0.63407 (0.60860)	Accuracy_p 0.831 (0.850)
+2026-11-04 12:37:08,267 Epoch: [9][80/100]	Accuracy_d 0.6 (0.808291093410572)	Loss_d_2 0.623090922832489	Time 0.400s (0.439s)	Data 0.000s (0.038s)	Loss_p -0.00273 (-0.00279)	Loss_d 0.63945 (0.60894)	Accuracy_p 0.881 (0.851)
+2026-11-04 12:37:17,514 Test: [0/7]	Time 0.914 (0.914)	Loss 0.0004 (0.0004)	Accuracy 0.897 (0.897)
+2026-11-04 12:37:19,609 => writing results json to output/L3/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/results/keypoints_validate_infant_results_0.json
+2026-11-04 12:37:19,723 | Arch | AP | Ap .5 | AP .75 | AP (M) | AP (L) | AR | AR .5 | AR .75 | AR (M) | AR (L) |
+2026-11-04 12:37:19,723 |---|---|---|---|---|---|---|---|---|---|---|
+2026-11-04 12:37:19,723 | adaptive... | 0.898 | 0.985 | 0.985 | -1.000 | 0.898 | 0.911 | 0.990 | 0.990 | -1.000 | 0.911 |
+2026-11-04 12:37:19,726 => epoch 9 val AP 0.8984 (best 0.9041), peak GPU mem 17.22 GiB
+2026-11-04 12:37:19,727 => saving checkpoint to output/L3/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant
+2026-11-04 12:37:22,714 Epoch: [10][0/100]	Accuracy_d 0.5 (0.8927115188583078)	Loss_d_2 0.6835047602653503	Time 1.208s (1.208s)	Data 0.775s (0.775s)	Loss_p -0.00298 (-0.00280)	Loss_d 0.70157 (0.61010)	Accuracy_p 0.860 (0.851)
+2026-11-04 12:37:31,280 Epoch: [10][20/100]	Accuracy_d 0.45 (0.8637835337650324)	Loss_d_2 0.7233763933181763	Time 0.398s (0.465s)	Data 0.000s (0.065s)	Loss_p -0.00312 (-0.00279)	Loss_d 0.74447 (0.61095)	Accuracy_p 0.847 (0.851)
+2026-11-04 12:37:39,832 Epoch: [10][40/100]	Accuracy_d 0.6 (0.8414479254868755)	Loss_d_2 0.663058340549469	Time 0.402s (0.447s)	Data 0.001s (0.047s)	Loss_p -0.00292 (-0.00279)	Loss_d 0.68218 (0.61184)	Accuracy_p 0.877 (0.851)
+2026-11-04 12:37:48,386 Epoch: [10][60/100]	Accuracy_d 0.4 (0.8194769711163153)	Loss_d_2 0.6901424527168274	Time 0.400s (0.441s)	Data 0.000s (0.041s)	Loss_p -0.00292 (-0.00280)	Loss_d 0.71097 (0.61289)	Accuracy_p 0.812 (0.851)
+2026-11-04 12:37:56,977 Epoch: [10][80/100]	Accuracy_d 0.45 (0.804670528602462)	Loss_d_2 0.7013959884643555	Time 0.400s (0.438s)	Data 0.000s (0.038s)	Loss_p -0.00312 (-0.00280)	Loss_d 0.71701 (0.61344)	Accuracy_p 0.901 (0.852)
+2026-11-04 12:38:06,254 Test: [0/7]	Time 0.917 (0.917)	Loss 0.0004 (0.0004)	Accuracy 0.908 (0.908)
+2026-11-04 12:38:08,408 => writing results json to output/L3/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/results/keypoints_validate_infant_results_0.json
+2026-11-04 12:38:08,561 | Arch | AP | Ap .5 | AP .75 | AP (M) | AP (L) | AR | AR .5 | AR .75 | AR (M) | AR (L) |
+2026-11-04 12:38:08,561 |---|---|---|---|---|---|---|---|---|---|---|
+2026-11-04 12:38:08,561 | adaptive... | 0.894 | 0.984 | 0.984 | -1.000 | 0.894 | 0.909 | 0.990 | 0.990 | -1.000 | 0.909 |
+2026-11-04 12:38:08,563 => epoch 10 val AP 0.8942 (best 0.9041), peak GPU mem 17.22 GiB
+2026-11-04 12:38:08,564 => saving checkpoint to output/L3/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant
+2026-11-04 12:38:11,535 Epoch: [11][0/100]	Accuracy_d 0.65 (0.8934760448521917)	Loss_d_2 0.6527158617973328	Time 1.125s (1.125s)	Data 0.689s (0.689s)	Loss_p -0.00275 (-0.00279)	Loss_d 0.67147 (0.61424)	Accuracy_p 0.833 (0.852)
+2026-11-04 12:38:20,167 Epoch: [11][20/100]	Accuracy_d 0.55 (0.8681776133209991)	Loss_d_2 0.7378060817718506	Time 0.399s (0.465s)	Data 0.000s (0.064s)	Loss_p -0.00311 (-0.00279)	Loss_d 0.75806 (0.61485)	Accuracy_p 0.787 (0.851)
+2026-11-04 12:38:28,697 Epoch: [11][40/100]	Accuracy_d 0.55 (0.8435647756138865)	Loss_d_2 0.6397964358329773	Time 0.402s (0.446s)	Data 0.000s (0.046s)	Loss_p -0.00271 (-0.00279)	Loss_d 0.65836 (0.61574)	Accuracy_p 0.813 (0.851)
+2026-11-04 12:38:37,281 Epoch: [11][60/100]	Accuracy_d 0.55 (0.8241608118657299)	Loss_d_2 0.6748145222663879	Time 0.404s (0.441s)	Data 0.000s (0.040s)	Loss_p -0.00293 (-0.00279)	Loss_d 0.69487 (0.61627)	Accuracy_p 0.851 (0.851)
+2026-11-04 12:38:45,903 Epoch: [11][80/100]	Accuracy_d 0.4 (0.8081100651701666)	Loss_d_2 0.7406148314476013	Time 0.400s (0.438s)	Data 0.000s (0.038s)	Loss_p -0.00333 (-0.00279)	Loss_d 0.76102 (0.61678)	Accuracy_p 0.905 (0.852)
+2026-11-04 12:38:55,058 Test: [0/7]	Time 0.860 (0.860)	Loss 0.0005 (0.0005)	Accuracy 0.882 (0.882)
+2026-11-04 12:38:57,279 => writing results json to output/L3/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/results/keypoints_validate_infant_results_0.json
+2026-11-04 12:38:57,405 | Arch | AP | Ap .5 | AP .75 | AP (M) | AP (L) | AR | AR .5 | AR .75 | AR (M) | AR (L) |
+2026-11-04 12:38:57,405 |---|---|---|---|---|---|---|---|---|---|---|
+2026-11-04 12:38:57,406 | adaptive... | 0.885 | 0.985 | 0.962 | -1.000 | 0.885 | 0.899 | 0.990 | 0.970 | -1.000 | 0.899 |
+2026-11-04 12:38:57,407 => epoch 11 val AP 0.8851 (best 0.9041), peak GPU mem 17.22 GiB
+2026-11-04 12:38:57,409 => saving checkpoint to output/L3/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant
+2026-11-04 12:39:00,840 Epoch: [12][0/100]	Accuracy_d 0.65 (0.8934760448521917)	Loss_d_2 0.6081128120422363	Time 1.078s (1.078s)	Data 0.645s (0.645s)	Loss_p -0.00251 (-0.00279)	Loss_d 0.62364 (0.61773)	Accuracy_p 0.832 (0.852)
+2026-11-04 12:39:09,492 Epoch: [12][20/100]	Accuracy_d 0.5 (0.8635522664199815)	Loss_d_2 0.6857659816741943	Time 0.397s (0.463s)	Data 0.000s (0.063s)	Loss_p -0.00285 (-0.00279)	Loss_d 0.70627 (0.61854)	Accuracy_p 0.769 (0.851)
+2026-11-04 12:39:18,005 Epoch: [12][40/100]	Accuracy_d 0.6 (0.8393310753598645)	Loss_d_2 0.6578553318977356	Time 0.401s (0.445s)	Data 0.000s (0.045s)	Loss_p -0.00286 (-0.00279)	Loss_d 0.67913 (0.61917)	Accuracy_p 0.861 (0.851)
+2026-11-04 12:39:26,536 Epoch: [12][60/100]	Accuracy_d 0.65 (0.8243559718969555)	Loss_d_2 0.648623526096344	Time 0.399s (0.439s)	Data 0.000s (0.039s)	Loss_p -0.00266 (-0.00279)	Loss_d 0.66557 (0.61942)	Accuracy_p 0.773 (0.852)
+2026-11-04 12:39:35,102 Epoch: [12][80/100]	Accuracy_d 0.6 (0.8095582910934106)	Loss_d_2 0.7106016874313354	Time 0.401s (0.436s)	Data 0.000s (0.037s)	Loss_p -0.00304 (-0.00279)	Loss_d 0.73463 (0.61978)	Accuracy_p 0.834 (0.852)
+2026-11-04 12:39:44,263 Test: [0/7]	Time 0.867 (0.867)	Loss 0.0004 (0.0004)	Accuracy 0.893 (0.893)
+2026-11-04 12:39:46,414 => writing results json to output/L3/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/results/keypoints_validate_infant_results_0.json
+2026-11-04 12:39:46,528 | Arch | AP | Ap .5 | AP .75 | AP (M) | AP (L) | AR | AR .5 | AR .75 | AR (M) | AR (L) |
+2026-11-04 12:39:46,528 |---|---|---|---|---|---|---|---|---|---|---|
+2026-11-04 12:39:46,528 | adaptive... | 0.895 | 0.984 | 0.984 | -1.000 | 0.895 | 0.909 | 0.990 | 0.990 | -1.000 | 0.909 |
+2026-11-04 12:39:46,530 => epoch 12 val AP 0.8952 (best 0.9041), peak GPU mem 17.22 GiB
+2026-11-04 12:39:46,531 => saving checkpoint to output/L3/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant
+2026-11-04 12:39:49,742 Epoch: [13][0/100]	Accuracy_d 0.55 (0.8929663608562691)	Loss_d_2 0.6717182993888855	Time 1.168s (1.168s)	Data 0.740s (0.740s)	Loss_p -0.00287 (-0.00279)	Loss_d 0.68824 (0.62049)	Accuracy_p 0.871 (0.852)
+2026-11-04 12:39:58,358 Epoch: [13][20/100]	Accuracy_d 0.5 (0.8617021276595744)	Loss_d_2 0.6883018612861633	Time 0.399s (0.466s)	Data 0.000s (0.066s)	Loss_p -0.00283 (-0.00279)	Loss_d 0.70972 (0.62134)	Accuracy_p 0.794 (0.851)
+2026-11-04 12:40:06,985 Epoch: [13][40/100]	Accuracy_d 0.55 (0.838272650296359)	Loss_d_2 0.7088821530342102	Time 0.400s (0.449s)	Data 0.000s (0.050s)	Loss_p -0.00310 (-0.00279)	Loss_d 0.72507 (0.62194)	Accuracy_p 0.854 (0.851)
+2026-11-04 12:40:15,641 Epoch: [13][60/100]	Accuracy_d 0.5 (0.819672131147541)	Loss_d_2 0.663402795791626	Time 0.404s (0.444s)	Data 0.000s (0.043s)	Loss_p -0.00272 (-0.00279)	Loss_d 0.68448 (0.62238)	Accuracy_p 0.795 (0.851)
+2026-11-04 12:40:24,240 Epoch: [13][80/100]	Accuracy_d 0.65 (0.807204923968139)	Loss_d_2 0.616693913936615	Time 0.403s (0.440s)	Data 0.000s (0.039s)	Loss_p -0.00259 (-0.00279)	Loss_d 0.63457 (0.62249)	Accuracy_p 0.852 (0.852)
+2026-11-04 12:40:33,405 Test: [0/7]	Time 0.853 (0.853)	Loss 0.0005 (0.0005)	Accuracy 0.893 (0.893)
+2026-11-04 12:40:35,534 => writing results json to output/L3/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/results/keypoints_validate_infant_results_0.json
+2026-11-04 12:40:35,644 | Arch | AP | Ap .5 | AP .75 | AP (M) | AP (L) | AR | AR .5 | AR .75 | AR (M) | AR (L) |
+2026-11-04 12:40:35,645 |---|---|---|---|---|---|---|---|---|---|---|
+2026-11-04 12:40:35,645 | adaptive... | 0.885 | 0.985 | 0.965 | -1.000 | 0.885 | 0.898 | 0.990 | 0.970 | -1.000 | 0.898 |
+2026-11-04 12:40:35,647 => epoch 13 val AP 0.8853 (best 0.9041), peak GPU mem 17.22 GiB
+2026-11-04 12:40:35,648 => saving checkpoint to output/L3/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant
+2026-11-04 12:40:38,681 Epoch: [14][0/100]	Accuracy_d 0.6 (0.8932212028542303)	Loss_d_2 0.6085290312767029	Time 1.130s (1.130s)	Data 0.695s (0.695s)	Loss_p -0.00261 (-0.00279)	Loss_d 0.62512 (0.62311)	Accuracy_p 0.878 (0.851)
+2026-11-04 12:40:47,254 Epoch: [14][20/100]	Accuracy_d 0.6 (0.8635522664199815)	Loss_d_2 0.662813127040863	Time 0.402s (0.462s)	Data 0.000s (0.062s)	Loss_p -0.00265 (-0.00279)	Loss_d 0.67926 (0.62377)	Accuracy_p 0.796 (0.851)
+2026-11-04 12:40:55,814 Epoch: [14][40/100]	Accuracy_d 0.7 (0.8384843353090601)	Loss_d_2 0.5857617259025574	Time 0.402s (0.445s)	Data 0.000s (0.044s)	Loss_p -0.00245 (-0.00279)	Loss_d 0.59791 (0.62438)	Accuracy_p 0.861 (0.851)
+2026-11-04 12:41:04,346 Epoch: [14][60/100]	Accuracy_d 0.7 (0.8202576112412178)	Loss_d_2 0.6465000510215759	Time 0.400s (0.439s)	Data 0.000s (0.039s)	Loss_p -0.00270 (-0.00279)	Loss_d 0.66539 (0.62497)	Accuracy_p 0.808 (0.851)
+2026-11-04 12:41:12,888 Epoch: [14][80/100]	Accuracy_d 0.75 (0.8066618392469225)	Loss_d_2 0.566273033618927	Time 0.398s (0.436s)	Data 0.000s (0.036s)	Loss_p -0.00241 (-0.00279)	Loss_d 0.57961 (0.62519)	Accuracy_p 0.906 (0.852)
+2026-11-04 12:41:22,026 Test: [0/7]	Time 0.850 (0.850)	Loss 0.0005 (0.0005)	Accuracy 0.890 (0.890)
+2026-11-04 12:41:24,064 => writing results json to output/L3/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/results/keypoints_validate_infant_results_0.json
+2026-11-04 12:41:24,182 | Arch | AP | Ap .5 | AP .75 | AP (M) | AP (L) | AR | AR .5 | AR .75 | AR (M) | AR (L) |
+2026-11-04 12:41:24,182 |---|---|---|---|---|---|---|---|---|---|---|
+2026-11-04 12:41:24,182 | adaptive... | 0.892 | 0.985 | 0.985 | -1.000 | 0.892 | 0.904 | 0.990 | 0.990 | -1.000 | 0.904 |
+2026-11-04 12:41:24,185 => epoch 14 val AP 0.8918 (best 0.9041), peak GPU mem 17.22 GiB
+2026-11-04 12:41:24,186 => saving checkpoint to output/L3/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant
+2026-11-04 12:41:27,063 Epoch: [15][0/100]	Accuracy_d 0.5 (0.8927115188583078)	Loss_d_2 0.7180845141410828	Time 1.119s (1.119s)	Data 0.693s (0.693s)	Loss_p -0.00304 (-0.00279)	Loss_d 0.73670 (0.62589)	Accuracy_p 0.806 (0.852)
+2026-11-04 12:41:35,731 Epoch: [15][20/100]	Accuracy_d 0.6 (0.8628584643848288)	Loss_d_2 0.6520118117332458	Time 0.401s (0.466s)	Data 0.000s (0.064s)	Loss_p -0.00264 (-0.00279)	Loss_d 0.66461 (0.62646)	Accuracy_p 0.820 (0.851)
+2026-11-04 12:41:44,297 Epoch: [15][40/100]	Accuracy_d 0.5 (0.84038950042337)	Loss_d_2 0.7064754366874695	Time 0.398s (0.448s)	Data 0.000s (0.046s)	Loss_p -0.00307 (-0.00279)	Loss_d 0.72344 (0.62693)	Accuracy_p 0.839 (0.851)
+2026-11-04 12:41:52,883 Epoch: [15][60/100]	Accuracy_d 0.55 (0.8202576112412178)	Loss_d_2 0.6462640762329102	Time 0.400s (0.442s)	Data 0.000s (0.040s)	Loss_p -0.00273 (-0.00279)	Loss_d 0.66046 (0.62747)	Accuracy_p 0.811 (0.851)
+2026-11-04 12:42:01,494 Epoch: [15][80/100]	Accuracy_d 0.6 (0.8028602461984069)	Loss_d_2 0.6432771682739258	Time 0.400s (0.439s)	Data 0.000s (0.038s)	Loss_p -0.00278 (-0.00279)	Loss_d 0.66056 (0.62776)	Accuracy_p 0.892 (0.852)
+2026-11-04 12:42:10,863 Test: [0/7]	Time 0.975 (0.975)	Loss 0.0005 (0.0005)	Accuracy 0.882 (0.882)
+2026-11-04 12:42:13,081 => writing results json to output/L3/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/results/keypoints_validate_infant_results_0.json
+2026-11-04 12:42:13,221 | Arch | AP | Ap .5 | AP .75 | AP (M) | AP (L) | AR | AR .5 | AR .75 | AR (M) | AR (L) |
+2026-11-04 12:42:13,222 |---|---|---|---|---|---|---|---|---|---|---|
+2026-11-04 12:42:13,222 | adaptive... | 0.884 | 0.985 | 0.985 | -1.000 | 0.884 | 0.900 | 0.990 | 0.990 | -1.000 | 0.900 |
+2026-11-04 12:42:13,224 => epoch 15 val AP 0.8836 (best 0.9041), peak GPU mem 17.22 GiB
+2026-11-04 12:42:13,225 => saving checkpoint to output/L3/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant
+2026-11-04 12:42:17,469 Epoch: [16][0/100]	Accuracy_d 0.6 (0.8932212028542303)	Loss_d_2 0.6457916498184204	Time 1.107s (1.107s)	Data 0.681s (0.681s)	Loss_p -0.00273 (-0.00279)	Loss_d 0.65941 (0.62830)	Accuracy_p 0.873 (0.852)
+2026-11-04 12:42:26,107 Epoch: [16][20/100]	Accuracy_d 0.75 (0.8651711378353376)	Loss_d_2 0.5991765856742859	Time 0.398s (0.464s)	Data 0.000s (0.064s)	Loss_p -0.00243 (-0.00279)	Loss_d 0.61360 (0.62879)	Accuracy_p 0.784 (0.852)
+2026-11-04 12:42:34,657 Epoch: [16][40/100]	Accuracy_d 0.6 (0.8384843353090601)	Loss_d_2 0.6435096859931946	Time 0.399s (0.446s)	Data 0.000s (0.047s)	Loss_p -0.00278 (-0.00279)	Loss_d 0.66046 (0.62941)	Accuracy_p 0.853 (0.852)
+2026-11-04 12:42:43,255 Epoch: [16][60/100]	Accuracy_d 0.45 (0.8165495706479313)	Loss_d_2 0.6640445590019226	Time 0.400s (0.441s)	Data 0.000s (0.041s)	Loss_p -0.00274 (-0.00279)	Loss_d 0.68120 (0.62980)	Accuracy_p 0.824 (0.852)
+2026-11-04 12:42:51,801 Epoch: [16][80/100]	Accuracy_d 0.55 (0.8024981897175959)	Loss_d_2 0.6332115530967712	Time 0.400s (0.438s)	Data 0.000s (0.038s)	Loss_p -0.00269 (-0.00279)	Loss_d 0.65035 (0.63005)	Accuracy_p 0.819 (0.852)
+2026-11-04 12:43:00,919 Test: [0/7]	Time 0.859 (0.859)	Loss 0.0004 (0.0004)	Accuracy 0.915 (0.915)
+2026-11-04 12:43:03,044 => writing results json to output/L3/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/results/keypoints_validate_infant_results_0.json
+2026-11-04 12:43:03,155 | Arch | AP | Ap .5 | AP .75 | AP (M) | AP (L) | AR | AR .5 | AR .75 | AR (M) | AR (L) |
+2026-11-04 12:43:03,156 |---|---|---|---|---|---|---|---|---|---|---|
+2026-11-04 12:43:03,156 | adaptive... | 0.902 | 0.986 | 0.986 | -1.000 | 0.902 | 0.916 | 0.990 | 0.990 | -1.000 | 0.916 |
+2026-11-04 12:43:03,158 => epoch 16 val AP 0.9023 (best 0.9041), peak GPU mem 17.22 GiB
+2026-11-04 12:43:03,159 => saving checkpoint to output/L3/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant
+2026-11-04 12:43:06,219 Epoch: [17][0/100]	Accuracy_d 0.35 (0.891946992864424)	Loss_d_2 0.7155729532241821	Time 1.206s (1.206s)	Data 0.705s (0.705s)	Loss_p -0.00314 (-0.00279)	Loss_d 0.73315 (0.63050)	Accuracy_p 0.889 (0.852)
+2026-11-04 12:43:14,807 Epoch: [17][20/100]	Accuracy_d 0.55 (0.8619333950046254)	Loss_d_2 0.6984227895736694	Time 0.401s (0.466s)	Data 0.000s (0.061s)	Loss_p -0.00290 (-0.00279)	Loss_d 0.71724 (0.63097)	Accuracy_p 0.823 (0.852)
+2026-11-04 12:43:23,354 Epoch: [17][40/100]	Accuracy_d 0.45 (0.8393310753598645)	Loss_d_2 0.6765089631080627	Time 0.399s (0.447s)	Data 0.000s (0.045s)	Loss_p -0.00297 (-0.00279)	Loss_d 0.69850 (0.63129)	Accuracy_p 0.869 (0.852)
+2026-11-04 12:43:31,906 Epoch: [17][60/100]	Accuracy_d 0.55 (0.8224043715846995)	Loss_d_2 0.6282202005386353	Time 0.399s (0.441s)	Data 0.000s (0.039s)	Loss_p -0.00260 (-0.00279)	Loss_d 0.64489 (0.63161)	Accuracy_p 0.772 (0.852)
+2026-11-04 12:43:40,540 Epoch: [17][80/100]	Accuracy_d 0.55 (0.810101375814627)	Loss_d_2 0.636163055896759	Time 0.401s (0.439s)	Data 0.000s (0.038s)	Loss_p -0.00277 (-0.00279)	Loss_d 0.65251 (0.63167)	Accuracy_p 0.872 (0.853)
+2026-11-04 12:43:49,776 Test: [0/7]	Time 0.855 (0.855)	Loss 0.0005 (0.0005)	Accuracy 0.912 (0.912)
+2026-11-04 12:43:51,879 => writing results json to output/L3/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/results/keypoints_validate_infant_results_0.json
+2026-11-04 12:43:51,992 | Arch | AP | Ap .5 | AP .75 | AP (M) | AP (L) | AR | AR .5 | AR .75 | AR (M) | AR (L) |
+2026-11-04 12:43:51,993 |---|---|---|---|---|---|---|---|---|---|---|
+2026-11-04 12:43:51,993 | adaptive... | 0.891 | 0.985 | 0.963 | -1.000 | 0.891 | 0.903 | 0.990 | 0.970 | -1.000 | 0.903 |
+2026-11-04 12:43:51,995 => epoch 17 val AP 0.8908 (best 0.9041), peak GPU mem 17.22 GiB
+2026-11-04 12:43:51,996 => saving checkpoint to output/L3/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant
+2026-11-04 12:43:55,002 Epoch: [18][0/100]	Accuracy_d 0.35 (0.891946992864424)	Loss_d_2 0.7428740859031677	Time 1.148s (1.148s)	Data 0.716s (0.716s)	Loss_p -0.00313 (-0.00279)	Loss_d 0.76501 (0.63221)	Accuracy_p 0.814 (0.852)
+2026-11-04 12:44:03,802 Epoch: [18][20/100]	Accuracy_d 0.6 (0.8630897317298798)	Loss_d_2 0.6599509119987488	Time 0.403s (0.474s)	Data 0.000s (0.070s)	Loss_p -0.00268 (-0.00279)	Loss_d 0.67432 (0.63252)	Accuracy_p 0.772 (0.853)
+2026-11-04 12:44:12,403 Epoch: [18][40/100]	Accuracy_d 0.6 (0.8391193903471634)	Loss_d_2 0.6418139338493347	Time 0.399s (0.452s)	Data 0.000s (0.050s)	Loss_p -0.00272 (-0.00279)	Loss_d 0.66172 (0.63301)	Accuracy_p 0.876 (0.853)
+2026-11-04 12:44:20,967 Epoch: [18][60/100]	Accuracy_d 0.4 (0.817720530835285)	Loss_d_2 0.7277450561523438	Time 0.403s (0.444s)	Data 0.000s (0.042s)	Loss_p -0.00303 (-0.00279)	Loss_d 0.74897 (0.63346)	Accuracy_p 0.767 (0.853)
+2026-11-04 12:44:29,516 Epoch: [18][80/100]	Accuracy_d 0.45 (0.8034033309196235)	Loss_d_2 0.6986838579177856	Time 0.399s (0.440s)	Data 0.000s (0.038s)	Loss_p -0.00303 (-0.00279)	Loss_d 0.71924 (0.63363)	Accuracy_p 0.886 (0.853)
+2026-11-04 12:44:38,661 Test: [0/7]	Time 0.875 (0.875)	Loss 0.0004 (0.0004)	Accuracy 0.912 (0.912)
+2026-11-04 12:44:40,812 => writing results json to output/L3/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/results/keypoints_validate_infant_results_0.json
+2026-11-04 12:44:40,931 | Arch | AP | Ap .5 | AP .75 | AP (M) | AP (L) | AR | AR .5 | AR .75 | AR (M) | AR (L) |
+2026-11-04 12:44:40,931 |---|---|---|---|---|---|---|---|---|---|---|
+2026-11-04 12:44:40,932 | adaptive... | 0.892 | 0.985 | 0.975 | -1.000 | 0.892 | 0.906 | 0.990 | 0.980 | -1.000 | 0.906 |
+2026-11-04 12:44:40,934 => epoch 18 val AP 0.8918 (best 0.9041), peak GPU mem 17.22 GiB
+2026-11-04 12:44:40,935 => saving checkpoint to output/L3/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant
+2026-11-04 12:44:44,240 Epoch: [19][0/100]	Accuracy_d 0.6 (0.8932212028542303)	Loss_d_2 0.6366819739341736	Time 1.165s (1.165s)	Data 0.739s (0.739s)	Loss_p -0.00272 (-0.00279)	Loss_d 0.65121 (0.63385)	Accuracy_p 0.840 (0.853)
+2026-11-04 12:44:52,789 Epoch: [19][20/100]	Accuracy_d 0.6 (0.86054579093432)	Loss_d_2 0.6478813290596008	Time 0.400s (0.463s)	Data 0.000s (0.063s)	Loss_p -0.00262 (-0.00279)	Loss_d 0.66293 (0.63441)	Accuracy_p 0.774 (0.853)
+2026-11-04 12:45:01,384 Epoch: [19][40/100]	Accuracy_d 0.55 (0.8357324301439458)	Loss_d_2 0.6659219264984131	Time 0.400s (0.447s)	Data 0.000s (0.047s)	Loss_p -0.00290 (-0.00279)	Loss_d 0.67982 (0.63475)	Accuracy_p 0.862 (0.853)
+2026-11-04 12:45:09,920 Epoch: [19][60/100]	Accuracy_d 0.7 (0.8159640905542545)	Loss_d_2 0.6424660682678223	Time 0.399s (0.440s)	Data 0.000s (0.040s)	Loss_p -0.00276 (-0.00279)	Loss_d 0.65549 (0.63507)	Accuracy_p 0.858 (0.853)
+2026-11-04 12:45:18,450 Epoch: [19][80/100]	Accuracy_d 0.55 (0.8034033309196235)	Loss_d_2 0.5946539044380188	Time 0.403s (0.437s)	Data 0.000s (0.037s)	Loss_p -0.00256 (-0.00279)	Loss_d 0.61032 (0.63505)	Accuracy_p 0.887 (0.854)
+2026-11-04 12:45:27,634 Test: [0/7]	Time 0.874 (0.874)	Loss 0.0005 (0.0005)	Accuracy 0.890 (0.890)
+2026-11-04 12:45:29,832 => writing results json to output/L3/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/results/keypoints_validate_infant_results_0.json
+2026-11-04 12:45:29,948 | Arch | AP | Ap .5 | AP .75 | AP (M) | AP (L) | AR | AR .5 | AR .75 | AR (M) | AR (L) |
+2026-11-04 12:45:29,948 |---|---|---|---|---|---|---|---|---|---|---|
+2026-11-04 12:45:29,948 | adaptive... | 0.897 | 0.985 | 0.975 | -1.000 | 0.897 | 0.913 | 0.990 | 0.980 | -1.000 | 0.913 |
+2026-11-04 12:45:29,950 => epoch 19 val AP 0.8968 (best 0.9041), peak GPU mem 17.22 GiB
+2026-11-04 12:45:29,952 => saving checkpoint to output/L3/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant
+2026-11-04 12:45:32,006 saving final model state to output/L3/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/final_state.pth

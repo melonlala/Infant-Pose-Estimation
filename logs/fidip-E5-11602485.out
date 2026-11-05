@@ -1,0 +1,214 @@
+name, memory.total [MiB]
+Tesla V100-SXM2-32GB, 32768 MiB
+Namespace(cfg='experiments/coco/hrnet/w48_384x288_adam_lr1e-3_infant.yaml', opts=['TRAIN.CHECKPOINT', 'models/coco/w48_384x288.pth', 'WORKERS', '8', 'OUTPUT_DIR', 'output/E5', 'LOG_DIR', 'log/E5', 'DATASET.ROOT', 'data/syrip_clean/'], modelDir='', logDir='', dataDir='', prevModelDir='')
+AUTO_RESUME: True
+CUDNN:
+  BENCHMARK: True
+  DETERMINISTIC: False
+  ENABLED: True
+DATASET:
+  COLOR_RGB: True
+  DATASET: syrip
+  DATA_FORMAT: jpg
+  FLIP: True
+  HYBRID_JOINTS_TYPE: 
+  NUM_JOINTS_HALF_BODY: 8
+  PROB_HALF_BODY: 0.3
+  ROOT: data/syrip_clean/
+  ROT_FACTOR: 45
+  SCALE_FACTOR: 0.35
+  SELECT_DATA: False
+  TEST_SET: validate_infant
+  TRAIN_PRE_SET: train_pre_infant
+  TRAIN_SET: train_infant
+DATA_DIR: 
+DEBUG:
+  DEBUG: True
+  SAVE_BATCH_IMAGES_GT: True
+  SAVE_BATCH_IMAGES_PRED: True
+  SAVE_HEATMAPS_GT: True
+  SAVE_HEATMAPS_PRED: True
+GPUS: (0,)
+LOG_DIR: log/E5
+LOSS:
+  TOPK: 8
+  USE_DIFFERENT_JOINTS_WEIGHT: False
+  USE_OHKM: False
+  USE_TARGET_WEIGHT: True
+MODEL:
+  EXTRA:
+    FINAL_CONV_KERNEL: 1
+    PRETRAINED_LAYERS: ['conv1', 'bn1', 'conv2', 'bn2', 'layer1', 'transition1', 'stage2', 'transition2', 'stage3', 'transition3', 'stage4']
+    STAGE2:
+      BLOCK: BASIC
+      FUSE_METHOD: SUM
+      NUM_BLOCKS: [4, 4]
+      NUM_BRANCHES: 2
+      NUM_CHANNELS: [48, 96]
+      NUM_MODULES: 1
+    STAGE3:
+      BLOCK: BASIC
+      FUSE_METHOD: SUM
+      NUM_BLOCKS: [4, 4, 4]
+      NUM_BRANCHES: 3
+      NUM_CHANNELS: [48, 96, 192]
+      NUM_MODULES: 4
+    STAGE4:
+      BLOCK: BASIC
+      FUSE_METHOD: SUM
+      NUM_BLOCKS: [4, 4, 4, 4]
+      NUM_BRANCHES: 4
+      NUM_CHANNELS: [48, 96, 192, 384]
+      NUM_MODULES: 3
+  HEATMAP_SIZE: [72, 96]
+  IMAGE_SIZE: [288, 384]
+  INIT_WEIGHTS: True
+  NAME: adaptive_pose_hrnet
+  NUM_JOINTS: 17
+  PRETRAINED: 
+  SIGMA: 3
+  TAG_PER_JOINT: True
+  TARGET_TYPE: gaussian
+OUTPUT_DIR: output/E5
+PIN_MEMORY: True
+PRINT_FREQ: 20
+RANK: 0
+TEST:
+  BATCH_SIZE_PER_GPU: 16
+  BBOX_THRE: 1.0
+  BLUR_KERNEL: 11
+  COCO_BBOX_FILE: data/coco/person_detection_results/COCO_val2017_detections_AP_H_56_person.json
+  FLIP_TEST: True
+  IMAGE_THRE: 0.0
+  IN_VIS_THRE: 0.2
+  MODEL_FILE: models/coco/w48_384×288.pth
+  NMS_THRE: 1.0
+  OKS_THRE: 0.9
+  POST_PROCESS: True
+  SOFT_NMS: False
+  USE_GT_BBOX: True
+TRAIN:
+  BATCH_SIZE_PER_GPU: 20
+  BEGIN_EPOCH: 0
+  CHECKPOINT: models/coco/w48_384x288.pth
+  END_EPOCH: 20
+  GAMMA1: 0.99
+  GAMMA2: 0.0
+  LAMBDA: 0.0
+  LR: 0.0001
+  LR_FACTOR: 0.1
+  LR_STEP: [40, 200]
+  MOMENTUM: 0.9
+  NESTEROV: False
+  OPTIMIZER: adam
+  PRE_BATCH_SIZE_PER_GPU: 16
+  PRE_EPOCH: 0
+  RESUME: False
+  SHUFFLE: True
+  WD: 0.0001
+WORKERS: 8
+=> init weights from normal distribution
+=> loading model from models/coco/w48_384x288.pth
+wandb: [wandb.login()] Loaded credentials for https://api.forge.coreweave.com from WANDB_API_KEY.
+wandb: Currently logged in as: yuchenhou0122 (yuchenhou0122-northeastern-university) to https://api.forge.coreweave.com. Use `wandb login --relogin` to force relogin
+wandb: setting up run 1617f41f
+wandb: Tracking run with wandb version 0.31.0
+wandb: Run data is saved locally in /home/hou.yuchen/courses/eece7373/wandb/run-20261103_203724-1617f41f
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run E5-clean
+wandb: ⭐️ View project at https://forge.coreweave.com/wandb/yuchenhou0122-northeastern-university/fidip
+wandb: 🚀 View run at https://forge.coreweave.com/wandb/yuchenhou0122-northeastern-university/fidip/runs/1617f41f
+
+Total Parameters: 63,595,745
+----------------------------------------------------------------------------------------------------------------------------------
+Total Multiply Adds (For Convolution and Linear Layers only): 32.881839752197266 GFLOPs
+----------------------------------------------------------------------------------------------------------------------------------
+Number of Layers
+Conv2d : 293 layers   BatchNorm2d : 292 layers   ReLU : 261 layers   Bottleneck : 4 layers   BasicBlock : 104 layers   Upsample : 28 layers   HighResolutionModule : 8 layers   
+=> classes: ['__background__', 'person']
+=> num_images: 4057
+=> load 3904 samples
+=> classes: ['__background__', 'person']
+=> num_images: 1200
+=> load 1200 samples
+=> classes: ['__background__', 'person']
+=> num_images: 100
+=> load 100 samples
+/home/hou.yuchen/courses/eece7373/envs/fidip/lib/python3.12/site-packages/torch/optim/lr_scheduler.py:143: UserWarning: Detected call of `lr_scheduler.step()` before `optimizer.step()`. In PyTorch 1.1.0 and later, you should call them in the opposite order: `optimizer.step()` before `lr_scheduler.step()`.  Failure to do this will result in PyTorch skipping the first value of the learning rate schedule. See more details at https://pytorch.org/docs/stable/optim.html#how-to-adjust-learning-rate
+  warnings.warn("Detected call of `lr_scheduler.step()` before `optimizer.step()`. "
+=> creating output/E5
+=> creating output/E5/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant
+=> creating log/E5/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant_2026-11-03-20-37
+loading annotations into memory...
+Done (t=0.07s)
+creating index...
+index created!
+loading annotations into memory...
+Done (t=0.03s)
+creating index...
+index created!
+loading annotations into memory...
+Done (t=0.00s)
+creating index...
+index created!
+Pretrained Stage:
+Start to train Domain Classifier-------
+Training Stage (Step I and II):
+100
+Epoch: [0][0/100]	Accuracy_d 0.4 (0.4)	Loss_d_2 0.5382640957832336	Time 3.551s (3.551s)	Data 1.240s (1.240s)	Loss_p 0.00055 (0.00055)	Loss_d 0.78628 (0.78628)	Accuracy_p 0.790 (0.790)
+Epoch: [0][20/100]	Accuracy_d 0.45 (0.5190476190476191)	Loss_d_2 0.6262568235397339	Time 0.398s (0.588s)	Data 0.000s (0.101s)	Loss_p 0.00039 (0.00046)	Loss_d 0.66545 (0.71172)	Accuracy_p 0.827 (0.834)
+Epoch: [0][40/100]	Accuracy_d 0.5 (0.5426829268292683)	Loss_d_2 0.6781188249588013	Time 0.394s (0.513s)	Data 0.000s (0.071s)	Loss_p 0.00044 (0.00044)	Loss_d 0.71568 (0.70628)	Accuracy_p 0.842 (0.841)
+Epoch: [0][60/100]	Accuracy_d 0.6 (0.5475409836065573)	Loss_d_2 0.619612991809845	Time 0.403s (0.486s)	Data 0.000s (0.058s)	Loss_p 0.00048 (0.00042)	Loss_d 0.64980 (0.69275)	Accuracy_p 0.836 (0.852)
+Epoch: [0][80/100]	Accuracy_d 0.65 (0.558641975308642)	Loss_d_2 0.5834214091300964	Time 0.395s (0.472s)	Data 0.000s (0.052s)	Loss_p 0.00036 (0.00040)	Loss_d 0.61352 (0.68553)	Accuracy_p 0.876 (0.862)
+Test: [0/7]	Time 1.265 (1.265)	Loss 0.0003 (0.0003)	Accuracy 0.908 (0.908)
+=> writing results json to output/E5/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/results/keypoints_validate_infant_results_0.json
+/home/hou.yuchen/courses/eece7373/envs/fidip/lib/python3.12/site-packages/json_tricks/encoders.py:419: UserWarning: json-tricks: numpy scalar serialization is experimental and may work differently in future versions
+  warnings.warn('json-tricks: numpy scalar serialization is experimental and may work differently in future versions')
+| Arch | AP | Ap .5 | AP .75 | AP (M) | AP (L) | AR | AR .5 | AR .75 | AR (M) | AR (L) |
+|---|---|---|---|---|---|---|---|---|---|---|
+| adaptive... | 0.910 | 0.986 | 0.986 | -1.000 | 0.910 | 0.920 | 0.990 | 0.990 | -1.000 | 0.920 |
+wandb: WARNING When using several event log directories, please call `wandb.tensorboard.patch(root_logdir="...")` before `wandb.init`
+wandb: WARNING When using several event log directories, please call `wandb.tensorboard.patch(root_logdir="...")` before `wandb.init`
+wandb: WARNING When using several event log directories, please call `wandb.tensorboard.patch(root_logdir="...")` before `wandb.init`
+wandb: WARNING When using several event log directories, please call `wandb.tensorboard.patch(root_logdir="...")` before `wandb.init`
+wandb: WARNING When using several event log directories, please call `wandb.tensorboard.patch(root_logdir="...")` before `wandb.init`
+wandb: WARNING When using several event log directories, please call `wandb.tensorboard.patch(root_logdir="...")` before `wandb.init`
+wandb: WARNING When using several event log directories, please call `wandb.tensorboard.patch(root_logdir="...")` before `wandb.init`
+wandb: WARNING When using several event log directories, please call `wandb.tensorboard.patch(root_logdir="...")` before `wandb.init`
+wandb: WARNING When using several event log directories, please call `wandb.tensorboard.patch(root_logdir="...")` before `wandb.init`
+wandb: WARNING When using several event log directories, please call `wandb.tensorboard.patch(root_logdir="...")` before `wandb.init`
+=> epoch 0 val AP 0.9101 (best 0.9101), peak GPU mem 12.60 GiB
+=> saving checkpoint to output/E5/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant
+batch
+batch
+batch
+batch
+batch
+batch
+batch
+Loading and preparing results...
+DONE (t=0.01s)
+creating index...
+index created!
+Running per image evaluation...
+Evaluate annotation type *keypoints*
+DONE (t=0.02s).
+Accumulating evaluation results...
+DONE (t=0.00s).
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets= 20 ] = 0.910
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets= 20 ] = 0.986
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets= 20 ] = 0.986
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets= 20 ] = -1.000
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets= 20 ] = 0.910
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 20 ] = 0.920
+ Average Recall     (AR) @[ IoU=0.50      | area=   all | maxDets= 20 ] = 0.990
+ Average Recall     (AR) @[ IoU=0.75      | area=   all | maxDets= 20 ] = 0.990
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets= 20 ] = -1.000
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets= 20 ] = 0.920
+100
+Epoch: [1][0/100]	Accuracy_d 0.5 (0.5)	Loss_d_2 0.6381252408027649	Time 1.166s (1.166s)	Data 0.705s (0.705s)	Loss_p 0.00036 (0.00040)	Loss_d 0.66554 (0.68338)	Accuracy_p 0.880 (0.860)
+Epoch: [1][20/100]	Accuracy_d 0.4 (0.5952380952380952)	Loss_d_2 0.7467440962791443	Time 0.400s (0.482s)	Data 0.000s (0.077s)	Loss_p 0.00036 (0.00040)	Loss_d 0.78654 (0.68019)	Accuracy_p 0.884 (0.858)
+Epoch: [1][40/100]	Accuracy_d 0.4 (0.5951219512195122)	Loss_d_2 0.6731950640678406	Time 0.395s (0.463s)	Data 0.000s (0.063s)	Loss_p 0.00038 (0.00040)	Loss_d 0.70530 (0.67746)	Accuracy_p 0.893 (0.861)
+Epoch: [1][60/100]	Accuracy_d 0.65 (0.6049180327868853)	Loss_d_2 0.6008192896842957	Time 0.401s (0.453s)	Data 0.000s (0.054s)	Loss_p 0.00047 (0.00039)	Loss_d 0.62593 (0.67235)	Accuracy_p 0.821 (0.864)
+Epoch: [1][80/100]	Accuracy_d 0.65 (0.6061728395061728)	Loss_d_2 0.6181368827819824	Time 0.397s (0.447s)	Data 0.000s (0.049s)	Loss_p 0.00037 (0.00039)	Loss_d 0.65113 (0.66840)	Accuracy_p 0.877 (0.866)
+slurmstepd: error: *** JOB 11602485 ON d1004 CANCELLED AT 2026-11-03T20:39:09 ***

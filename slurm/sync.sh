@@ -18,9 +18,10 @@ rs() { local i; for i in 1 2 3; do rsync -e "$XSSH" --partial "$@" && return 0; 
 case "${1:-}" in
 push)
   # Never overwrite cluster-only state: data, models, env, outputs, results, secrets, nms build products, cluster .git
-  # .gitignore rules are applied too (`--filter=':- .gitignore'`), so anything git ignores (venvs, figures, models...) never goes up
+  # .gitignore rules are applied too (`--filter=':- .gitignore'`). Results (output*/, log/, logs/, figures/, temp_uploads/, data/) are tracked
+  # in git since 2026-11-04, so they are excluded explicitly here: push must never overwrite the cluster's results with server copies
   rs -az --itemize-changes --filter=':- .gitignore' \
-    --exclude='.git/' --exclude='.claude/' --exclude='.codex/' --exclude='.venv*/' --exclude='figures/' \
+    --exclude='.git/' --exclude='.claude/' --exclude='.codex/' --exclude='.venv*/' --exclude='figures/' --exclude='temp_uploads/' --exclude='REPORT.md' \
     --exclude='data/' --exclude='models/' --exclude='envs/' \
     --exclude='output/' --exclude='output_*/' --exclude='log/' --exclude='logs/' --exclude='wandb/' \
     --exclude='.env' --exclude='__pycache__/' --exclude='*.pth' --exclude='*.npy' \

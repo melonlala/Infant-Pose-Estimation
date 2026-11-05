@@ -1,0 +1,267 @@
+name, memory.total [MiB]
+Tesla V100-SXM2-32GB, 32768 MiB
+Namespace(cfg='experiments/coco/hrnet/w48_384x288_adam_lr1e-3_infant.yaml', opts=['TRAIN.CHECKPOINT', 'models/coco/w48_384x288.pth', 'WORKERS', '8', 'OUTPUT_DIR', 'output/B4b', 'LOG_DIR', 'log/B4b', 'DATASET.ROOT', 'data/syrip_fixed/', 'TRAIN.END_EPOCH', '100', 'DATASET.ROT_FACTOR', '60'], modelDir='', logDir='', dataDir='', prevModelDir='')
+AUTO_RESUME: True
+CUDNN:
+  BENCHMARK: True
+  DETERMINISTIC: False
+  ENABLED: True
+DATASET:
+  COLOR_RGB: True
+  DATASET: syrip
+  DATA_FORMAT: jpg
+  FLIP: True
+  HYBRID_JOINTS_TYPE: 
+  NUM_JOINTS_HALF_BODY: 8
+  PROB_HALF_BODY: 0.3
+  ROOT: data/syrip_fixed/
+  ROT_FACTOR: 60
+  SCALE_FACTOR: 0.35
+  SELECT_DATA: False
+  TEST_SET: validate_infant
+  TRAIN_PRE_SET: train_pre_infant
+  TRAIN_SET: train_infant
+DATA_DIR: 
+DEBUG:
+  DEBUG: True
+  SAVE_BATCH_IMAGES_GT: True
+  SAVE_BATCH_IMAGES_PRED: True
+  SAVE_HEATMAPS_GT: True
+  SAVE_HEATMAPS_PRED: True
+GPUS: (0,)
+LOG_DIR: log/B4b
+LOSS:
+  TOPK: 8
+  USE_DIFFERENT_JOINTS_WEIGHT: False
+  USE_OHKM: False
+  USE_TARGET_WEIGHT: True
+MODEL:
+  EXTRA:
+    FINAL_CONV_KERNEL: 1
+    PRETRAINED_LAYERS: ['conv1', 'bn1', 'conv2', 'bn2', 'layer1', 'transition1', 'stage2', 'transition2', 'stage3', 'transition3', 'stage4']
+    STAGE2:
+      BLOCK: BASIC
+      FUSE_METHOD: SUM
+      NUM_BLOCKS: [4, 4]
+      NUM_BRANCHES: 2
+      NUM_CHANNELS: [48, 96]
+      NUM_MODULES: 1
+    STAGE3:
+      BLOCK: BASIC
+      FUSE_METHOD: SUM
+      NUM_BLOCKS: [4, 4, 4]
+      NUM_BRANCHES: 3
+      NUM_CHANNELS: [48, 96, 192]
+      NUM_MODULES: 4
+    STAGE4:
+      BLOCK: BASIC
+      FUSE_METHOD: SUM
+      NUM_BLOCKS: [4, 4, 4, 4]
+      NUM_BRANCHES: 4
+      NUM_CHANNELS: [48, 96, 192, 384]
+      NUM_MODULES: 3
+  HEATMAP_SIZE: [72, 96]
+  IMAGE_SIZE: [288, 384]
+  INIT_WEIGHTS: True
+  NAME: adaptive_pose_hrnet
+  NUM_JOINTS: 17
+  PRETRAINED: 
+  SIGMA: 3
+  TAG_PER_JOINT: True
+  TARGET_TYPE: gaussian
+OUTPUT_DIR: output/B4b
+PIN_MEMORY: True
+PRINT_FREQ: 20
+RANK: 0
+TEST:
+  BATCH_SIZE_PER_GPU: 16
+  BBOX_THRE: 1.0
+  BLUR_KERNEL: 11
+  COCO_BBOX_FILE: data/coco/person_detection_results/COCO_val2017_detections_AP_H_56_person.json
+  FLIP_TEST: True
+  IMAGE_THRE: 0.0
+  IN_VIS_THRE: 0.2
+  MODEL_FILE: models/coco/w48_384×288.pth
+  NMS_THRE: 1.0
+  OKS_THRE: 0.9
+  POST_PROCESS: True
+  SOFT_NMS: False
+  USE_GT_BBOX: True
+TRAIN:
+  BALANCED_SHUFFLE: False
+  BATCH_SIZE_PER_GPU: 20
+  BEGIN_EPOCH: 0
+  CHECKPOINT: models/coco/w48_384x288.pth
+  END_EPOCH: 100
+  GAMMA1: 0.99
+  GAMMA2: 0.0
+  LAMBDA: 0.0
+  LR: 0.0001
+  LR_FACTOR: 0.1
+  LR_STEP: [40, 200]
+  MOMENTUM: 0.9
+  NESTEROV: False
+  OPTIMIZER: adam
+  PRE_BATCH_SIZE_PER_GPU: 16
+  PRE_EPOCH: 0
+  RESUME: False
+  SHUFFLE: True
+  WD: 0.0001
+WORKERS: 8
+=> init weights from normal distribution
+=> loading model from models/coco/w48_384x288.pth
+wandb: [wandb.login()] Loaded credentials for https://api.forge.coreweave.com from WANDB_API_KEY.
+wandb: Currently logged in as: yuchenhou0122 (yuchenhou0122-northeastern-university) to https://api.forge.coreweave.com. Use `wandb login --relogin` to force relogin
+wandb: setting up run a32061c4
+wandb: Tracking run with wandb version 0.31.0
+wandb: Run data is saved locally in /home/hou.yuchen/courses/eece7373/wandb/run-20261104_190117-a32061c4
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run B4b
+wandb: ⭐️ View project at https://forge.coreweave.com/wandb/yuchenhou0122-northeastern-university/fidip
+wandb: 🚀 View run at https://forge.coreweave.com/wandb/yuchenhou0122-northeastern-university/fidip/runs/a32061c4
+
+Total Parameters: 63,595,745
+----------------------------------------------------------------------------------------------------------------------------------
+Total Multiply Adds (For Convolution and Linear Layers only): 32.881839752197266 GFLOPs
+----------------------------------------------------------------------------------------------------------------------------------
+Number of Layers
+Conv2d : 293 layers   BatchNorm2d : 292 layers   ReLU : 261 layers   Bottleneck : 4 layers   BasicBlock : 104 layers   Upsample : 28 layers   HighResolutionModule : 8 layers   
+=> classes: ['__background__', 'person']
+=> num_images: 4057
+=> load 3904 samples
+=> classes: ['__background__', 'person']
+=> num_images: 1200
+=> load 1200 samples
+=> classes: ['__background__', 'person']
+=> num_images: 100
+=> load 100 samples
+/home/hou.yuchen/courses/eece7373/envs/fidip/lib/python3.12/site-packages/torch/optim/lr_scheduler.py:143: UserWarning: Detected call of `lr_scheduler.step()` before `optimizer.step()`. In PyTorch 1.1.0 and later, you should call them in the opposite order: `optimizer.step()` before `lr_scheduler.step()`.  Failure to do this will result in PyTorch skipping the first value of the learning rate schedule. See more details at https://pytorch.org/docs/stable/optim.html#how-to-adjust-learning-rate
+  warnings.warn("Detected call of `lr_scheduler.step()` before `optimizer.step()`. "
+=> creating output/B4b
+=> creating output/B4b/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant
+=> creating log/B4b/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant_2026-11-04-19-01
+loading annotations into memory...
+Done (t=0.07s)
+creating index...
+index created!
+loading annotations into memory...
+Done (t=0.03s)
+creating index...
+index created!
+loading annotations into memory...
+Done (t=0.00s)
+creating index...
+index created!
+Pretrained Stage:
+Start to train Domain Classifier-------
+Training Stage (Step I and II):
+100
+Epoch: [0][0/100]	Accuracy_d 0.3 (0.3)	Loss_d_2 0.5287508964538574	Time 3.641s (3.641s)	Data 1.174s (1.174s)	Loss_p 0.00060 (0.00060)	Loss_d 0.75432 (0.75432)	Accuracy_p 0.785 (0.785)
+Epoch: [0][20/100]	Accuracy_d 0.4 (0.48333333333333334)	Loss_d_2 0.6712198257446289	Time 0.396s (0.579s)	Data 0.000s (0.085s)	Loss_p 0.00041 (0.00048)	Loss_d 0.70676 (0.71339)	Accuracy_p 0.864 (0.818)
+Epoch: [0][40/100]	Accuracy_d 0.65 (0.5134146341463415)	Loss_d_2 0.5974840521812439	Time 0.397s (0.502s)	Data 0.000s (0.056s)	Loss_p 0.00042 (0.00046)	Loss_d 0.62772 (0.70160)	Accuracy_p 0.882 (0.825)
+Epoch: [0][60/100]	Accuracy_d 0.6 (0.5278688524590164)	Loss_d_2 0.6133484840393066	Time 0.397s (0.477s)	Data 0.000s (0.046s)	Loss_p 0.00061 (0.00044)	Loss_d 0.64282 (0.69957)	Accuracy_p 0.796 (0.840)
+Epoch: [0][80/100]	Accuracy_d 0.6 (0.55)	Loss_d_2 0.6357411742210388	Time 0.396s (0.465s)	Data 0.000s (0.042s)	Loss_p 0.00036 (0.00043)	Loss_d 0.67188 (0.69012)	Accuracy_p 0.895 (0.849)
+Test: [0/7]	Time 1.325 (1.325)	Loss 0.0003 (0.0003)	Accuracy 0.915 (0.915)
+=> writing results json to output/B4b/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/results/keypoints_validate_infant_results_0.json
+/home/hou.yuchen/courses/eece7373/envs/fidip/lib/python3.12/site-packages/json_tricks/encoders.py:419: UserWarning: json-tricks: numpy scalar serialization is experimental and may work differently in future versions
+  warnings.warn('json-tricks: numpy scalar serialization is experimental and may work differently in future versions')
+| Arch | AP | Ap .5 | AP .75 | AP (M) | AP (L) | AR | AR .5 | AR .75 | AR (M) | AR (L) |
+|---|---|---|---|---|---|---|---|---|---|---|
+| adaptive... | 0.913 | 0.986 | 0.986 | -1.000 | 0.913 | 0.922 | 0.990 | 0.990 | -1.000 | 0.922 |
+wandb: WARNING When using several event log directories, please call `wandb.tensorboard.patch(root_logdir="...")` before `wandb.init`
+wandb: WARNING When using several event log directories, please call `wandb.tensorboard.patch(root_logdir="...")` before `wandb.init`
+wandb: WARNING When using several event log directories, please call `wandb.tensorboard.patch(root_logdir="...")` before `wandb.init`
+wandb: WARNING When using several event log directories, please call `wandb.tensorboard.patch(root_logdir="...")` before `wandb.init`
+wandb: WARNING When using several event log directories, please call `wandb.tensorboard.patch(root_logdir="...")` before `wandb.init`
+wandb: WARNING When using several event log directories, please call `wandb.tensorboard.patch(root_logdir="...")` before `wandb.init`
+wandb: WARNING When using several event log directories, please call `wandb.tensorboard.patch(root_logdir="...")` before `wandb.init`
+wandb: WARNING When using several event log directories, please call `wandb.tensorboard.patch(root_logdir="...")` before `wandb.init`
+wandb: WARNING When using several event log directories, please call `wandb.tensorboard.patch(root_logdir="...")` before `wandb.init`
+wandb: WARNING When using several event log directories, please call `wandb.tensorboard.patch(root_logdir="...")` before `wandb.init`
+=> epoch 0 val AP 0.9135 (best 0.9135), peak GPU mem 12.63 GiB
+=> saving checkpoint to output/B4b/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant
+batch
+batch
+batch
+batch
+batch
+batch
+batch
+Loading and preparing results...
+DONE (t=0.00s)
+creating index...
+index created!
+Running per image evaluation...
+Evaluate annotation type *keypoints*
+DONE (t=0.02s).
+Accumulating evaluation results...
+DONE (t=0.00s).
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets= 20 ] = 0.913
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets= 20 ] = 0.986
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets= 20 ] = 0.986
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets= 20 ] = -1.000
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets= 20 ] = 0.913
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 20 ] = 0.922
+ Average Recall     (AR) @[ IoU=0.50      | area=   all | maxDets= 20 ] = 0.990
+ Average Recall     (AR) @[ IoU=0.75      | area=   all | maxDets= 20 ] = 0.990
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets= 20 ] = -1.000
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets= 20 ] = 0.922
+100
+Epoch: [1][0/100]	Accuracy_d 0.45 (0.45)	Loss_d_2 0.6923631429672241	Time 1.143s (1.143s)	Data 0.709s (0.709s)	Loss_p 0.00041 (0.00043)	Loss_d 0.71878 (0.68635)	Accuracy_p 0.858 (0.848)
+Epoch: [1][20/100]	Accuracy_d 0.45 (0.6166666666666667)	Loss_d_2 0.753566563129425	Time 0.397s (0.460s)	Data 0.000s (0.062s)	Loss_p 0.00034 (0.00042)	Loss_d 0.79341 (0.68225)	Accuracy_p 0.894 (0.850)
+Epoch: [1][40/100]	Accuracy_d 0.5 (0.6085365853658536)	Loss_d_2 0.6695773005485535	Time 0.398s (0.441s)	Data 0.000s (0.043s)	Loss_p 0.00047 (0.00042)	Loss_d 0.70544 (0.67720)	Accuracy_p 0.799 (0.851)
+Epoch: [1][60/100]	Accuracy_d 0.65 (0.6221311475409836)	Loss_d_2 0.6267918348312378	Time 0.397s (0.437s)	Data 0.000s (0.039s)	Loss_p 0.00050 (0.00041)	Loss_d 0.65387 (0.67204)	Accuracy_p 0.809 (0.853)
+Epoch: [1][80/100]	Accuracy_d 0.55 (0.6320987654320988)	Loss_d_2 0.6165614128112793	Time 0.398s (0.433s)	Data 0.000s (0.036s)	Loss_p 0.00042 (0.00041)	Loss_d 0.64648 (0.66493)	Accuracy_p 0.858 (0.856)
+Test: [0/7]	Time 0.824 (0.824)	Loss 0.0003 (0.0003)	Accuracy 0.930 (0.930)
+=> writing results json to output/B4b/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/results/keypoints_validate_infant_results_0.json
+| Arch | AP | Ap .5 | AP .75 | AP (M) | AP (L) | AR | AR .5 | AR .75 | AR (M) | AR (L) |
+|---|---|---|---|---|---|---|---|---|---|---|
+| adaptive... | 0.923 | 0.986 | 0.986 | -1.000 | 0.923 | 0.933 | 0.990 | 0.990 | -1.000 | 0.933 |
+=> epoch 1 val AP 0.9234 (best 0.9234), peak GPU mem 12.63 GiB
+=> saving checkpoint to output/B4b/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant
+batch
+batch
+batch
+batch
+batch
+batch
+batch
+Loading and preparing results...
+DONE (t=0.00s)
+creating index...
+index created!
+Running per image evaluation...
+Evaluate annotation type *keypoints*
+DONE (t=0.02s).
+Accumulating evaluation results...
+DONE (t=0.00s).
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets= 20 ] = 0.923
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets= 20 ] = 0.986
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets= 20 ] = 0.986
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets= 20 ] = -1.000
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets= 20 ] = 0.923
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 20 ] = 0.933
+ Average Recall     (AR) @[ IoU=0.50      | area=   all | maxDets= 20 ] = 0.990
+ Average Recall     (AR) @[ IoU=0.75      | area=   all | maxDets= 20 ] = 0.990
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets= 20 ] = -1.000
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets= 20 ] = 0.933
+Traceback (most recent call last):
+  File "/home/hou.yuchen/courses/eece7373/tools/train_adaptive_model_hrnet_x.py", line 400, in <module>
+    main()
+  File "/home/hou.yuchen/courses/eece7373/tools/train_adaptive_model_hrnet_x.py", line 357, in main
+    save_checkpoint({
+  File "/home/hou.yuchen/courses/eece7373/tools/../lib/utils/utils.py", line 81, in save_checkpoint
+    torch.save(states, os.path.join(output_dir, filename))
+  File "/home/hou.yuchen/courses/eece7373/envs/fidip/lib/python3.12/site-packages/torch/serialization.py", line 627, in save
+    with _open_zipfile_writer(f) as opened_zipfile:
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hou.yuchen/courses/eece7373/envs/fidip/lib/python3.12/site-packages/torch/serialization.py", line 501, in _open_zipfile_writer
+    return container(name_or_buffer)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/hou.yuchen/courses/eece7373/envs/fidip/lib/python3.12/site-packages/torch/serialization.py", line 472, in __init__
+    super().__init__(torch._C.PyTorchFileWriter(self.name))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: File output/B4b/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant/checkpoint.pth cannot be opened.
+[1;34mwandb[0m: 
+[1;34mwandb[0m: 🚀 View run [33mB4b[0m at: [34mhttps://forge.coreweave.com/wandb/yuchenhou0122-northeastern-university/fidip/runs/a32061c4[0m
+[1;34mwandb[0m: Find logs at: [1;35mwandb/run-20261104_190117-a32061c4/logs[0m

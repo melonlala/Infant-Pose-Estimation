@@ -170,7 +170,7 @@ accuracy than the paper's numbers (see `STUDENT_GUIDE.md`, Part 7).
 - **Asked:** after creating the private repo, push only the server's code to it, and sync the cluster with the server by simple copy.
 - **Did:** removed `slurm/push_results.sh` and the plan for a cluster deploy key. Added `slurm/sync.sh push|pull|env` (rsync, no `--delete`).
   `push` copies code/scripts/docs to the cluster and excludes data/models/env/outputs/results/`.env`/nms build products. `pull` brings
-  back `logs/`, `log/` (TB), and `*.log|*.json|*.txt` from `output*/`. `env` copies only `WANDB_*` lines. `logs/` and `output_*/` are now git-ignored.
+  back `logs/`, `log/` (TB), and `*.log|*.json|*.txt` from `output*/`. `env` copies only `WANDB_*` lines. `logs/` and `output_*/` are now git-ignored. *(Reversed 2026-11-04: results are tracked for submission, see the last log entry.)*
   Pushed `main` to `origin` (private `melonlala/Infant-Pose-Estimation`).
 - **Why:** simpler. The cluster needs no GitHub credentials and git history stays code-only. The trade-off is that the cluster copy has no
   version info, so the commit used by a run must be noted in AGENT.md when submitting.
@@ -701,9 +701,19 @@ accuracy than the paper's numbers (see `STUDENT_GUIDE.md`, Part 7).
 - **Did:** rescored every run on Test100/99/95/500f/499f with the annotation branch's `tools/eval_subsets.py` (numbers match the logs). New on
   this branch: SY1/SY2 on Test99 = 92.4 / 92.3 (F4/H1 93.0), Test499f 91.5 / 91.2. Paired image bootstrap vs the released model
   (`tools/report_stats_bootstrap.py`, B = 1000): F4 Test99 +0.5 [−0.1, +1.2], Test499f +0.7 [+0.2, +1.3]; A2 (F4 + TTA) +1.0 [+0.2, +1.8] / +1.3 [+0.7, +1.9].
-  Fig. 1 `docs/report_figures/ablation_overview.png` (`tools/plot_report_ablation.py`); curated figures copied to `docs/report_figures/` (figures/ is git-ignored).
-- **Open:** B4a/B4b still training (A100); branch `claude/raw-data-annotation-check-23431c` not merged into main yet, so REPORT.md cites tools that only
-  exist there (`eval_subsets.py`, `eval_ensemble_tta.py`, `eval_ens.sh`, `make_syrip_fixed.sh`, `make_syrip500_fixed.py`, `plot_compare.py`).
+  Fig. 1 `figures/report/ablation_overview.png` (`tools/plot_report_ablation.py`).
+- **Open:** B4a/B4b still training (A100).
+
+### 2026-11-04: Results and generated data now tracked in git (user: "sync all data with repo, update the path in report as in repo")
+- **Did:** merged `claude/raw-data-annotation-check-23431c` into this branch (`claude/fidip-grading-rubric-86bb65`; AGENT/MANIFEST conflicts resolved by keeping
+  both sides). Changed `.gitignore` so these are tracked, copied from the main checkout as of 2026-11-04 ~22:00:
+  `logs/` (104 Slurm stdout files), `log/` (TensorBoard events, 309 files), `output/`, `output_test500/`, `output_test500f/` (prediction JSONs + train/eval logs, no
+  checkpoints), `figures/` (92 files incl. 10 mp4), `temp_uploads/` (12 CC photos + `SOURCES.md`), `data/syrip_syn_new/` (522 SMIL renders + COCO json). ~227 MB total, largest file 7 MB.
+- **Still not in git (size/licence):** SyRIP images and annotations (`data/syrip`, `data/SyRIP`, raw zips; re-download per MANIFEST §3), the symlink roots built from them
+  (`data/syrip_fixed`, `data/syrip500_fixed`, ...; rebuilt by scripts), all `*.pth` checkpoints, `*.npy`, and the licensed SMIL model.
+- **Sync safety:** `slurm/sync.sh push` already excluded `output*/`, `log/`, `logs/`, `figures/`, `data/` explicitly; added `temp_uploads/` and `REPORT.md`, so a push still
+  cannot overwrite cluster results. `sync.sh pull` now updates tracked files: commit after each pull.
+- REPORT.md figure links point at `figures/...`; the duplicate `docs/report_figures/` copies were removed. B4 logs in the snapshot are partial (run in progress).
 
 ---
 

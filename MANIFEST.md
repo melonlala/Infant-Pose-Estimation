@@ -5,7 +5,7 @@ reproduce the final reported result from this file alone.
 
 - **Local repo:** `/home/yuchen/courses/EECE7373/hands_on_project`
 - **Cluster project root:** `explorer:/home/hou.yuchen/courses/eece7373`
-- **Code:** GitHub `git@github.com:melonlala/Infant-Pose-Estimation.git` (private, branch `main`; code only, pushed from the server). `upstream` = ostadabbas
+- **Code:** GitHub `git@github.com:melonlala/Infant-Pose-Estimation.git` (private, branch `main`; code, docs, text results, figures and our generated data; no checkpoints or SyRIP data; pushed from the server). `upstream` = ostadabbas
 - **Server <-> cluster:** `rsync` via `slurm/sync.sh push|pull|env` through the transfer node **`hou.yuchen@xfer.discovery.neu.edu`** (same `/home`; never copy through the login node). Slurm commands use `ssh explorer`. The cluster does not use git. See `SKILL.md` § Sync model
 - **Status legend:** `planned` · `present` · `missing` · `deprecated`
 
@@ -134,14 +134,14 @@ All annotations are COCO format, 17 keypoints.
 | `tools/plot_compare.py` | Part 4.5 overlay of several runs (train loss, val loss, val AP) | `figures/compare_4_5.png` |
 | `tools/eval_test96.py` | (superseded by `eval_subsets.py`) | Test100 vs Test96 AP from final-epoch prediction JSONs in `output/<run>/` | stdout |
 | `slurm/submit_mobile.sh`, `slurm/train_mobile.sh`, `slurm/eval_mobile.sh`, `tools/train_adaptive_model_mobile_wb.py` | MobileNet train + Test500f evals (upstream mobile script + W&B); separate files so `sync.sh push` cannot revert them | cluster `output/<NAME>/syrip/adaptive_pose_mobile/` |
-| `REPORT.md`, `docs/report_figures/` | course report draft + the figures it embeds (tracked copies) | — |
+| `REPORT.md` | course report draft; embeds figures from `figures/` | — |
 | `tools/report_stats_bootstrap.py` | full AP/AP50/AP75/AR on Test99/Test499f + paired bootstrap CIs vs released model | stdout |
-| `tools/plot_report_ablation.py` | report Fig. 1 | `docs/report_figures/ablation_overview.png` |
+| `tools/plot_report_ablation.py` | report Fig. 1 | `figures/report/ablation_overview.png` |
 | `tools/wandb_smoke.py` | offline check of the W&B code path | — |
 | `tools/video_infer.py` | 7.3 video file / folder batch / webcam inference with tracking | `<out>/<name>_pose.mp4`, `_keypoints.jsonl/.csv` |
 | `docs/part3_model_notes.md`, `docs/part7_synthetic_and_apps.md` | Part 3 notes; 7.1 status + 7.3 results | — |
 
-Server copies of weights (git-ignored): `models/hrnet_fidip.pth`, `models/E1b/model_best.pth`. Figures are git-ignored (`figures/`).
+Server copies of weights (git-ignored): `models/hrnet_fidip.pth`, `models/E1b/model_best.pth`. Figures (`figures/`), Slurm logs (`logs/`), TensorBoard events (`log/`), text results in `output*/`, `temp_uploads/` and `data/syrip_syn_new/` are **tracked in git** since 2026-11-04; checkpoints and SyRIP itself are not.
 
 ## 8. Final reported result
 

@@ -1,0 +1,178 @@
+name, memory.total [MiB]
+Tesla P100-PCIE-12GB, 12288 MiB
+Namespace(cfg='experiments/coco/hrnet/w48_384x288_adam_lr1e-3_infant.yaml', opts=['TRAIN.CHECKPOINT', 'models/coco/w48_384x288.pth', 'WORKERS', '8', 'OUTPUT_DIR', 'output/probe_p100', 'LOG_DIR', 'log/probe_p100', 'TRAIN.LAMBDA', '0.0005', 'TRAIN.PRE_EPOCH', '1', 'TRAIN.END_EPOCH', '1'], modelDir='', logDir='', dataDir='', prevModelDir='')
+AUTO_RESUME: True
+CUDNN:
+  BENCHMARK: True
+  DETERMINISTIC: False
+  ENABLED: True
+DATASET:
+  COLOR_RGB: True
+  DATASET: syrip
+  DATA_FORMAT: jpg
+  FLIP: True
+  HYBRID_JOINTS_TYPE: 
+  NUM_JOINTS_HALF_BODY: 8
+  PROB_HALF_BODY: 0.3
+  ROOT: data/syrip/
+  ROT_FACTOR: 45
+  SCALE_FACTOR: 0.35
+  SELECT_DATA: False
+  TEST_SET: validate_infant
+  TRAIN_PRE_SET: train_pre_infant
+  TRAIN_SET: train_infant
+DATA_DIR: 
+DEBUG:
+  DEBUG: True
+  SAVE_BATCH_IMAGES_GT: True
+  SAVE_BATCH_IMAGES_PRED: True
+  SAVE_HEATMAPS_GT: True
+  SAVE_HEATMAPS_PRED: True
+GPUS: (0,)
+LOG_DIR: log/probe_p100
+LOSS:
+  TOPK: 8
+  USE_DIFFERENT_JOINTS_WEIGHT: False
+  USE_OHKM: False
+  USE_TARGET_WEIGHT: True
+MODEL:
+  EXTRA:
+    FINAL_CONV_KERNEL: 1
+    PRETRAINED_LAYERS: ['conv1', 'bn1', 'conv2', 'bn2', 'layer1', 'transition1', 'stage2', 'transition2', 'stage3', 'transition3', 'stage4']
+    STAGE2:
+      BLOCK: BASIC
+      FUSE_METHOD: SUM
+      NUM_BLOCKS: [4, 4]
+      NUM_BRANCHES: 2
+      NUM_CHANNELS: [48, 96]
+      NUM_MODULES: 1
+    STAGE3:
+      BLOCK: BASIC
+      FUSE_METHOD: SUM
+      NUM_BLOCKS: [4, 4, 4]
+      NUM_BRANCHES: 3
+      NUM_CHANNELS: [48, 96, 192]
+      NUM_MODULES: 4
+    STAGE4:
+      BLOCK: BASIC
+      FUSE_METHOD: SUM
+      NUM_BLOCKS: [4, 4, 4, 4]
+      NUM_BRANCHES: 4
+      NUM_CHANNELS: [48, 96, 192, 384]
+      NUM_MODULES: 3
+  HEATMAP_SIZE: [72, 96]
+  IMAGE_SIZE: [288, 384]
+  INIT_WEIGHTS: True
+  NAME: adaptive_pose_hrnet
+  NUM_JOINTS: 17
+  PRETRAINED: 
+  SIGMA: 3
+  TAG_PER_JOINT: True
+  TARGET_TYPE: gaussian
+OUTPUT_DIR: output/probe_p100
+PIN_MEMORY: True
+PRINT_FREQ: 20
+RANK: 0
+TEST:
+  BATCH_SIZE_PER_GPU: 16
+  BBOX_THRE: 1.0
+  BLUR_KERNEL: 11
+  COCO_BBOX_FILE: data/coco/person_detection_results/COCO_val2017_detections_AP_H_56_person.json
+  FLIP_TEST: True
+  IMAGE_THRE: 0.0
+  IN_VIS_THRE: 0.2
+  MODEL_FILE: models/coco/w48_384×288.pth
+  NMS_THRE: 1.0
+  OKS_THRE: 0.9
+  POST_PROCESS: True
+  SOFT_NMS: False
+  USE_GT_BBOX: True
+TRAIN:
+  BATCH_SIZE_PER_GPU: 20
+  BEGIN_EPOCH: 0
+  CHECKPOINT: models/coco/w48_384x288.pth
+  END_EPOCH: 1
+  GAMMA1: 0.99
+  GAMMA2: 0.0
+  LAMBDA: 0.0005
+  LR: 0.0001
+  LR_FACTOR: 0.1
+  LR_STEP: [40, 200]
+  MOMENTUM: 0.9
+  NESTEROV: False
+  OPTIMIZER: adam
+  PRE_BATCH_SIZE_PER_GPU: 16
+  PRE_EPOCH: 1
+  RESUME: False
+  SHUFFLE: True
+  WD: 0.0001
+WORKERS: 8
+=> init weights from normal distribution
+=> loading model from models/coco/w48_384x288.pth
+
+Total Parameters: 63,595,745
+----------------------------------------------------------------------------------------------------------------------------------
+Total Multiply Adds (For Convolution and Linear Layers only): 32.881839752197266 GFLOPs
+----------------------------------------------------------------------------------------------------------------------------------
+Number of Layers
+Conv2d : 293 layers   BatchNorm2d : 292 layers   ReLU : 261 layers   Bottleneck : 4 layers   BasicBlock : 104 layers   Upsample : 28 layers   HighResolutionModule : 8 layers   
+=> classes: ['__background__', 'person']
+=> num_images: 4057
+=> load 3904 samples
+=> classes: ['__background__', 'person']
+=> num_images: 1200
+=> load 1200 samples
+=> classes: ['__background__', 'person']
+=> num_images: 100
+=> load 100 samples
+=> creating output/probe_p100
+=> creating output/probe_p100/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant
+=> creating log/probe_p100/syrip/adaptive_pose_hrnet/w48_384x288_adam_lr1e-3_infant_2026-11-03-20-34
+loading annotations into memory...
+Done (t=0.12s)
+creating index...
+index created!
+loading annotations into memory...
+Done (t=0.04s)
+creating index...
+index created!
+loading annotations into memory...
+Done (t=0.01s)
+creating index...
+index created!
+Pretrained Stage:
+Start to train Domain Classifier-------
+Epoch: [0][0/244]	Accuracy_d: 0.375 (0.375)	Loss_d: 0.69855 (0.69855)
+Epoch: [0][20/244]	Accuracy_d: 1.0 (0.8303571428571429)	Loss_d: 0.20114 (0.42806)
+Epoch: [0][40/244]	Accuracy_d: 0.8125 (0.864329268292683)	Loss_d: 0.36421 (0.36806)
+Epoch: [0][60/244]	Accuracy_d: 1.0 (0.8668032786885246)	Loss_d: 0.16278 (0.34691)
+Epoch: [0][80/244]	Accuracy_d: 0.875 (0.8641975308641975)	Loss_d: 0.26740 (0.35001)
+Epoch: [0][100/244]	Accuracy_d: 0.9375 (0.870049504950495)	Loss_d: 0.18632 (0.34104)
+Epoch: [0][120/244]	Accuracy_d: 0.9375 (0.8775826446280992)	Loss_d: 0.24657 (0.32660)
+Epoch: [0][140/244]	Accuracy_d: 0.9375 (0.8816489361702128)	Loss_d: 0.19803 (0.31880)
+Epoch: [0][160/244]	Accuracy_d: 0.9375 (0.8850931677018633)	Loss_d: 0.24813 (0.31037)
+Epoch: [0][180/244]	Accuracy_d: 0.875 (0.8895027624309392)	Loss_d: 0.32912 (0.30367)
+Epoch: [0][200/244]	Accuracy_d: 0.875 (0.888681592039801)	Loss_d: 0.20402 (0.30299)
+Epoch: [0][220/244]	Accuracy_d: 0.875 (0.891685520361991)	Loss_d: 0.25760 (0.29825)
+Epoch: [0][240/244]	Accuracy_d: 0.9375 (0.8934128630705395)	Loss_d: 0.15886 (0.29464)
+/home/hou.yuchen/courses/eece7373/envs/fidip/lib/python3.12/site-packages/torch/optim/lr_scheduler.py:143: UserWarning: Detected call of `lr_scheduler.step()` before `optimizer.step()`. In PyTorch 1.1.0 and later, you should call them in the opposite order: `optimizer.step()` before `lr_scheduler.step()`.  Failure to do this will result in PyTorch skipping the first value of the learning rate schedule. See more details at https://pytorch.org/docs/stable/optim.html#how-to-adjust-learning-rate
+  warnings.warn("Detected call of `lr_scheduler.step()` before `optimizer.step()`. "
+Training Stage (Step I and II):
+100
+Traceback (most recent call last):
+  File "/home/hou.yuchen/courses/eece7373/tools/train_adaptive_model_hrnet.py", line 392, in <module>
+    if __name__ == '__main__':
+        ^^^^^^
+  File "/home/hou.yuchen/courses/eece7373/tools/train_adaptive_model_hrnet.py", line 328, in main
+    # train for one epoch
+                          
+  File "/home/hou.yuchen/courses/eece7373/tools/../lib/core/function.py", line 147, in train_adaptive
+    loss_p.backward(retain_graph = True)
+  File "/home/hou.yuchen/courses/eece7373/envs/fidip/lib/python3.12/site-packages/torch/_tensor.py", line 525, in backward
+    torch.autograd.backward(
+  File "/home/hou.yuchen/courses/eece7373/envs/fidip/lib/python3.12/site-packages/torch/autograd/__init__.py", line 267, in backward
+    _engine_run_backward(
+  File "/home/hou.yuchen/courses/eece7373/envs/fidip/lib/python3.12/site-packages/torch/autograd/graph.py", line 744, in _engine_run_backward
+    return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+torch.cuda.OutOfMemoryError: CUDA out of memory. Tried to allocate 26.00 MiB. GPU 

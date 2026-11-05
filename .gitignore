@@ -52,12 +52,13 @@ Thumbs.db
 # ---- FiDIP project (EECE7373) ----
 # secrets
 .env
-# large / machine-local artifacts (kept on the cluster, inventoried in MANIFEST.md)
-data/
+# Not in git (size / licence; inventoried in MANIFEST.md): third-party data and all checkpoints.
+# SyRIP images + annotations come from the AClab download (MANIFEST §3); data/syrip_fixed etc. are symlink
+# trees rebuilt by tools/make_syrip_fixed.sh, tools/make_syrip500_fixed.py, slurm/make_*_data.sh.
+data/*
+!data/syrip_syn_new/
 models/
 envs/
-output/
-log/
 *.pth
 *.npy
 wandb/
@@ -69,10 +70,10 @@ lib/nms/gpu_nms.cpp
 # Claude Code worktrees (the skill under .claude/skills is tracked)
 .claude/worktrees/
 .claude/settings.local.json
-# results pulled from the cluster by `slurm/sync.sh pull` (GitHub holds code only)
-logs/
-output_*/
-# report figures / demo outputs (generated, not code)
-figures/
-temp_uploads/
 .venv*/
+# Tracked results (since 2026-11-04, for submission): logs/ (Slurm stdout), log/ (TensorBoard events),
+# output*/ (text results pulled by `slurm/sync.sh pull`: *.json/*.log/*.txt; checkpoints and feature.npy stay out),
+# figures/, temp_uploads/, data/syrip_syn_new/. Re-allow the extensions the generic rules above ignore:
+!/output/**/*.log
+!/output_*/**/*.log
+!/figures/**/*.mp4
