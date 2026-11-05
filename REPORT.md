@@ -1,6 +1,6 @@
 <!--
 DRAFT, 2026-11-04. Open items before submission:
-  [ ] B4a/B4b (100 ep + ROT_FACTOR 60) are still training (jobs 11631221/11631233, A100). Fill §6.2 row "B4" and re-check the final-model decision.
+  [x] B4a/B4b finished (not confirmed); final model unchanged.
   [x] Annotation-audit branch merged into this branch; results, logs, figures and generated data tracked in git (2026-11-04).
   [ ] Merge this branch (claude/fidip-grading-rubric-86bb65) into main before submission.
   [ ] Fill in the name/ID line and the repo URL / commit hash below.
@@ -34,8 +34,8 @@ the paper uses. Evaluation conditions are defined in §4.
 2. **Improvement.** One controlled change helped and was confirmed by a replicate: training 100 epochs instead of 20 (F4/H1). It gives +0.4 AP
    over the released model on Test99 and +0.7 on Test499f. A fixed test-time-augmentation grid adds a further +0.4 / +0.6.
 3. **Negative results** (§6): domain adaptation (the "DIP" in FiDIP) does not help at any of 5 λ values once the labels are correct. The paper's
-   LR of 1e-3 overfits. Real-only training matches real + synthetic. 522 new SMIL renders, OHKM loss, and a sampler-shuffle fix all fall inside
-   run-to-run noise.
+   LR of 1e-3 overfits. Real-only training matches real + synthetic. 522 new SMIL renders, OHKM loss, stronger rotation augmentation and a
+   sampler-shuffle fix all fall inside run-to-run noise.
 
 ---
 
@@ -224,7 +224,7 @@ bar. Orange: adopted. `tools/plot_report_ablation.py`.*
 | **F4 / H1** | **100 epochs** | **94.0 / 93.9** | **93.0 / 93.0** | **93.2 / 93.2** | **91.7 / 91.6** | **91.4 / 91.4** | **confirmed** |
 | S1 / S2 | 100 ep + shuffle | 94.3 / 94.2 | 93.3 / 93.2 | 93.5 / 93.4 | 91.5 / 91.7 | 91.4 / 91.6 | not confirmed (trend +0.1–0.3) |
 | B3a / B3b | 100 ep + OHKM (top-8 joints) | 94.0 / 94.1 | 93.0 / 93.1 | 93.2 / 93.3 | 91.5 / 91.2 | 91.4 / 91.1 | not confirmed |
-| B4a / B4b | 100 ep + rotation 60° | *running* | | | | | *pending* |
+| B4a / B4b | 100 ep + rotation ±60° (A100) | 93.8 / 94.0 | 92.9 / 93.0 | 93.0 / 93.1 | 91.4 / 91.6 | 91.3 / 91.4 | not confirmed |
 | SY1 / SY2 | 100 ep + 522 new SMIL renders (§7.1) | 93.2 / 93.1 | 92.4 / 92.3 | 92.6 / 92.4 | 91.7 / 91.5 | 91.5 / 91.2 | no effect on Test499f; −0.6 Test99 |
 | A1 | ensemble {F4,H1,S1,S2}, flip only | 94.2 | 93.2 | 93.4 | 91.8 | 91.5 | below bar |
 | **A2** | F4 + TTA | 94.4 | 93.4 | 93.6 | 92.2 | **92.0** | adopted (system) |
